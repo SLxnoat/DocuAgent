@@ -63,16 +63,16 @@ Each item is categorized by priority tag:
 
 ### 2.3 Frontend Environment Bootstrap
 
-- [ ] **[P0]** Initialize React 18+ Vite project with TypeScript (`npm create vite@latest frontend -- --template react-ts`).
-- [ ] **[P0]** Configure Tailwind CSS 3+ with PostCSS and Autoprefixer.
-- [ ] **[P0]** Install and configure `shadcn/ui` primitives and `lucide-react` icon library.
-- [ ] **[P0]** Install core dependencies: `zustand`, `@monaco-editor/react`, `axios`, `react-markdown`, `remark-gfm`.
-- [ ] **[P1]** Create `frontend/.env.example` defining API endpoints and feature flags.
-- [ ] **[P1]** Set up TypeScript configuration (`tsconfig.json`) in strict mode.
+- [x] **[P0]** Initialize React 18+ Vite project with TypeScript (`npm create vite@latest frontend -- --template react-ts`).
+- [x] **[P0]** Configure Tailwind CSS 3+ with PostCSS and Autoprefixer.
+- [x] **[P0]** Install and configure `shadcn/ui` primitives and `lucide-react` icon library.
+- [x] **[P0]** Install core dependencies: `zustand`, `@monaco-editor/react`, `axios`, `react-markdown`, `remark-gfm`.
+- [x] **[P1]** Create `frontend/.env.example` defining API endpoints and feature flags.
+- [x] **[P1]** Set up TypeScript configuration (`tsconfig.json`) in strict mode.
 
 ### 2.4 Infrastructure & Tooling Prerequisites
 
-- [ ] **[P0]** Verify Docker and Docker Compose v2.20+ installation.
+- [x] **[P0]** Verify Docker and Docker Compose v2.20+ installation.
 - [ ] **[P0]** Test network connectivity and authentication to Ollama Cloud LLM endpoint.
 - [ ] **[P0]** Verify availability of models `llama3.3:70b` and `qwen2.5:72b` on Ollama Cloud instance.
 - [ ] **[P0]** Run initial Playwright headless installation verification (`playwright install chromium && playwright install-deps`).
