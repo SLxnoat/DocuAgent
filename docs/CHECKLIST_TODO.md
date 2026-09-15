@@ -55,11 +55,11 @@ Each item is categorized by priority tag:
 
 ### 2.2 Backend Environment Bootstrap
 
-- [ ] **[P0]** Verify Python 3.11+ environment and virtual environment tooling (`python3.11 -m venv .venv`).
-- [ ] **[P0]** Pin backend dependencies in `backend/requirements.txt` (FastAPI, Uvicorn, LangGraph, Playwright, Celery, Redis, Pydantic).
-- [ ] **[P0]** Pin developer dependencies in `backend/requirements-dev.txt` (pytest, pytest-asyncio, mypy, ruff, httpx).
-- [ ] **[P0]** Create `backend/.env.example` defining all required configuration variables.
-- [ ] **[P1]** Configure `pyproject.toml` with strict Ruff and Mypy rule configurations.
+- [x] **[P0]** Verify Python 3.11+ environment and virtual environment tooling (`python3.11 -m venv .venv`).
+- [x] **[P0]** Pin backend dependencies in `backend/requirements.txt` (FastAPI, Uvicorn, LangGraph, Playwright, Celery, Redis, Pydantic).
+- [x] **[P0]** Pin developer dependencies in `backend/requirements-dev.txt` (pytest, pytest-asyncio, mypy, ruff, httpx).
+- [x] **[P0]** Create `backend/.env.example` defining all required configuration variables.
+- [x] **[P1]** Configure `pyproject.toml` with strict Ruff and Mypy rule configurations.
 
 ### 2.3 Frontend Environment Bootstrap
 

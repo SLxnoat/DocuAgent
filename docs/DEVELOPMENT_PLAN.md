@@ -123,12 +123,12 @@ P5 = E2E Integration          P10 = Release & Post-Launch
 
 ### 5.2 Backend Environment
 
-- [ ] Initialize Python 3.11 project with `pyproject.toml` (or `setup.py`).
-- [ ] Create `requirements.txt` with all pinned dependencies (FastAPI, LangGraph, Playwright, Celery, etc.).
-- [ ] Create `requirements-dev.txt` with dev dependencies (pytest, mypy, ruff, httpx test client).
+- [x] Initialize Python 3.11 project with `pyproject.toml` (or `setup.py`).
+- [x] Create `requirements.txt` with all pinned dependencies (FastAPI, LangGraph, Playwright, Celery, etc.).
+- [x] Create `requirements-dev.txt` with dev dependencies (pytest, mypy, ruff, httpx test client).
 - [ ] Set up virtual environment instructions in `README.md`.
-- [ ] Create `.env.example` with all required environment variable keys (no values).
-- [ ] Configure `ruff` for Python linting and `mypy` for type checking.
+- [x] Create `.env.example` with all required environment variable keys (no values).
+- [x] Configure `ruff` for Python linting and `mypy` for type checking.
 - [ ] Initialize `app/` package with `main.py`, `config.py`, `models/`, `api/`, `agents/`, `tasks/`, `utils/` directories.
 
 ### 5.3 Frontend Environment
