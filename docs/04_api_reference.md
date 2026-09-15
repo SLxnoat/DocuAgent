@@ -68,12 +68,12 @@ Tokens are issued during system provisioning and managed by the system administr
 
 ## 3. Common Headers
 
-| Header | Required | Description |
-|--------|----------|-------------|
-| `Authorization` | ✅ Yes | Bearer authentication token |
-| `Content-Type` | ✅ Yes (POST/PUT) | Must be `application/json` |
-| `Accept` | Optional | `application/json` (default) or `text/event-stream` for SSE |
-| `X-Request-ID` | Optional | Client-provided UUID for request tracing |
+| Header          | Required          | Description                                                 |
+| --------------- | ----------------- | ----------------------------------------------------------- |
+| `Authorization` | ✅ Yes            | Bearer authentication token                                 |
+| `Content-Type`  | ✅ Yes (POST/PUT) | Must be `application/json`                                  |
+| `Accept`        | Optional          | `application/json` (default) or `text/event-stream` for SSE |
+| `X-Request-ID`  | Optional          | Client-provided UUID for request tracing                    |
 
 ---
 
@@ -98,17 +98,17 @@ All error responses follow a consistent JSON schema:
 
 ### Error Codes
 
-| Code | HTTP Status | Description |
-|------|------------|-------------|
-| `VALIDATION_ERROR` | 422 | Request body failed schema validation |
-| `AUTHENTICATION_FAILED` | 401 | Invalid or missing API token |
-| `JOB_NOT_FOUND` | 404 | Specified job_id does not exist |
-| `SESSION_NOT_FOUND` | 404 | Specified session_id does not exist |
-| `JOB_ALREADY_RUNNING` | 409 | A generation job is already active for this session |
-| `EXPORT_FORMAT_UNSUPPORTED` | 400 | Requested export format is not supported |
-| `INTERNAL_SERVER_ERROR` | 500 | Unhandled server-side error |
-| `LLM_INFERENCE_TIMEOUT` | 504 | Ollama Cloud API did not respond within timeout |
-| `BROWSER_AUTOMATION_FAILED` | 500 | Playwright engine encountered an unrecoverable error |
+| Code                        | HTTP Status | Description                                          |
+| --------------------------- | ----------- | ---------------------------------------------------- |
+| `VALIDATION_ERROR`          | 422         | Request body failed schema validation                |
+| `AUTHENTICATION_FAILED`     | 401         | Invalid or missing API token                         |
+| `JOB_NOT_FOUND`             | 404         | Specified job_id does not exist                      |
+| `SESSION_NOT_FOUND`         | 404         | Specified session_id does not exist                  |
+| `JOB_ALREADY_RUNNING`       | 409         | A generation job is already active for this session  |
+| `EXPORT_FORMAT_UNSUPPORTED` | 400         | Requested export format is not supported             |
+| `INTERNAL_SERVER_ERROR`     | 500         | Unhandled server-side error                          |
+| `LLM_INFERENCE_TIMEOUT`     | 504         | Ollama Cloud API did not respond within timeout      |
+| `BROWSER_AUTOMATION_FAILED` | 500         | Playwright engine encountered an unrecoverable error |
 
 ---
 
@@ -136,15 +136,15 @@ Submits a new manual generation job. Returns a `job_id` and `session_id` for sub
 }
 ```
 
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `script` | string | ✅ | Unstructured workflow text to process |
-| `target_url` | string | ✅ | Base URL of the staging application |
-| `credentials.username` | string | Optional | Username for application authentication |
-| `credentials.password` | string | Optional | Password for application authentication |
-| `options.output_formats` | array | Optional | Formats to generate. Default: `["markdown"]` |
-| `options.domain_hint` | string | Optional | Override domain detection (e.g., `"CRM"`) |
-| `options.language` | string | Optional | Output language code. Default: `"en"` |
+| Field                    | Type   | Required | Description                                  |
+| ------------------------ | ------ | -------- | -------------------------------------------- |
+| `script`                 | string | ✅       | Unstructured workflow text to process        |
+| `target_url`             | string | ✅       | Base URL of the staging application          |
+| `credentials.username`   | string | Optional | Username for application authentication      |
+| `credentials.password`   | string | Optional | Password for application authentication      |
+| `options.output_formats` | array  | Optional | Formats to generate. Default: `["markdown"]` |
+| `options.domain_hint`    | string | Optional | Override domain detection (e.g., `"CRM"`)    |
+| `options.language`       | string | Optional | Output language code. Default: `"en"`        |
 
 **Response `202 Accepted`:**
 
@@ -188,11 +188,12 @@ Opens a Server-Sent Events (SSE) channel for real-time pipeline progress updates
 
 **Path Parameters:**
 
-| Parameter | Type | Description |
-|-----------|------|-------------|
-| `job_id` | string | Job identifier returned by `/generate` |
+| Parameter | Type   | Description                            |
+| --------- | ------ | -------------------------------------- |
+| `job_id`  | string | Job identifier returned by `/generate` |
 
 **Headers:**
+
 ```http
 Accept: text/event-stream
 Cache-Control: no-cache
@@ -234,8 +235,8 @@ Sends a natural language refinement request to the Conversational Refiner Agent.
 
 **Path Parameters:**
 
-| Parameter | Type | Description |
-|-----------|------|-------------|
+| Parameter    | Type   | Description                                |
+| ------------ | ------ | ------------------------------------------ |
 | `session_id` | string | Session identifier returned by `/generate` |
 
 **Request Body:**
@@ -249,9 +250,9 @@ Sends a natural language refinement request to the Conversational Refiner Agent.
 }
 ```
 
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `message` | string | ✅ | Natural language refinement request |
+| Field                      | Type   | Required | Description                                                |
+| -------------------------- | ------ | -------- | ---------------------------------------------------------- |
+| `message`                  | string | ✅       | Natural language refinement request                        |
 | `context.current_markdown` | string | Optional | If user manually edited the document, pass current content |
 
 **Response `200 OK`:**
@@ -274,13 +275,13 @@ Sends a natural language refinement request to the Conversational Refiner Agent.
 }
 ```
 
-| Response Field | Type | Description |
-|---------------|------|-------------|
-| `response_message` | string | Agent's conversational reply to the user |
-| `updated_markdown` | string | Full updated Markdown document |
-| `changes_summary` | array | Machine-readable summary of applied changes |
-| `recapture_triggered` | boolean | True if agent initiated a screenshot re-capture |
-| `recapture_step_index` | int/null | Step index being recaptured (if applicable) |
+| Response Field         | Type     | Description                                     |
+| ---------------------- | -------- | ----------------------------------------------- |
+| `response_message`     | string   | Agent's conversational reply to the user        |
+| `updated_markdown`     | string   | Full updated Markdown document                  |
+| `changes_summary`      | array    | Machine-readable summary of applied changes     |
+| `recapture_triggered`  | boolean  | True if agent initiated a screenshot re-capture |
+| `recapture_step_index` | int/null | Step index being recaptured (if applicable)     |
 
 **Example Request:**
 
@@ -303,25 +304,25 @@ Generates and downloads the final document in the specified format.
 
 **Path Parameters:**
 
-| Parameter | Type | Description |
-|-----------|------|-------------|
-| `job_id` | string | Job identifier |
+| Parameter | Type   | Description    |
+| --------- | ------ | -------------- |
+| `job_id`  | string | Job identifier |
 
 **Query Parameters:**
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `format` | string | ✅ | One of: `markdown`, `html`, `pdf` |
+| Parameter | Type   | Required | Description                       |
+| --------- | ------ | -------- | --------------------------------- |
+| `format`  | string | ✅       | One of: `markdown`, `html`, `pdf` |
 
 **Response `200 OK`:**
 
 Returns the file as a binary stream with appropriate Content-Type and Content-Disposition headers.
 
-| Format | Content-Type | Filename |
-|--------|-------------|----------|
-| `markdown` | `text/markdown` | `manual_{job_id}.md` |
-| `html` | `text/html` | `manual_{job_id}.html` |
-| `pdf` | `application/pdf` | `manual_{job_id}.pdf` |
+| Format     | Content-Type      | Filename               |
+| ---------- | ----------------- | ---------------------- |
+| `markdown` | `text/markdown`   | `manual_{job_id}.md`   |
+| `html`     | `text/html`       | `manual_{job_id}.html` |
+| `pdf`      | `application/pdf` | `manual_{job_id}.pdf`  |
 
 **Example Request:**
 
@@ -334,11 +335,11 @@ curl -X GET "https://docuagent.example.com/api/v1/export/job_a1b2c3d4e5f6?format
 
 **Error Cases:**
 
-| Scenario | HTTP Status | Error Code |
-|---------|------------|------------|
-| Job not found | 404 | `JOB_NOT_FOUND` |
-| Export not yet available | 409 | `JOB_STILL_PROCESSING` |
-| Unsupported format | 400 | `EXPORT_FORMAT_UNSUPPORTED` |
+| Scenario                 | HTTP Status | Error Code                  |
+| ------------------------ | ----------- | --------------------------- |
+| Job not found            | 404         | `JOB_NOT_FOUND`             |
+| Export not yet available | 409         | `JOB_STILL_PROCESSING`      |
+| Unsupported format       | 400         | `EXPORT_FORMAT_UNSUPPORTED` |
 
 ---
 
@@ -350,9 +351,9 @@ Triggers a Playwright re-capture for a single step. Used when the user clicks th
 
 **Path Parameters:**
 
-| Parameter | Type | Description |
-|-----------|------|-------------|
-| `job_id` | string | Job identifier |
+| Parameter    | Type    | Description                      |
+| ------------ | ------- | -------------------------------- |
+| `job_id`     | string  | Job identifier                   |
 | `step_index` | integer | 1-based step index to re-capture |
 
 **Request Body (optional):**
@@ -405,17 +406,17 @@ Retrieves the current status and metadata of a generation job.
 
 **Job Status Values:**
 
-| Status | Description |
-|--------|-------------|
-| `queued` | Job is in the Celery task queue, not yet started |
-| `analyzing` | Agent 1 is parsing the script |
-| `capturing` | Agent 2 is running browser automation |
-| `compiling` | Agent 3 is generating Markdown |
-| `reviewing` | Agent 4 is performing quality review |
-| `awaiting_input` | HITL interrupt — document presented to user |
-| `refining` | Agent 5 is processing a chat request |
-| `completed` | Pipeline finished, document ready |
-| `failed` | Job failed after all retries |
+| Status           | Description                                      |
+| ---------------- | ------------------------------------------------ |
+| `queued`         | Job is in the Celery task queue, not yet started |
+| `analyzing`      | Agent 1 is parsing the script                    |
+| `capturing`      | Agent 2 is running browser automation            |
+| `compiling`      | Agent 3 is generating Markdown                   |
+| `reviewing`      | Agent 4 is performing quality review             |
+| `awaiting_input` | HITL interrupt — document presented to user      |
+| `refining`       | Agent 5 is processing a chat request             |
+| `completed`      | Pipeline finished, document ready                |
+| `failed`         | Job failed after all retries                     |
 
 ### DELETE `/api/v1/jobs/{job_id}`
 
@@ -467,15 +468,15 @@ wss://{host}/api/v1/ws/chat/{session_id}?token={api_token}
 
 **WebSocket Message Types:**
 
-| Type | Direction | Description |
-|------|-----------|-------------|
-| `user_message` | Client → Server | User refinement request |
-| `agent_response` | Server → Client | Agent reply with updated document |
-| `recapture_started` | Server → Client | Playwright recapture initiated |
-| `recapture_complete` | Server → Client | New screenshot available |
-| `error` | Server → Client | Error notification |
-| `ping` | Client → Server | Keep-alive heartbeat |
-| `pong` | Server → Client | Keep-alive response |
+| Type                 | Direction       | Description                       |
+| -------------------- | --------------- | --------------------------------- |
+| `user_message`       | Client → Server | User refinement request           |
+| `agent_response`     | Server → Client | Agent reply with updated document |
+| `recapture_started`  | Server → Client | Playwright recapture initiated    |
+| `recapture_complete` | Server → Client | New screenshot available          |
+| `error`              | Server → Client | Error notification                |
+| `ping`               | Client → Server | Keep-alive heartbeat              |
+| `pong`               | Server → Client | Keep-alive response               |
 
 ---
 
@@ -483,36 +484,36 @@ wss://{host}/api/v1/ws/chat/{session_id}?token={api_token}
 
 All SSE events are JSON objects emitted as `data:` fields.
 
-| Event Type | Payload Fields | Description |
-|------------|---------------|-------------|
-| `pipeline_started` | `job_id`, `timestamp` | Job execution has begun |
-| `script_analyzed` | `step_count`, `domain`, `timestamp` | Script parsing complete |
-| `capture_progress` | `step_index`, `total_steps`, `status`, `error?` | Per-step capture update |
-| `capture_complete` | `total_captured`, `total_fallbacks` | All captures finished |
-| `draft_compiled` | `timestamp` | Markdown draft generated |
-| `quality_review_started` | `timestamp` | Quality agent reviewing |
-| `quality_loop` | `retry_count`, `feedback` | Quality review failed; retrying |
-| `quality_approved` | `timestamp` | Quality review passed |
-| `document_ready` | `markdown` | Full document content ready for UI |
-| `document_updated` | `markdown`, `changes_summary` | Chat-triggered update applied |
-| `export_ready` | `format`, `download_url` | Export file ready |
-| `job_failed` | `error`, `step`, `timestamp` | Job encountered fatal error |
+| Event Type               | Payload Fields                                  | Description                        |
+| ------------------------ | ----------------------------------------------- | ---------------------------------- |
+| `pipeline_started`       | `job_id`, `timestamp`                           | Job execution has begun            |
+| `script_analyzed`        | `step_count`, `domain`, `timestamp`             | Script parsing complete            |
+| `capture_progress`       | `step_index`, `total_steps`, `status`, `error?` | Per-step capture update            |
+| `capture_complete`       | `total_captured`, `total_fallbacks`             | All captures finished              |
+| `draft_compiled`         | `timestamp`                                     | Markdown draft generated           |
+| `quality_review_started` | `timestamp`                                     | Quality agent reviewing            |
+| `quality_loop`           | `retry_count`, `feedback`                       | Quality review failed; retrying    |
+| `quality_approved`       | `timestamp`                                     | Quality review passed              |
+| `document_ready`         | `markdown`                                      | Full document content ready for UI |
+| `document_updated`       | `markdown`, `changes_summary`                   | Chat-triggered update applied      |
+| `export_ready`           | `format`, `download_url`                        | Export file ready                  |
+| `job_failed`             | `error`, `step`, `timestamp`                    | Job encountered fatal error        |
 
 ---
 
 ## 13. HTTP Status Code Reference
 
-| Status | Meaning | Common Causes |
-|--------|---------|--------------|
-| `200 OK` | Request succeeded | Successful GET, synchronous operations |
-| `202 Accepted` | Request accepted for async processing | Job submission, recapture trigger |
-| `400 Bad Request` | Invalid request parameters | Unsupported format, malformed body |
-| `401 Unauthorized` | Authentication failed | Missing/invalid Bearer token |
-| `404 Not Found` | Resource not found | Unknown job_id or session_id |
-| `409 Conflict` | State conflict | Job already running, export not ready |
-| `422 Unprocessable Entity` | Schema validation failure | Missing required fields |
-| `500 Internal Server Error` | Server-side failure | LLM or browser automation error |
-| `504 Gateway Timeout` | Upstream timeout | Ollama Cloud API timeout |
+| Status                      | Meaning                               | Common Causes                          |
+| --------------------------- | ------------------------------------- | -------------------------------------- |
+| `200 OK`                    | Request succeeded                     | Successful GET, synchronous operations |
+| `202 Accepted`              | Request accepted for async processing | Job submission, recapture trigger      |
+| `400 Bad Request`           | Invalid request parameters            | Unsupported format, malformed body     |
+| `401 Unauthorized`          | Authentication failed                 | Missing/invalid Bearer token           |
+| `404 Not Found`             | Resource not found                    | Unknown job_id or session_id           |
+| `409 Conflict`              | State conflict                        | Job already running, export not ready  |
+| `422 Unprocessable Entity`  | Schema validation failure             | Missing required fields                |
+| `500 Internal Server Error` | Server-side failure                   | LLM or browser automation error        |
+| `504 Gateway Timeout`       | Upstream timeout                      | Ollama Cloud API timeout               |
 
 ---
 
@@ -572,9 +573,9 @@ All SSE events are JSON objects emitted as `data:` fields.
 
 ---
 
-*← Previous: [Multi-Agent Design Specification](./03_multi_agent_specification.md)*  
-*→ Next: [Browser Automation Engine](./05_browser_automation_engine.md)*
+_← Previous: [Multi-Agent Design Specification](./03_multi_agent_specification.md)_  
+_→ Next: [Browser Automation Engine](./05_browser_automation_engine.md)_
 
 ---
 
-*Document ID: DOC-004 · Version: 1.0.0 · DocuAgent AI Technical Documentation Suite*
+_Document ID: DOC-004 · Version: 1.0.0 · DocuAgent AI Technical Documentation Suite_

@@ -38,13 +38,13 @@ DocuAgent AI's core intelligence is orchestrated through a **LangGraph State Mac
 
 ### 1.2 Agent Roster
 
-| Agent | Node Name | Primary Role |
-|-------|-----------|-------------|
-| **Agent 1** | `analyze_script_node` | Script parsing & structured step DAG generation |
-| **Agent 2** | `capture_screenshots_node` | Browser automation & screenshot collection |
-| **Agent 3** | `compile_markdown_node` | Technical content synthesis & Markdown formatting |
-| **Agent 4** | `quality_review_node` | Automated quality gate & document approval |
-| **Agent 5** | `chat_refiner_node` | Conversational human-in-the-loop document editing |
+| Agent       | Node Name                  | Primary Role                                      |
+| ----------- | -------------------------- | ------------------------------------------------- |
+| **Agent 1** | `analyze_script_node`      | Script parsing & structured step DAG generation   |
+| **Agent 2** | `capture_screenshots_node` | Browser automation & screenshot collection        |
+| **Agent 3** | `compile_markdown_node`    | Technical content synthesis & Markdown formatting |
+| **Agent 4** | `quality_review_node`      | Automated quality gate & document approval        |
+| **Agent 5** | `chat_refiner_node`        | Conversational human-in-the-loop document editing |
 
 ---
 
@@ -169,19 +169,20 @@ def route_after_quality_review(state: ManualState) -> str:
 
 ### 4.1 Agent Summary
 
-| Property | Value |
-|----------|-------|
-| **Node Name** | `analyze_script_node` |
-| **Role** | Context Extraction & Execution Planning |
-| **Preferred LLM** | Qwen 2.5 72B |
-| **Input State Fields** | `raw_input_script`, `target_url` |
-| **Output State Fields** | `structured_steps`, `execution_logs` |
+| Property                | Value                                   |
+| ----------------------- | --------------------------------------- |
+| **Node Name**           | `analyze_script_node`                   |
+| **Role**                | Context Extraction & Execution Planning |
+| **Preferred LLM**       | Qwen 2.5 72B                            |
+| **Input State Fields**  | `raw_input_script`, `target_url`        |
+| **Output State Fields** | `structured_steps`, `execution_logs`    |
 
 ### 4.2 Functional Description
 
 Agent 1 is the entry point of the pipeline. It receives the raw, unstructured user-provided workflow script and transforms it into a structured, machine-executable JSON Directed Acyclic Graph (DAG) of UI interaction steps.
 
 **Core Tasks:**
+
 1. Parse free-form text to identify discrete UI actions (clicks, form inputs, navigation events).
 2. Infer CSS/XPath selectors for each target UI element based on contextual description.
 3. Detect the application domain (E-commerce, CRM, Financial Dashboard, Admin Portal, SaaS).
@@ -191,6 +192,7 @@ Agent 1 is the entry point of the pipeline. It receives the raw, unstructured us
 ### 4.3 Input/Output Contract
 
 **Input Example (raw_input_script):**
+
 ```
 Go to https://app.example.com and log in with admin credentials.
 Navigate to the Users section from the left sidebar.
@@ -200,6 +202,7 @@ Click "Save" and verify the confirmation toast appears.
 ```
 
 **Output Example (structured_steps):**
+
 ```json
 [
   {
@@ -237,11 +240,11 @@ Click "Save" and verify the confirmation toast appears.
 
 ### 4.4 Error Conditions
 
-| Condition | Behavior |
-|-----------|---------|
+| Condition                  | Behavior                                                        |
+| -------------------------- | --------------------------------------------------------------- |
 | Ambiguous step description | Agent requests clarification; logs a `[AMBIGUOUS_STEP]` warning |
-| No URL detected | Uses `target_url` from state as base URL for all steps |
-| Malformed JSON output | Pydantic validation triggers retry (max 2 retries) |
+| No URL detected            | Uses `target_url` from state as base URL for all steps          |
+| Malformed JSON output      | Pydantic validation triggers retry (max 2 retries)              |
 
 ---
 
@@ -249,12 +252,12 @@ Click "Save" and verify the confirmation toast appears.
 
 ### 5.1 Agent Summary
 
-| Property | Value |
-|----------|-------|
-| **Node Name** | `capture_screenshots_node` |
-| **Role** | Live Application Execution & Image Collection |
-| **Preferred LLM** | N/A (orchestration only — calls Playwright engine) |
-| **Input State Fields** | `structured_steps`, `credentials`, `target_url` |
+| Property                | Value                                                 |
+| ----------------------- | ----------------------------------------------------- |
+| **Node Name**           | `capture_screenshots_node`                            |
+| **Role**                | Live Application Execution & Image Collection         |
+| **Preferred LLM**       | N/A (orchestration only — calls Playwright engine)    |
+| **Input State Fields**  | `structured_steps`, `credentials`, `target_url`       |
 | **Output State Fields** | `screenshot_assets`, `error_states`, `execution_logs` |
 
 ### 5.2 Functional Description
@@ -264,6 +267,7 @@ Agent 2 acts as the coordinator between the LangGraph state machine and the Play
 > 📌 **Note:** Agent 2 does not call an LLM. It is a pure orchestration agent that interfaces with the Playwright Python SDK.
 
 **Core Tasks:**
+
 1. Initialize a Playwright browser context with optional credential injection.
 2. Execute each `StepSchema` action (click, type, navigate, scroll).
 3. Locate target selectors and inject CSS highlight styles.
@@ -298,19 +302,20 @@ state["screenshot_assets"][step.index] = "/assets/{job_id}/step_003_fallback.png
 
 ### 6.1 Agent Summary
 
-| Property | Value |
-|----------|-------|
-| **Node Name** | `compile_markdown_node` |
-| **Role** | Content Generation & Technical Formatting |
-| **Preferred LLM** | Llama 3.3 70B |
-| **Input State Fields** | `structured_steps`, `screenshot_assets`, `target_url`, `quality_feedback` |
-| **Output State Fields** | `markdown_content`, `execution_logs` |
+| Property                | Value                                                                     |
+| ----------------------- | ------------------------------------------------------------------------- |
+| **Node Name**           | `compile_markdown_node`                                                   |
+| **Role**                | Content Generation & Technical Formatting                                 |
+| **Preferred LLM**       | Llama 3.3 70B                                                             |
+| **Input State Fields**  | `structured_steps`, `screenshot_assets`, `target_url`, `quality_feedback` |
+| **Output State Fields** | `markdown_content`, `execution_logs`                                      |
 
 ### 6.2 Functional Description
 
 Agent 3 synthesizes the structured step data and screenshot asset index into a professionally formatted Markdown user manual. It applies standard technical writing frameworks to ensure the document is publication-ready.
 
 **Core Tasks:**
+
 1. Generate a document header with title, prerequisites section, and overview.
 2. Format each step as a numbered section with:
    - Step title and action description.
@@ -327,9 +332,11 @@ Agent 3 synthesizes the structured step data and screenshot asset index into a p
 # [Document Title]
 
 ## Prerequisites
+
 - [List of prerequisites inferred from domain context and steps]
 
 ## Overview
+
 [Brief paragraph describing the workflow and its purpose]
 
 ---
@@ -347,6 +354,7 @@ Agent 3 synthesizes the structured step data and screenshot asset index into a p
 ---
 
 ## Step 2: [Step Description]
+
 ...
 
 ---
@@ -354,6 +362,7 @@ Agent 3 synthesizes the structured step data and screenshot asset index into a p
 ## Troubleshooting
 
 ### [Issue Title for failed step]
+
 **Symptom:** [Described error condition]
 **Resolution:** [Suggested fix or workaround]
 [Placeholder if screenshot unavailable: ![Insert Screenshot Here: Description]()]
@@ -361,13 +370,13 @@ Agent 3 synthesizes the structured step data and screenshot asset index into a p
 
 ### 6.4 Domain-Specific Writing Modes
 
-| Domain | Tone | Special Sections |
-|--------|------|-----------------|
-| E-commerce | Clear, consumer-friendly | Shopping cart guidance, payment notes |
-| Financial Dashboard | Formal, precise | Data accuracy warnings, audit trail notes |
-| CRM | Professional, process-focused | Workflow notes, field validation tips |
-| Admin Portal | Technical, concise | Permission requirements, role-based notes |
-| SaaS Platform | Modern, efficient | Feature flags, plan-specific notes |
+| Domain              | Tone                          | Special Sections                          |
+| ------------------- | ----------------------------- | ----------------------------------------- |
+| E-commerce          | Clear, consumer-friendly      | Shopping cart guidance, payment notes     |
+| Financial Dashboard | Formal, precise               | Data accuracy warnings, audit trail notes |
+| CRM                 | Professional, process-focused | Workflow notes, field validation tips     |
+| Admin Portal        | Technical, concise            | Permission requirements, role-based notes |
+| SaaS Platform       | Modern, efficient             | Feature flags, plan-specific notes        |
 
 ---
 
@@ -375,13 +384,13 @@ Agent 3 synthesizes the structured step data and screenshot asset index into a p
 
 ### 7.1 Agent Summary
 
-| Property | Value |
-|----------|-------|
-| **Node Name** | `quality_review_node` |
-| **Role** | Verification & Document Polish |
-| **Preferred LLM** | Llama 3.3 70B |
-| **Input State Fields** | `markdown_content`, `structured_steps`, `screenshot_assets` |
-| **Output State Fields** | `quality_approved`, `quality_feedback`, `execution_logs` |
+| Property                | Value                                                       |
+| ----------------------- | ----------------------------------------------------------- |
+| **Node Name**           | `quality_review_node`                                       |
+| **Role**                | Verification & Document Polish                              |
+| **Preferred LLM**       | Llama 3.3 70B                                               |
+| **Input State Fields**  | `markdown_content`, `structured_steps`, `screenshot_assets` |
+| **Output State Fields** | `quality_approved`, `quality_feedback`, `execution_logs`    |
 
 ### 7.2 Functional Description
 
@@ -389,15 +398,15 @@ Agent 4 acts as an AI-powered technical editor, reviewing the compiled Markdown 
 
 **Quality Review Checklist:**
 
-| Check | Description |
-|-------|-------------|
-| **Step Completeness** | Every `structured_steps` entry has a corresponding section in the document |
-| **Screenshot Coverage** | Every section references a valid screenshot (or a fallback placeholder) |
-| **Logical Flow** | Steps are sequenced coherently; prerequisites are complete |
-| **Tone Consistency** | Document maintains consistent tone throughout |
-| **Terminology Accuracy** | UI element names match the step descriptions |
-| **Callout Appropriateness** | Tips and warnings are contextually relevant |
-| **Troubleshooting Coverage** | All `error_states` entries have troubleshooting entries |
+| Check                        | Description                                                                |
+| ---------------------------- | -------------------------------------------------------------------------- |
+| **Step Completeness**        | Every `structured_steps` entry has a corresponding section in the document |
+| **Screenshot Coverage**      | Every section references a valid screenshot (or a fallback placeholder)    |
+| **Logical Flow**             | Steps are sequenced coherently; prerequisites are complete                 |
+| **Tone Consistency**         | Document maintains consistent tone throughout                              |
+| **Terminology Accuracy**     | UI element names match the step descriptions                               |
+| **Callout Appropriateness**  | Tips and warnings are contextually relevant                                |
+| **Troubleshooting Coverage** | All `error_states` entries have troubleshooting entries                    |
 
 ### 7.3 Approval Logic
 
@@ -405,7 +414,7 @@ Agent 4 acts as an AI-powered technical editor, reviewing the compiled Markdown 
 def quality_review_node(state: ManualState) -> ManualState:
     review_prompt = build_review_prompt(state)
     response = llm.invoke(review_prompt)
-    
+
     if response.approved:
         state["quality_approved"] = True
         state["quality_feedback"] = None
@@ -413,7 +422,7 @@ def quality_review_node(state: ManualState) -> ManualState:
         state["quality_approved"] = False
         state["quality_feedback"] = response.feedback_notes
         state["quality_retry_count"] = state.get("quality_retry_count", 0) + 1
-    
+
     return state
 ```
 
@@ -423,13 +432,13 @@ def quality_review_node(state: ManualState) -> ManualState:
 
 ### 8.1 Agent Summary
 
-| Property | Value |
-|----------|-------|
-| **Node Name** | `chat_refiner_node` |
-| **Role** | Interactive Human-in-the-Loop Document Editor |
-| **Preferred LLM** | Qwen 2.5 72B |
-| **Input State Fields** | `markdown_content`, `chat_history`, `structured_steps`, `screenshot_assets` |
-| **Output State Fields** | `markdown_content`, `chat_history`, `execution_logs` |
+| Property                | Value                                                                       |
+| ----------------------- | --------------------------------------------------------------------------- |
+| **Node Name**           | `chat_refiner_node`                                                         |
+| **Role**                | Interactive Human-in-the-Loop Document Editor                               |
+| **Preferred LLM**       | Qwen 2.5 72B                                                                |
+| **Input State Fields**  | `markdown_content`, `chat_history`, `structured_steps`, `screenshot_assets` |
+| **Output State Fields** | `markdown_content`, `chat_history`, `execution_logs`                        |
 
 ### 8.2 Functional Description
 
@@ -437,15 +446,15 @@ Agent 5 handles all user-initiated refinement requests received through the chat
 
 ### 8.3 Edit Classification Matrix
 
-| Request Type | Classification | Agent Behavior |
-|-------------|---------------|----------------|
-| "Fix the wording in step 3" | **Text Edit** | LLM rewrites only the Step 3 section |
-| "Add a warning about data loss" | **Text Edit** | Inserts callout box at specified location |
-| "Translate the entire manual to French" | **Text Edit** | Full document re-rendered in French |
-| "Move step 5 before step 3" | **Structural Edit** | Reorders Markdown sections, renumbers |
-| "Add a new step after step 4" | **Structural Edit** | Inserts new section with placeholder image |
-| "Re-take the screenshot for step 2" | **Re-capture Trigger** | Calls Playwright for step 2 only; updates asset |
-| "Make the tone more formal" | **Text Edit** | Re-passes full document through LLM with tone instruction |
+| Request Type                            | Classification         | Agent Behavior                                            |
+| --------------------------------------- | ---------------------- | --------------------------------------------------------- |
+| "Fix the wording in step 3"             | **Text Edit**          | LLM rewrites only the Step 3 section                      |
+| "Add a warning about data loss"         | **Text Edit**          | Inserts callout box at specified location                 |
+| "Translate the entire manual to French" | **Text Edit**          | Full document re-rendered in French                       |
+| "Move step 5 before step 3"             | **Structural Edit**    | Reorders Markdown sections, renumbers                     |
+| "Add a new step after step 4"           | **Structural Edit**    | Inserts new section with placeholder image                |
+| "Re-take the screenshot for step 2"     | **Re-capture Trigger** | Calls Playwright for step 2 only; updates asset           |
+| "Make the tone more formal"             | **Text Edit**          | Re-passes full document through LLM with tone instruction |
 
 ### 8.4 Selective Update Strategy
 
@@ -516,10 +525,10 @@ The LangGraph `thread_id` (equivalent to `session_id`) maintains the full conver
 
 ### 10.1 Checkpointer Configuration
 
-| Environment | Checkpointer | Configuration |
-|------------|-------------|---------------|
-| Development | `MemorySaver` | In-process, no external dependency |
-| Production | `RedisCheckpointer` | Redis with 24h TTL per session |
+| Environment | Checkpointer        | Configuration                      |
+| ----------- | ------------------- | ---------------------------------- |
+| Development | `MemorySaver`       | In-process, no external dependency |
+| Production  | `RedisCheckpointer` | Redis with 24h TTL per session     |
 
 ### 10.2 Production Checkpointer Setup
 
@@ -541,7 +550,7 @@ The `credentials` field in `ManualState` is **never persisted** to the Redis che
 ```python
 def capture_screenshots_node(state: ManualState) -> ManualState:
     # ... perform browser automation using state["credentials"] ...
-    
+
     # Scrub credentials from state before returning
     state["credentials"] = {}
     return state
@@ -553,13 +562,13 @@ def capture_screenshots_node(state: ManualState) -> ManualState:
 
 ### 11.1 Agent-Level Error Handling
 
-| Error Type | Recovery Strategy |
-|-----------|------------------|
-| LLM response parsing failure | Retry up to 2 times with corrected output format hint |
-| Playwright selector timeout | Log to `error_states`, use fallback viewport screenshot |
-| Network error (LLM API) | Exponential backoff, 3 retries |
-| Quality review infinite loop | Force approve after 3 consecutive quality failures |
-| Export conversion failure | Return Markdown as fallback; log export error |
+| Error Type                   | Recovery Strategy                                       |
+| ---------------------------- | ------------------------------------------------------- |
+| LLM response parsing failure | Retry up to 2 times with corrected output format hint   |
+| Playwright selector timeout  | Log to `error_states`, use fallback viewport screenshot |
+| Network error (LLM API)      | Exponential backoff, 3 retries                          |
+| Quality review infinite loop | Force approve after 3 consecutive quality failures      |
+| Export conversion failure    | Return Markdown as fallback; log export error           |
 
 ### 11.2 Dead Letter Queue
 
@@ -572,7 +581,7 @@ Jobs that fail after all retries are moved to a Celery dead-letter queue for man
 ### 12.1 Script Analyzer System Prompt
 
 ```
-You are a meticulous software workflow analyst. Your task is to parse the provided 
+You are a meticulous software workflow analyst. Your task is to parse the provided
 user workflow description and extract a structured JSON array of UI interaction steps.
 
 For each step, identify:
@@ -589,7 +598,7 @@ Return ONLY a valid JSON array matching the StepSchema. Do not include any prose
 
 ```
 You are a senior technical writer specializing in enterprise software documentation.
-Your task is to synthesize the provided UI interaction steps and screenshot index 
+Your task is to synthesize the provided UI interaction steps and screenshot index
 into a professional, publication-ready user manual in Markdown format.
 
 Apply the following standards:
@@ -613,20 +622,20 @@ You will receive:
 2. A user request in the chat_history
 3. The original structured steps for context
 
-Your task is to apply ONLY the user's requested changes precisely and return the 
-updated Markdown. Do not modify sections unrelated to the user's request unless 
-explicitly instructed. If the user requests a re-capture, set the "recapture_step" 
+Your task is to apply ONLY the user's requested changes precisely and return the
+updated Markdown. Do not modify sections unrelated to the user's request unless
+explicitly instructed. If the user requests a re-capture, set the "recapture_step"
 field in your JSON response to the step index.
 
-Maintain the document's existing formatting, heading hierarchy, and style unless 
+Maintain the document's existing formatting, heading hierarchy, and style unless
 the user specifically asks you to change them.
 ```
 
 ---
 
-*← Previous: [Architecture Design Document](./02_architecture_design.md)*  
-*→ Next: [API Reference](./04_api_reference.md)*
+_← Previous: [Architecture Design Document](./02_architecture_design.md)_  
+_→ Next: [API Reference](./04_api_reference.md)_
 
 ---
 
-*Document ID: DOC-003 · Version: 1.0.0 · DocuAgent AI Technical Documentation Suite*
+_Document ID: DOC-003 · Version: 1.0.0 · DocuAgent AI Technical Documentation Suite_

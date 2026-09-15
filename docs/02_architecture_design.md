@@ -30,12 +30,12 @@
 
 DocuAgent AI is designed around four core architectural principles:
 
-| Principle | Description |
-|-----------|-------------|
-| **Decoupled Layers** | Each system layer communicates through well-defined interfaces, allowing independent scaling and replacement |
+| Principle                  | Description                                                                                                      |
+| -------------------------- | ---------------------------------------------------------------------------------------------------------------- |
+| **Decoupled Layers**       | Each system layer communicates through well-defined interfaces, allowing independent scaling and replacement     |
 | **Asynchronous Execution** | All long-running operations (browser automation, LLM inference) run asynchronously to maintain UI responsiveness |
-| **State Persistence** | A centralized shared state (`ManualState`) ensures all agents have consistent, synchronized knowledge |
-| **Graceful Degradation** | Every failure path produces a usable partial output rather than a hard error |
+| **State Persistence**      | A centralized shared state (`ManualState`) ensures all agents have consistent, synchronized knowledge            |
+| **Graceful Degradation**   | Every failure path produces a usable partial output rather than a hard error                                     |
 
 ---
 
@@ -133,14 +133,14 @@ DocuAgent AI comprises five principal architectural layers and their sub-compone
 
 ### 4.1 Technology Stack
 
-| Component | Technology | Version |
-|-----------|-----------|---------|
-| Build Tool | Vite | Latest |
-| UI Framework | React | 18+ |
-| Styling | Tailwind CSS + CSS Modules | 3+ |
-| Component Library | shadcn/ui + Lucide Icons | Latest |
-| State Management | Zustand | 4+ |
-| Code Editor | Monaco Editor / @uiw/react-md-editor | Latest |
+| Component         | Technology                           | Version |
+| ----------------- | ------------------------------------ | ------- |
+| Build Tool        | Vite                                 | Latest  |
+| UI Framework      | React                                | 18+     |
+| Styling           | Tailwind CSS + CSS Modules           | 3+      |
+| Component Library | shadcn/ui + Lucide Icons             | Latest  |
+| State Management  | Zustand                              | 4+      |
+| Code Editor       | Monaco Editor / @uiw/react-md-editor | Latest  |
 
 ### 4.2 Application Structure
 
@@ -193,6 +193,7 @@ Targeted Markdown node updated ──► Store update ──► Editor refresh
 The FastAPI backend serves as the central orchestrator routing requests to the appropriate processing layers.
 
 **Core Responsibilities:**
+
 - Accepting and validating incoming generation requests.
 - Delegating long-running generation jobs to Celery task workers.
 - Managing SSE streaming channels for real-time progress delivery.
@@ -221,14 +222,14 @@ FastAPI Request Handler
 
 ### 5.3 Key API Endpoints (Summary)
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| `POST` | `/api/v1/generate` | Submit a new manual generation job |
-| `GET` | `/api/v1/stream/{job_id}` | Subscribe to SSE progress stream |
-| `GET` | `/api/v1/jobs/{job_id}` | Poll job status |
-| `POST` | `/api/v1/chat/{session_id}` | Send a refinement chat message |
-| `GET` | `/api/v1/export/{job_id}` | Download final document in specified format |
-| `POST` | `/api/v1/recapture/{job_id}/{step_index}` | Re-trigger Playwright for a single step |
+| Method | Endpoint                                  | Description                                 |
+| ------ | ----------------------------------------- | ------------------------------------------- |
+| `POST` | `/api/v1/generate`                        | Submit a new manual generation job          |
+| `GET`  | `/api/v1/stream/{job_id}`                 | Subscribe to SSE progress stream            |
+| `GET`  | `/api/v1/jobs/{job_id}`                   | Poll job status                             |
+| `POST` | `/api/v1/chat/{session_id}`               | Send a refinement chat message              |
+| `GET`  | `/api/v1/export/{job_id}`                 | Download final document in specified format |
+| `POST` | `/api/v1/recapture/{job_id}/{step_index}` | Re-trigger Playwright for a single step     |
 
 > 📌 **Full endpoint specifications with request/response schemas are in [API Reference](./04_api_reference.md).**
 
@@ -342,16 +343,17 @@ llm = ChatOllama(
 
 ### 8.2 Model Selection Strategy
 
-| Agent | Preferred Model | Rationale |
-|-------|----------------|-----------|
-| Script Analyzer | Qwen 2.5 72B | Superior JSON schema generation and instruction following |
-| Technical Writer | Llama 3.3 70B | Best-in-class technical prose quality |
-| Quality Reviewer | Llama 3.3 70B | Strong reasoning for logical consistency checks |
-| Conversational Refiner | Qwen 2.5 72B | Fast response for interactive chat latency requirements |
+| Agent                  | Preferred Model | Rationale                                                 |
+| ---------------------- | --------------- | --------------------------------------------------------- |
+| Script Analyzer        | Qwen 2.5 72B    | Superior JSON schema generation and instruction following |
+| Technical Writer       | Llama 3.3 70B   | Best-in-class technical prose quality                     |
+| Quality Reviewer       | Llama 3.3 70B   | Strong reasoning for logical consistency checks           |
+| Conversational Refiner | Qwen 2.5 72B    | Fast response for interactive chat latency requirements   |
 
 ### 8.3 Prompt Engineering
 
 Each agent uses a structured prompt template with:
+
 - **System Message:** Agent role definition and output format constraints.
 - **Human Message:** Current task context injected from `ManualState`.
 - **Output Parser:** Pydantic model or JSON parser for structured output validation.
@@ -375,25 +377,25 @@ assets/
 
 ### 9.2 Export Engine
 
-| Format | Tool | Description |
-|--------|------|-------------|
-| **Markdown** | Native | Direct state content, UTF-8 encoded |
-| **HTML** | Pandoc | Pandoc converts Markdown with embedded base64 image support |
-| **PDF** | WeasyPrint | High-fidelity HTML-to-PDF with CSS styling and embedded images |
+| Format       | Tool       | Description                                                    |
+| ------------ | ---------- | -------------------------------------------------------------- |
+| **Markdown** | Native     | Direct state content, UTF-8 encoded                            |
+| **HTML**     | Pandoc     | Pandoc converts Markdown with embedded base64 image support    |
+| **PDF**      | WeasyPrint | High-fidelity HTML-to-PDF with CSS styling and embedded images |
 
 ---
 
 ## 10. Communication Protocols
 
-| Interface | Protocol | Direction | Purpose |
-|-----------|---------|-----------|---------|
-| Job submission | REST (HTTPS POST) | Client → Server | Submit generation request |
-| Progress monitoring | SSE (HTTP/1.1) | Server → Client | Stream pipeline events |
-| Chat interface | WebSocket (WSS) | Bidirectional | Real-time chat with agent |
-| Job status poll | REST (HTTPS GET) | Client → Server | Fallback status polling |
-| Export download | REST (HTTPS GET) | Client → Server | Retrieve final document |
-| LLM inference | HTTPS (REST) | Server → Ollama Cloud | Token generation |
-| Task queue | Redis RESP | Internal | Celery task broker |
+| Interface           | Protocol          | Direction             | Purpose                   |
+| ------------------- | ----------------- | --------------------- | ------------------------- |
+| Job submission      | REST (HTTPS POST) | Client → Server       | Submit generation request |
+| Progress monitoring | SSE (HTTP/1.1)    | Server → Client       | Stream pipeline events    |
+| Chat interface      | WebSocket (WSS)   | Bidirectional         | Real-time chat with agent |
+| Job status poll     | REST (HTTPS GET)  | Client → Server       | Fallback status polling   |
+| Export download     | REST (HTTPS GET)  | Client → Server       | Retrieve final document   |
+| LLM inference       | HTTPS (REST)      | Server → Ollama Cloud | Token generation          |
+| Task queue          | Redis RESP        | Internal              | Celery task broker        |
 
 ---
 
@@ -438,22 +440,22 @@ Step 10: User clicks Export → WeasyPrint/Pandoc generates PDF/HTML → Downloa
 
 ## 12. Technology Stack Reference
 
-| Layer | Technology | Version | Justification |
-|-------|-----------|---------|--------------|
-| Frontend Framework | React (Vite) | 18+ | Fast HMR, component isolation, large ecosystem |
-| Styling | Tailwind CSS + CSS Modules | 3+ | Rapid design, responsive layouts, dark mode |
-| UI Components | shadcn/ui + Lucide Icons | Latest | Accessible, enterprise-grade UI primitives |
-| State Management | Zustand | 4+ | Lightweight, minimal boilerplate client state |
-| Editor | Monaco Editor / @uiw/react-md-editor | Latest | Syntax-highlighted Markdown with live preview |
-| Backend | FastAPI (Python 3.11+) | 0.100+ | Async, Pydantic support, high throughput |
-| Agent Orchestration | LangGraph + LangChain Core | Latest | State machine, cyclic workflows, HITL |
-| Browser Automation | Playwright Python SDK | 1.40+ | Modern headless browser, multi-browser |
-| LLM Inference | Ollama Cloud API | Latest | Enterprise privacy, fast cloud execution |
-| Primary LLMs | Llama 3.3 70B / Qwen 2.5 72B | Latest | Technical writing, JSON generation |
-| Task Queue | Celery + Redis | 5+ | Async worker pool, multi-tenant support |
-| Export (PDF) | WeasyPrint | 60+ | High-fidelity PDF with CSS support |
-| Export (HTML) | Pandoc | 3+ | Standards-compliant HTML conversion |
-| State Persistence | Redis (Checkpointer) | 7+ | LangGraph production checkpointing |
+| Layer               | Technology                           | Version | Justification                                  |
+| ------------------- | ------------------------------------ | ------- | ---------------------------------------------- |
+| Frontend Framework  | React (Vite)                         | 18+     | Fast HMR, component isolation, large ecosystem |
+| Styling             | Tailwind CSS + CSS Modules           | 3+      | Rapid design, responsive layouts, dark mode    |
+| UI Components       | shadcn/ui + Lucide Icons             | Latest  | Accessible, enterprise-grade UI primitives     |
+| State Management    | Zustand                              | 4+      | Lightweight, minimal boilerplate client state  |
+| Editor              | Monaco Editor / @uiw/react-md-editor | Latest  | Syntax-highlighted Markdown with live preview  |
+| Backend             | FastAPI (Python 3.11+)               | 0.100+  | Async, Pydantic support, high throughput       |
+| Agent Orchestration | LangGraph + LangChain Core           | Latest  | State machine, cyclic workflows, HITL          |
+| Browser Automation  | Playwright Python SDK                | 1.40+   | Modern headless browser, multi-browser         |
+| LLM Inference       | Ollama Cloud API                     | Latest  | Enterprise privacy, fast cloud execution       |
+| Primary LLMs        | Llama 3.3 70B / Qwen 2.5 72B         | Latest  | Technical writing, JSON generation             |
+| Task Queue          | Celery + Redis                       | 5+      | Async worker pool, multi-tenant support        |
+| Export (PDF)        | WeasyPrint                           | 60+     | High-fidelity PDF with CSS support             |
+| Export (HTML)       | Pandoc                               | 3+      | Standards-compliant HTML conversion            |
+| State Persistence   | Redis (Checkpointer)                 | 7+      | LangGraph production checkpointing             |
 
 ---
 
@@ -484,9 +486,9 @@ Step 10: User clicks Export → WeasyPrint/Pandoc generates PDF/HTML → Downloa
 
 ---
 
-*← Previous: [System Overview](./01_system_overview.md)*  
-*→ Next: [Multi-Agent Design Specification](./03_multi_agent_specification.md)*
+_← Previous: [System Overview](./01_system_overview.md)_  
+_→ Next: [Multi-Agent Design Specification](./03_multi_agent_specification.md)_
 
 ---
 
-*Document ID: DOC-002 · Version: 1.0.0 · DocuAgent AI Technical Documentation Suite*
+_Document ID: DOC-002 · Version: 1.0.0 · DocuAgent AI Technical Documentation Suite_

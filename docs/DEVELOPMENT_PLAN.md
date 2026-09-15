@@ -34,15 +34,15 @@
 
 ## 1. Project Summary
 
-| Field | Value |
-|-------|-------|
-| **Project Name** | DocuAgent AI — AI-Powered Dynamic User Manual Generator |
-| **Version Target** | v1.0.0 General Availability |
-| **Start Date** | October 2026 |
-| **Target GA Date** | December 2026 (10-week sprint plan) |
-| **Tech Stack** | React · FastAPI · LangGraph · Playwright · Ollama Cloud · Redis · Celery |
-| **Deployment** | Docker Compose (MVP) → Kubernetes (Scale) |
-| **Team Size** | 4–6 engineers |
+| Field              | Value                                                                    |
+| ------------------ | ------------------------------------------------------------------------ |
+| **Project Name**   | DocuAgent AI — AI-Powered Dynamic User Manual Generator                  |
+| **Version Target** | v1.0.0 General Availability                                              |
+| **Start Date**     | October 2026                                                             |
+| **Target GA Date** | December 2026 (10-week sprint plan)                                      |
+| **Tech Stack**     | React · FastAPI · LangGraph · Playwright · Ollama Cloud · Redis · Celery |
+| **Deployment**     | Docker Compose (MVP) → Kubernetes (Scale)                                |
+| **Team Size**      | 4–6 engineers                                                            |
 
 ---
 
@@ -59,13 +59,13 @@
 
 ## 3. Team Structure & Roles
 
-| Role | Responsibilities | Count |
-|------|-----------------|-------|
-| **Backend Engineer** | FastAPI, LangGraph agents, Celery, Redis, Ollama integration | 2 |
-| **Frontend Engineer** | React SPA, Monaco Editor, Zustand, SSE/WebSocket hooks | 1 |
-| **DevOps Engineer** | Docker Compose, Nginx, CI/CD, monitoring, security | 1 |
-| **QA Engineer** | Test planning, E2E testing, performance testing | 1 |
-| **Tech Lead / Architect** | Architecture decisions, code reviews, cross-cutting concerns | 1 |
+| Role                      | Responsibilities                                             | Count |
+| ------------------------- | ------------------------------------------------------------ | ----- |
+| **Backend Engineer**      | FastAPI, LangGraph agents, Celery, Redis, Ollama integration | 2     |
+| **Frontend Engineer**     | React SPA, Monaco Editor, Zustand, SSE/WebSocket hooks       | 1     |
+| **DevOps Engineer**       | Docker Compose, Nginx, CI/CD, monitoring, security           | 1     |
+| **QA Engineer**           | Test planning, E2E testing, performance testing              | 1     |
+| **Tech Lead / Architect** | Architecture decisions, code reviews, cross-cutting concerns | 1     |
 
 ---
 
@@ -92,18 +92,18 @@ P4 = Frontend SPA             P9 = Documentation
 P5 = E2E Integration          P10 = Release & Post-Launch
 ```
 
-| Phase | Name | Duration | Sprint |
-|-------|------|----------|--------|
-| **Phase 1** | Foundation & Environment Setup | 1 week | Sprint 1 (partial) |
-| **Phase 2** | Backend Core & LangGraph Agents | 2 weeks | Sprint 1–2 |
-| **Phase 3** | Playwright Browser Automation Engine | 2 weeks | Sprint 2–3 |
-| **Phase 4** | Frontend React Application | 3 weeks | Sprint 1–3 |
-| **Phase 5** | Integration & End-to-End Pipeline | 1 week | Sprint 4 |
-| **Phase 6** | Quality, Security & Hardening | 1 week | Sprint 4–5 |
-| **Phase 7** | Deployment & DevOps | 2 weeks | Sprint 4–5 |
-| **Phase 8** | Testing & QA | 1 week | Sprint 5 |
-| **Phase 9** | Documentation | Ongoing | All sprints |
-| **Phase 10** | Release & Post-Launch | 1 week | Sprint 5 |
+| Phase        | Name                                 | Duration | Sprint             |
+| ------------ | ------------------------------------ | -------- | ------------------ |
+| **Phase 1**  | Foundation & Environment Setup       | 1 week   | Sprint 1 (partial) |
+| **Phase 2**  | Backend Core & LangGraph Agents      | 2 weeks  | Sprint 1–2         |
+| **Phase 3**  | Playwright Browser Automation Engine | 2 weeks  | Sprint 2–3         |
+| **Phase 4**  | Frontend React Application           | 3 weeks  | Sprint 1–3         |
+| **Phase 5**  | Integration & End-to-End Pipeline    | 1 week   | Sprint 4           |
+| **Phase 6**  | Quality, Security & Hardening        | 1 week   | Sprint 4–5         |
+| **Phase 7**  | Deployment & DevOps                  | 2 weeks  | Sprint 4–5         |
+| **Phase 8**  | Testing & QA                         | 1 week   | Sprint 5           |
+| **Phase 9**  | Documentation                        | Ongoing  | All sprints        |
+| **Phase 10** | Release & Post-Launch                | 1 week   | Sprint 5           |
 
 ---
 
@@ -115,11 +115,11 @@ P5 = E2E Integration          P10 = Release & Post-Launch
 
 ### 5.1 Repository & Project Structure
 
-- [ ] Initialize Git monorepo with `/backend`, `/frontend`, `/docker`, `/docs`, `/tests` structure.
-- [ ] Configure `.gitignore` for Python (`venv`, `__pycache__`, `.env`) and Node (`node_modules`, `dist`).
+- [x] Initialize Git monorepo with `/backend`, `/frontend`, `/deploy`, `/docs`, `/scripts` structure.
+- [x] Configure `.gitignore` for Python (`venv`, `__pycache__`, `.env`) and Node (`node_modules`, `dist`).
 - [ ] Add repository `README.md` with quickstart instructions and architecture diagram link.
-- [ ] Set up branch protection rules on `main` and `develop`.
-- [ ] Configure GitHub Actions CI pipeline skeleton (lint + build triggers).
+- [x] Set up branch protection rules on `main` and `develop`.
+- [x] Configure GitHub Actions CI pipeline skeleton (lint + build triggers).
 
 ### 5.2 Backend Environment
 
@@ -711,34 +711,34 @@ P5 = E2E Integration          P10 = Release & Post-Launch
 
 ## 15. Milestone Summary
 
-| Milestone | Target Date | Success Criteria |
-|-----------|------------|-----------------|
-| **M1: Environment Ready** | Week 1, Day 5 | All engineers running project locally; CI pipeline green |
-| **M2: Backend Agents Complete** | Week 3, Day 5 | All 5 LangGraph agents functional; unit tests passing |
-| **M3: Playwright Engine Complete** | Week 3, Day 5 | Full highlight capture working; all fallbacks tested |
-| **M4: Frontend MVP Complete** | Week 3, Day 5 | All UI screens implemented; SSE and WS hooks functional |
-| **M5: E2E Pipeline Working** | Week 4, Day 3 | Full flow from submit to PDF export with no manual steps |
-| **M6: Security Hardening** | Week 4, Day 5 | All security checklist items ✅; OWASP ZAP baseline clean |
-| **M7: Production Deployment** | Week 5, Day 2 | Docker Compose stack live; monitoring active; CI/CD verified |
-| **M8: QA Complete** | Week 5, Day 4 | All P0 test cases passing; performance targets met |
-| **M9: v1.0.0 GA Release** | Week 5, Day 5 | Git tag v1.0.0; production deployment verified; docs published |
+| Milestone                          | Target Date   | Success Criteria                                               |
+| ---------------------------------- | ------------- | -------------------------------------------------------------- |
+| **M1: Environment Ready**          | Week 1, Day 5 | All engineers running project locally; CI pipeline green       |
+| **M2: Backend Agents Complete**    | Week 3, Day 5 | All 5 LangGraph agents functional; unit tests passing          |
+| **M3: Playwright Engine Complete** | Week 3, Day 5 | Full highlight capture working; all fallbacks tested           |
+| **M4: Frontend MVP Complete**      | Week 3, Day 5 | All UI screens implemented; SSE and WS hooks functional        |
+| **M5: E2E Pipeline Working**       | Week 4, Day 3 | Full flow from submit to PDF export with no manual steps       |
+| **M6: Security Hardening**         | Week 4, Day 5 | All security checklist items ✅; OWASP ZAP baseline clean      |
+| **M7: Production Deployment**      | Week 5, Day 2 | Docker Compose stack live; monitoring active; CI/CD verified   |
+| **M8: QA Complete**                | Week 5, Day 4 | All P0 test cases passing; performance targets met             |
+| **M9: v1.0.0 GA Release**          | Week 5, Day 5 | Git tag v1.0.0; production deployment verified; docs published |
 
 ---
 
 ## 16. Risk Register
 
-| # | Risk | Likelihood | Impact | Mitigation |
-|---|------|-----------|--------|-----------|
-| R1 | Ollama Cloud latency exceeds 120s timeout for 70B models | Medium | High | Pre-test inference latency; use Qwen 2.5 72B as faster fallback; increase timeout |
-| R2 | Target staging app uses heavy anti-bot detection blocking Playwright | High | Medium | Implement graceful text-only fallback; document limitation clearly |
-| R3 | LLM JSON output parsing failures causing agent retry loops | Medium | Medium | Strict Pydantic output parsers with explicit retry prompts |
-| R4 | Redis memory exhaustion under load | Low | High | Configure `maxmemory` with `allkeys-lru`; monitor closely |
-| R5 | Playwright Chromium memory leak in long-running worker | Medium | Medium | Implement periodic worker restart (Celery `--max-tasks-per-child=50`) |
-| R6 | WeasyPrint PDF rendering issues with complex layouts | Medium | Low | Test early with sample documents; fallback to Pandoc HTML |
-| R7 | Frontend SSE connection drops in corporate proxy environments | Medium | Medium | Implement SSE reconnection logic; offer polling fallback |
-| R8 | Scope creep extending development beyond Week 10 | Medium | High | Strict backlog management; defer v1.1 features explicitly |
-| R9 | SSL certificate provisioning delay for production domain | Low | High | Provision certificate in Week 4; use Let's Encrypt with auto-renewal |
-| R10 | Team member unavailability during critical sprint | Low | High | Document all implementation decisions; pair programming for critical paths |
+| #   | Risk                                                                 | Likelihood | Impact | Mitigation                                                                        |
+| --- | -------------------------------------------------------------------- | ---------- | ------ | --------------------------------------------------------------------------------- |
+| R1  | Ollama Cloud latency exceeds 120s timeout for 70B models             | Medium     | High   | Pre-test inference latency; use Qwen 2.5 72B as faster fallback; increase timeout |
+| R2  | Target staging app uses heavy anti-bot detection blocking Playwright | High       | Medium | Implement graceful text-only fallback; document limitation clearly                |
+| R3  | LLM JSON output parsing failures causing agent retry loops           | Medium     | Medium | Strict Pydantic output parsers with explicit retry prompts                        |
+| R4  | Redis memory exhaustion under load                                   | Low        | High   | Configure `maxmemory` with `allkeys-lru`; monitor closely                         |
+| R5  | Playwright Chromium memory leak in long-running worker               | Medium     | Medium | Implement periodic worker restart (Celery `--max-tasks-per-child=50`)             |
+| R6  | WeasyPrint PDF rendering issues with complex layouts                 | Medium     | Low    | Test early with sample documents; fallback to Pandoc HTML                         |
+| R7  | Frontend SSE connection drops in corporate proxy environments        | Medium     | Medium | Implement SSE reconnection logic; offer polling fallback                          |
+| R8  | Scope creep extending development beyond Week 10                     | Medium     | High   | Strict backlog management; defer v1.1 features explicitly                         |
+| R9  | SSL certificate provisioning delay for production domain             | Low        | High   | Provision certificate in Week 4; use Let's Encrypt with auto-renewal              |
+| R10 | Team member unavailability during critical sprint                    | Low        | High   | Document all implementation decisions; pair programming for critical paths        |
 
 ---
 
@@ -768,12 +768,12 @@ Phase 5 (Integration)
 
 **External Dependencies:**
 
-| Dependency | Blocking Phase | Mitigation if Unavailable |
-|-----------|---------------|--------------------------|
-| Ollama Cloud endpoint access | Phase 2 (Week 1) | Use local Ollama with smaller models (Llama 3.2 8B) |
-| Staging application URL for Playwright testing | Phase 3 (Week 2) | Use internal demo app (e.g., TodoMVC, Juice Shop) |
-| Production server provisioning | Phase 7 (Week 4) | Use local Docker Compose as fallback |
-| SSL certificate for production domain | Phase 7 (Week 5) | Use self-signed for pre-release testing |
+| Dependency                                     | Blocking Phase   | Mitigation if Unavailable                           |
+| ---------------------------------------------- | ---------------- | --------------------------------------------------- |
+| Ollama Cloud endpoint access                   | Phase 2 (Week 1) | Use local Ollama with smaller models (Llama 3.2 8B) |
+| Staging application URL for Playwright testing | Phase 3 (Week 2) | Use internal demo app (e.g., TodoMVC, Juice Shop)   |
+| Production server provisioning                 | Phase 7 (Week 4) | Use local Docker Compose as fallback                |
+| SSL certificate for production domain          | Phase 7 (Week 5) | Use self-signed for pre-release testing             |
 
 ---
 
@@ -793,5 +793,5 @@ A feature, task, or phase is **Done** when:
 
 ---
 
-*Document ID: PLAN-001 · Version: 1.0.0 · DocuAgent AI Development Plan*  
-*See companion document: [Master Checklist & TODO](./CHECKLIST_TODO.md)*
+_Document ID: PLAN-001 · Version: 1.0.0 · DocuAgent AI Development Plan_  
+_See companion document: [Master Checklist & TODO](./CHECKLIST_TODO.md)_

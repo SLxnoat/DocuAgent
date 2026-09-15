@@ -27,11 +27,11 @@
 
 The DocuAgent AI roadmap is organized around three strategic themes:
 
-| Theme | Description | Horizon |
-|-------|-------------|---------|
-| **🎯 Accuracy & Intelligence** | Improve the precision of AI-generated content and visual captures | v1.1 – v2.0 |
-| **🎬 Media & Format Richness** | Expand output formats from static screenshots to video and interactive media | v2.1 |
-| **🔗 Enterprise Integration** | Connect DocuAgent AI output to existing knowledge management ecosystems | v2.2 – v3.0 |
+| Theme                          | Description                                                                  | Horizon     |
+| ------------------------------ | ---------------------------------------------------------------------------- | ----------- |
+| **🎯 Accuracy & Intelligence** | Improve the precision of AI-generated content and visual captures            | v1.1 – v2.0 |
+| **🎬 Media & Format Richness** | Expand output formats from static screenshots to video and interactive media | v2.1        |
+| **🔗 Enterprise Integration**  | Connect DocuAgent AI output to existing knowledge management ecosystems      | v2.2 – v3.0 |
 
 ```
 Q4 2026       Q1 2027       Q2 2027       Q3 2027       Q4 2027
@@ -48,13 +48,14 @@ Q4 2026       Q1 2027       Q2 2027       Q3 2027       Q4 2027
 
 DocuAgent AI follows **Semantic Versioning (SemVer)**:
 
-| Version Type | When Used | Example |
-|-------------|-----------|---------|
-| **MAJOR** (X.0.0) | Breaking API changes or fundamental architecture shifts | v2.0.0 |
-| **MINOR** (x.Y.0) | New backward-compatible features | v1.1.0 |
-| **PATCH** (x.y.Z) | Bug fixes, security patches, performance improvements | v1.0.1 |
+| Version Type      | When Used                                               | Example |
+| ----------------- | ------------------------------------------------------- | ------- |
+| **MAJOR** (X.0.0) | Breaking API changes or fundamental architecture shifts | v2.0.0  |
+| **MINOR** (x.Y.0) | New backward-compatible features                        | v1.1.0  |
+| **PATCH** (x.y.Z) | Bug fixes, security patches, performance improvements   | v1.0.1  |
 
 **Support Policy:**
+
 - The current major version receives full feature development and security patches.
 - The previous major version receives **security patches only** for 12 months post-successor release.
 
@@ -66,34 +67,34 @@ DocuAgent AI follows **Semantic Versioning (SemVer)**:
 
 ### Included Capabilities
 
-| Feature | Status |
-|---------|--------|
-| Script parsing & structured DAG generation (Agent 1) | ✅ Released |
-| Playwright-based UI automation & screenshot capture | ✅ Released |
-| Dynamic CSS highlight injection | ✅ Released |
+| Feature                                                | Status      |
+| ------------------------------------------------------ | ----------- |
+| Script parsing & structured DAG generation (Agent 1)   | ✅ Released |
+| Playwright-based UI automation & screenshot capture    | ✅ Released |
+| Dynamic CSS highlight injection                        | ✅ Released |
 | Technical Writer Agent (Agent 3) — Markdown generation | ✅ Released |
-| Quality Review Agent (Agent 4) | ✅ Released |
-| Conversational Refiner Agent (Agent 5) | ✅ Released |
-| Human-in-the-Loop interrupt mechanism | ✅ Released |
-| Split-screen Monaco Editor + live preview | ✅ Released |
-| SSE-based real-time progress streaming | ✅ Released |
-| WebSocket chat interface | ✅ Released |
-| Multi-format export (Markdown, HTML, PDF) | ✅ Released |
-| Playwright selector fallback strategies | ✅ Released |
-| Graceful degradation (text-only output) | ✅ Released |
-| Celery + Redis task queue | ✅ Released |
-| Docker Compose deployment | ✅ Released |
+| Quality Review Agent (Agent 4)                         | ✅ Released |
+| Conversational Refiner Agent (Agent 5)                 | ✅ Released |
+| Human-in-the-Loop interrupt mechanism                  | ✅ Released |
+| Split-screen Monaco Editor + live preview              | ✅ Released |
+| SSE-based real-time progress streaming                 | ✅ Released |
+| WebSocket chat interface                               | ✅ Released |
+| Multi-format export (Markdown, HTML, PDF)              | ✅ Released |
+| Playwright selector fallback strategies                | ✅ Released |
+| Graceful degradation (text-only output)                | ✅ Released |
+| Celery + Redis task queue                              | ✅ Released |
+| Docker Compose deployment                              | ✅ Released |
 
 ### Known Limitations (v1.0)
 
-| Limitation | Planned Fix Version |
-|-----------|---------------------|
-| Manual screenshot replacement requires page reload | v1.1 |
-| No support for applications behind corporate SSO (SAML/OAuth) | v1.1 |
-| PDF export does not support RTL languages | v1.1 |
-| Chat session expires after Redis TTL (24h) — no session resume | v2.0 |
-| No visual verification that captured screenshot shows intended element | v2.0 |
-| Only static PNG screenshots — no animated captures | v2.1 |
+| Limitation                                                             | Planned Fix Version |
+| ---------------------------------------------------------------------- | ------------------- |
+| Manual screenshot replacement requires page reload                     | v1.1                |
+| No support for applications behind corporate SSO (SAML/OAuth)          | v1.1                |
+| PDF export does not support RTL languages                              | v1.1                |
+| Chat session expires after Redis TTL (24h) — no session resume         | v2.0                |
+| No visual verification that captured screenshot shows intended element | v2.0                |
+| Only static PNG screenshots — no animated captures                     | v2.1                |
 
 ---
 
@@ -107,6 +108,7 @@ DocuAgent AI follows **Semantic Versioning (SemVer)**:
 **Background:** Many enterprise staging environments use corporate SSO (SAML 2.0 or OAuth 2.0) for authentication, which standard form-based login does not support.
 
 **Enhancement:** Extend the `authenticate()` method in the Playwright Capture Engine to support:
+
 - **Cookie/Session Token Injection:** Accept pre-authenticated browser cookies from the user.
 - **OAuth 2.0 Authorization Code Flow:** Playwright navigates through OAuth consent screens using provided credentials.
 - **SAML Assertion Injection:** Accept a valid SAML session cookie to bypass IdP redirects.
@@ -118,6 +120,7 @@ DocuAgent AI follows **Semantic Versioning (SemVer)**:
 **Background:** v1.0 requires a page reload after manual screenshot upload, disrupting the editing flow.
 
 **Enhancement:** Implement in-place React image update using object URL replacement:
+
 - Frontend uses `URL.createObjectURL()` to display the uploaded file immediately.
 - Background API call saves the file server-side asynchronously.
 - `ScreenshotImage` component updates `src` prop without parent re-render.
@@ -136,13 +139,13 @@ DocuAgent AI follows **Semantic Versioning (SemVer)**:
 
 ### 4.5 Estimated v1.1 Scope
 
-| Feature | Engineering Estimate | Priority |
-|---------|--------------------|---------| 
-| SSO/OAuth authentication | 2 weeks | P0 |
-| Live screenshot replacement | 3 days | P1 |
-| RTL PDF export | 1 week | P1 |
-| Selector learning cache | 1 week | P2 |
-| Bug fixes & security patches | Ongoing | P0 |
+| Feature                      | Engineering Estimate | Priority |
+| ---------------------------- | -------------------- | -------- |
+| SSO/OAuth authentication     | 2 weeks              | P0       |
+| Live screenshot replacement  | 3 days               | P1       |
+| RTL PDF export               | 1 week               | P1       |
+| Selector learning cache      | 1 week               | P2       |
+| Bug fixes & security patches | Ongoing              | P0       |
 
 ---
 
@@ -159,11 +162,11 @@ In v1.0, the Quality Review Agent (Agent 4) reviews only the Markdown content �
 
 **New Agent — Agent 6: Vision Verifier**
 
-| Property | Value |
-|----------|-------|
-| **Node Name** | `vision_verify_node` |
-| **Role** | Screenshot–Step Consistency Verification |
-| **LLM Model** | LLaVA 34B or Qwen-VL 72B (vision-capable) |
+| Property              | Value                                                            |
+| --------------------- | ---------------------------------------------------------------- |
+| **Node Name**         | `vision_verify_node`                                             |
+| **Role**              | Screenshot–Step Consistency Verification                         |
+| **LLM Model**         | LLaVA 34B or Qwen-VL 72B (vision-capable)                        |
 | **Position in Graph** | After `capture_screenshots_node`; before `compile_markdown_node` |
 
 **Workflow:**
@@ -190,11 +193,11 @@ LLM responds with:
 
 ### 5.3 Expected Impact
 
-| Metric | v1.0 | v2.0 Target |
-|--------|------|------------|
-| Screenshot accuracy rate | ~85% (estimated) | ≥ 97% |
-| Auto-detected wrong-element captures | 0% | ≥ 90% of wrong captures detected |
-| Manual re-capture interventions | Frequent | Rare |
+| Metric                               | v1.0             | v2.0 Target                      |
+| ------------------------------------ | ---------------- | -------------------------------- |
+| Screenshot accuracy rate             | ~85% (estimated) | ≥ 97%                            |
+| Auto-detected wrong-element captures | 0%               | ≥ 90% of wrong captures detected |
+| Manual re-capture interventions      | Frequent         | Rare                             |
 
 ### 5.4 Vision Model Integration
 
@@ -258,15 +261,16 @@ await video.save_as(f"assets/{job_id}/videos/step_{step_index:03d}.webm")
 
 ### 6.3 Output Formats
 
-| Format | Use Case | Tool |
-|--------|---------|------|
-| **WebM** | Embedding in HTML manuals | Playwright native recording |
-| **MP4** | Embedding in PDF (interactive PDF) or standalone | FFmpeg conversion from WebM |
-| **GIF** | Embedding in Markdown (GitHub-compatible) | FFmpeg WebM → GIF (palettegen) |
+| Format   | Use Case                                         | Tool                           |
+| -------- | ------------------------------------------------ | ------------------------------ |
+| **WebM** | Embedding in HTML manuals                        | Playwright native recording    |
+| **MP4**  | Embedding in PDF (interactive PDF) or standalone | FFmpeg conversion from WebM    |
+| **GIF**  | Embedding in Markdown (GitHub-compatible)        | FFmpeg WebM → GIF (palettegen) |
 
 ### 6.4 Manual Output Changes
 
 **Markdown format with GIF:**
+
 ```markdown
 ## Step 3: Add a New User
 
@@ -276,20 +280,21 @@ Click the **Add New User** button in the toolbar...
 ```
 
 **HTML format with inline video:**
+
 ```html
 <video autoplay loop muted playsinline width="1440">
-  <source src="../assets/{job_id}/videos/step_003.webm" type="video/webm">
+  <source src="../assets/{job_id}/videos/step_003.webm" type="video/webm" />
 </video>
 ```
 
 ### 6.5 Estimated Storage Impact
 
-| Per Job (10 steps) | Size |
-|--------------------|------|
-| Screenshots (PNG) | ~5 MB |
-| Video clips (WebM, 5s each) | ~20 MB |
-| GIFs (from WebM) | ~15 MB |
-| **Total** | **~40 MB** |
+| Per Job (10 steps)          | Size       |
+| --------------------------- | ---------- |
+| Screenshots (PNG)           | ~5 MB      |
+| Video clips (WebM, 5s each) | ~20 MB     |
+| GIFs (from WebM)            | ~15 MB     |
+| **Total**                   | **~40 MB** |
 
 > ⚠️ **Storage Warning:** Video generation significantly increases per-job storage requirements. Production deployments targeting this feature should provision S3-compatible object storage and implement 48-hour asset expiry for video assets.
 
@@ -302,12 +307,12 @@ Click the **Add New User** button in the toolbar...
 
 ### 7.1 Supported Integrations (Phase 1)
 
-| Platform | Integration Method | Authentication |
-|---------|-------------------|---------------|
-| **Confluence** | Confluence REST API v2 — Create/Update Page | API Token (Basic Auth) |
-| **Notion** | Notion API — Create Page in Database | Notion Integration Token |
-| **GitBook** | GitBook API — Create Space Content | GitBook API Key |
-| **GitHub Pages** | GitHub REST API — Create/Update File in Repo | GitHub PAT |
+| Platform         | Integration Method                           | Authentication           |
+| ---------------- | -------------------------------------------- | ------------------------ |
+| **Confluence**   | Confluence REST API v2 — Create/Update Page  | API Token (Basic Auth)   |
+| **Notion**       | Notion API — Create Page in Database         | Notion Integration Token |
+| **GitBook**      | GitBook API — Create Space Content           | GitBook API Key          |
+| **GitHub Pages** | GitHub REST API — Create/Update File in Repo | GitHub PAT               |
 
 ### 7.2 User Flow
 
@@ -384,19 +389,19 @@ Vision LLM compares new screenshot to original screenshot
 
 ### 8.2 Trigger Options
 
-| Trigger Method | Description |
-|---------------|-------------|
-| **Scheduled** | Cron-based re-check (daily, weekly) |
-| **Webhook** | CI/CD pipeline calls DocuAgent at deployment time |
-| **Manual** | User clicks "Check for Updates" in the ExportBar |
+| Trigger Method | Description                                       |
+| -------------- | ------------------------------------------------- |
+| **Scheduled**  | Cron-based re-check (daily, weekly)               |
+| **Webhook**    | CI/CD pipeline calls DocuAgent at deployment time |
+| **Manual**     | User clicks "Check for Updates" in the ExportBar  |
 
 ### 8.3 Benefits
 
-| Benefit | Value |
-|---------|-------|
-| Proactive staleness detection | Documentation team alerted before users find outdated manuals |
-| Automated re-generation | Reduces revision workload to a single review-and-approve action |
-| CI/CD integration | Documentation health becomes part of the deployment pipeline |
+| Benefit                       | Value                                                           |
+| ----------------------------- | --------------------------------------------------------------- |
+| Proactive staleness detection | Documentation team alerted before users find outdated manuals   |
+| Automated re-generation       | Reduces revision workload to a single review-and-approve action |
+| CI/CD integration             | Documentation health becomes part of the deployment pipeline    |
 
 ---
 
@@ -404,18 +409,18 @@ Vision LLM compares new screenshot to original screenshot
 
 The following features are under consideration for future releases but are not yet scheduled:
 
-| Feature | Description | Est. Complexity |
-|---------|-------------|----------------|
-| **Multilingual parallel generation** | Generate the same manual in multiple languages simultaneously using parallel LLM calls | Medium |
-| **WCAG accessibility checks** | Automatically flag UI elements that appear inaccessible based on screenshot analysis | High |
-| **Manual versioning & diff view** | Track document versions and display a diff when refinements are made | Medium |
-| **Template library** | Community-contributed and organization-specific document templates | Low |
-| **Browser extension** | Record workflow directly in the browser without providing a staging URL | High |
-| **Offline mode** | Run all LLM inference locally using smaller quantized models | High |
-| **Jira issue linking** | Attach generated manuals to Jira tickets as documentation artifacts | Low |
-| **User analytics dashboard** | Track which manuals are generated, exported, and published per team | Medium |
-| **Annotation tool** | Let users add manual callout arrows or text annotations to screenshots in-browser | High |
-| **API-first scripting** | Accept OpenAPI specs (Swagger) to automatically generate API documentation manuals | High |
+| Feature                              | Description                                                                            | Est. Complexity |
+| ------------------------------------ | -------------------------------------------------------------------------------------- | --------------- |
+| **Multilingual parallel generation** | Generate the same manual in multiple languages simultaneously using parallel LLM calls | Medium          |
+| **WCAG accessibility checks**        | Automatically flag UI elements that appear inaccessible based on screenshot analysis   | High            |
+| **Manual versioning & diff view**    | Track document versions and display a diff when refinements are made                   | Medium          |
+| **Template library**                 | Community-contributed and organization-specific document templates                     | Low             |
+| **Browser extension**                | Record workflow directly in the browser without providing a staging URL                | High            |
+| **Offline mode**                     | Run all LLM inference locally using smaller quantized models                           | High            |
+| **Jira issue linking**               | Attach generated manuals to Jira tickets as documentation artifacts                    | Low             |
+| **User analytics dashboard**         | Track which manuals are generated, exported, and published per team                    | Medium          |
+| **Annotation tool**                  | Let users add manual callout arrows or text annotations to screenshots in-browser      | High            |
+| **API-first scripting**              | Accept OpenAPI specs (Swagger) to automatically generate API documentation manuals     | High            |
 
 ---
 
@@ -423,10 +428,10 @@ The following features are under consideration for future releases but are not y
 
 ### 10.1 v1.0 Support Window
 
-| Release | Feature Support | Security Patches | End of Support |
-|---------|----------------|-----------------|----------------|
-| v1.0.x | Until v2.0 GA | Until v3.0 GA | 12 months after v2.0 GA |
-| v2.0.x | Until v3.0 GA | Until v4.0 GA | 12 months after v3.0 GA |
+| Release | Feature Support | Security Patches | End of Support          |
+| ------- | --------------- | ---------------- | ----------------------- |
+| v1.0.x  | Until v2.0 GA   | Until v3.0 GA    | 12 months after v2.0 GA |
+| v2.0.x  | Until v3.0 GA   | Until v4.0 GA    | 12 months after v3.0 GA |
 
 ### 10.2 Deprecation Notification Policy
 
@@ -436,16 +441,16 @@ The following features are under consideration for future releases but are not y
 
 ### 10.3 API Version Lifecycle
 
-| API Version | Status | Sunset Date |
-|------------|--------|------------|
-| `/api/v1` | ✅ Active | TBD (minimum 12 months post v2 API release) |
-| `/api/v2` | 🔲 Planned (v2.0) | — |
+| API Version | Status            | Sunset Date                                 |
+| ----------- | ----------------- | ------------------------------------------- |
+| `/api/v1`   | ✅ Active         | TBD (minimum 12 months post v2 API release) |
+| `/api/v2`   | 🔲 Planned (v2.0) | —                                           |
 
 ---
 
-*← Previous: [Non-Functional Requirements](./09_non_functional_requirements.md)*  
-*→ Back to: [Documentation Index](./README.md)*
+_← Previous: [Non-Functional Requirements](./09_non_functional_requirements.md)_  
+_→ Back to: [Documentation Index](./README.md)_
 
 ---
 
-*Document ID: DOC-010 · Version: 1.0.0 · DocuAgent AI Technical Documentation Suite*
+_Document ID: DOC-010 · Version: 1.0.0 · DocuAgent AI Technical Documentation Suite_

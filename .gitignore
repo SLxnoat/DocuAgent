@@ -1,0 +1,147 @@
+# ==============================================================================
+# DocuAgent AI — Root Monorepo .gitignore
+# ==============================================================================
+
+# ------------------------------------------------------------------------------
+# Python & Backend Artifacts
+# ------------------------------------------------------------------------------
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual Environments
+.venv/
+venv/
+ENV/
+env/
+env.bak/
+venv.bak/
+
+# Testing & Quality Tools Cache
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.nox/
+.hypothesis/
+.mypy_cache/
+.ruff_cache/
+.dmypy.json
+dmypy.json
+
+# ------------------------------------------------------------------------------
+# Node.js & Frontend Artifacts
+# ------------------------------------------------------------------------------
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Build outputs
+dist/
+out/
+build/
+.next/
+.nuxt/
+.vuepress/dist/
+.serverless/
+.fusebox/
+.dynamodb/
+.tern-port
+.eslintcache
+
+# ------------------------------------------------------------------------------
+# Runtime Generated Media & Storage Assets
+# ------------------------------------------------------------------------------
+assets/*
+!assets/.gitkeep
+exports/*
+!exports/.gitkeep
+recordings/*
+!recordings/.gitkeep
+videos/*
+!videos/.gitkeep
+
+# ------------------------------------------------------------------------------
+# Browser Automation (Playwright)
+# ------------------------------------------------------------------------------
+test-results/
+playwright-report/
+blob-report/
+playwright/.cache/
+
+# ------------------------------------------------------------------------------
+# Environment Variables, Secrets & Certificates
+# ------------------------------------------------------------------------------
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.crt
+*.cert
+*.p12
+*.pfx
+
+# ------------------------------------------------------------------------------
+# Redis & Celery Runtime Artifacts
+# ------------------------------------------------------------------------------
+dump.rdb
+*.pid
+celerybeat-schedule
+celerybeat.pid
+
+# ------------------------------------------------------------------------------
+# Logs & Temporary Files
+# ------------------------------------------------------------------------------
+logs/
+*.log
+*.tmp
+*.temp
+tmp/
+temp/
+
+# ------------------------------------------------------------------------------
+# IDE, Editor & OS Files
+# ------------------------------------------------------------------------------
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Editors
+.idea/
+*.swp
+*.swo
+*~
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json

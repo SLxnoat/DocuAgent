@@ -93,20 +93,20 @@ docuagent-frontend/
 
 ## 3. Technology Stack
 
-| Package | Version | Purpose |
-|---------|---------|---------|
-| `react` | 18+ | UI framework |
-| `vite` | 5+ | Build tool and dev server |
-| `typescript` | 5+ | Static typing |
-| `tailwindcss` | 3+ | Utility-first CSS framework |
-| `@shadcn/ui` | Latest | Accessible component primitives |
-| `lucide-react` | Latest | Icon library |
-| `zustand` | 4+ | Lightweight global state management |
-| `@monaco-editor/react` | 4+ | Monaco code editor React wrapper |
-| `@uiw/react-md-editor` | 3+ | Alternative Markdown preview renderer |
-| `axios` | 1+ | HTTP client for REST API calls |
-| `react-markdown` | 9+ | Markdown to JSX renderer |
-| `remark-gfm` | 4+ | GitHub Flavored Markdown support |
+| Package                | Version | Purpose                               |
+| ---------------------- | ------- | ------------------------------------- |
+| `react`                | 18+     | UI framework                          |
+| `vite`                 | 5+      | Build tool and dev server             |
+| `typescript`           | 5+      | Static typing                         |
+| `tailwindcss`          | 3+      | Utility-first CSS framework           |
+| `@shadcn/ui`           | Latest  | Accessible component primitives       |
+| `lucide-react`         | Latest  | Icon library                          |
+| `zustand`              | 4+      | Lightweight global state management   |
+| `@monaco-editor/react` | 4+      | Monaco code editor React wrapper      |
+| `@uiw/react-md-editor` | 3+      | Alternative Markdown preview renderer |
+| `axios`                | 1+      | HTTP client for REST API calls        |
+| `react-markdown`       | 9+      | Markdown to JSX renderer              |
+| `remark-gfm`           | 4+      | GitHub Flavored Markdown support      |
 
 **Install Dependencies:**
 
@@ -129,30 +129,30 @@ All shared application state is managed in a single Zustand store (`useManualSto
 ```typescript
 // src/store/useManualStore.ts
 
-import { create } from 'zustand';
+import { create } from "zustand";
 
 export type JobStatus =
-  | 'idle'
-  | 'queued'
-  | 'analyzing'
-  | 'capturing'
-  | 'compiling'
-  | 'reviewing'
-  | 'awaiting_input'
-  | 'refining'
-  | 'completed'
-  | 'failed';
+  | "idle"
+  | "queued"
+  | "analyzing"
+  | "capturing"
+  | "compiling"
+  | "reviewing"
+  | "awaiting_input"
+  | "refining"
+  | "completed"
+  | "failed";
 
 export interface StepCaptureStatus {
   stepIndex: number;
-  status: 'pending' | 'captured' | 'fallback' | 'error';
+  status: "pending" | "captured" | "fallback" | "error";
   screenshotPath?: string;
   error?: string;
 }
 
 export interface ChatMessage {
   id: string;
-  role: 'user' | 'assistant';
+  role: "user" | "assistant";
   content: string;
   timestamp: string;
 }
@@ -162,21 +162,21 @@ interface ManualStore {
   jobId: string | null;
   sessionId: string | null;
   jobStatus: JobStatus;
-  
+
   // Document State
   markdownContent: string;
-  
+
   // Progress State
   stepCount: number;
   stepStatuses: StepCaptureStatus[];
-  
+
   // Chat State
   chatHistory: ChatMessage[];
   isChatLoading: boolean;
-  
+
   // Export State
-  exportFormats: ('markdown' | 'html' | 'pdf')[];
-  
+  exportFormats: ("markdown" | "html" | "pdf")[];
+
   // Actions
   setJobId: (id: string) => void;
   setSessionId: (id: string) => void;
@@ -191,30 +191,41 @@ interface ManualStore {
 export const useManualStore = create<ManualStore>((set) => ({
   jobId: null,
   sessionId: null,
-  jobStatus: 'idle',
-  markdownContent: '',
+  jobStatus: "idle",
+  markdownContent: "",
   stepCount: 0,
   stepStatuses: [],
   chatHistory: [],
   isChatLoading: false,
   exportFormats: [],
-  
+
   setJobId: (id) => set({ jobId: id }),
   setSessionId: (id) => set({ sessionId: id }),
   setJobStatus: (status) => set({ jobStatus: status }),
   setMarkdownContent: (content) => set({ markdownContent: content }),
-  updateStepStatus: (status) => set((state) => ({
-    stepStatuses: [...state.stepStatuses.filter(s => s.stepIndex !== status.stepIndex), status]
-  })),
-  addChatMessage: (message) => set((state) => ({
-    chatHistory: [...state.chatHistory, message]
-  })),
+  updateStepStatus: (status) =>
+    set((state) => ({
+      stepStatuses: [
+        ...state.stepStatuses.filter((s) => s.stepIndex !== status.stepIndex),
+        status,
+      ],
+    })),
+  addChatMessage: (message) =>
+    set((state) => ({
+      chatHistory: [...state.chatHistory, message],
+    })),
   setChatLoading: (loading) => set({ isChatLoading: loading }),
-  reset: () => set({
-    jobId: null, sessionId: null, jobStatus: 'idle',
-    markdownContent: '', stepCount: 0, stepStatuses: [],
-    chatHistory: [], isChatLoading: false,
-  }),
+  reset: () =>
+    set({
+      jobId: null,
+      sessionId: null,
+      jobStatus: "idle",
+      markdownContent: "",
+      stepCount: 0,
+      stepStatuses: [],
+      chatHistory: [],
+      isChatLoading: false,
+    }),
 }));
 ```
 
@@ -239,13 +250,14 @@ interface GenerateRequest {
   targetUrl: string;
   credentials?: { username: string; password: string };
   options: {
-    outputFormats: ('markdown' | 'html' | 'pdf')[];
+    outputFormats: ("markdown" | "html" | "pdf")[];
     language: string;
   };
 }
 ```
 
 **Key Behaviors:**
+
 - The credential fields use `type="password"` with no autocomplete.
 - Submitting the form clears the credential fields from the React component state immediately after the API call is dispatched.
 - The "Generate Manual" button is disabled while `isLoading` is true.
@@ -258,9 +270,9 @@ The split-screen editor uses a resizable two-pane layout. The left pane hosts Mo
 // src/components/editor/SplitScreen.tsx
 
 interface SplitScreenProps {
-  leftPane: React.ReactNode;   // <EditorPane />
-  rightPane: React.ReactNode;  // <PreviewPane />
-  defaultSplit?: number;       // Percentage (0-100), default: 50
+  leftPane: React.ReactNode; // <EditorPane />
+  rightPane: React.ReactNode; // <PreviewPane />
+  defaultSplit?: number; // Percentage (0-100), default: 50
 }
 ```
 
@@ -268,17 +280,17 @@ interface SplitScreenProps {
 
 ```typescript
 // src/components/editor/EditorPane.tsx
-import Editor from '@monaco-editor/react';
+import Editor from "@monaco-editor/react";
 
 const editorOptions = {
-  language: 'markdown',
-  theme: 'vs-dark',            // Dark theme — matches DocuAgent UI
-  wordWrap: 'on',
+  language: "markdown",
+  theme: "vs-dark", // Dark theme — matches DocuAgent UI
+  wordWrap: "on",
   minimap: { enabled: false }, // Disable minimap for narrow pane
   fontSize: 14,
-  lineNumbers: 'on',
+  lineNumbers: "on",
   scrollBeyondLastLine: false,
-  automaticLayout: true,       // Auto-resize with pane resizing
+  automaticLayout: true, // Auto-resize with pane resizing
 };
 ```
 
@@ -300,6 +312,7 @@ interface ScreenshotImageProps {
 ```
 
 On click, the component renders an action overlay:
+
 - **🔄 Re-Capture** — triggers `POST /api/v1/recapture/{job_id}/{step_index}`
 - **📁 Upload Replacement** — opens a file picker for manual image upload
 
@@ -315,6 +328,7 @@ interface ChatPanelProps {
 ```
 
 **Panel States:**
+
 - **Hidden** — collapsed to right sidebar when not in use.
 - **Visible** — slides in as a side panel overlay on the preview pane.
 - **Loading** — "Agent is thinking..." indicator with animated dots.
@@ -328,20 +342,20 @@ All REST calls are made through a centralized Axios client:
 ```typescript
 // src/api/client.ts
 
-import axios from 'axios';
+import axios from "axios";
 
 export const apiClient = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api/v1',
+  baseURL: import.meta.env.VITE_API_BASE_URL || "http://localhost:8000/api/v1",
   timeout: 30000,
   headers: {
-    'Content-Type': 'application/json',
-    'Authorization': `Bearer ${import.meta.env.VITE_API_TOKEN}`,
+    "Content-Type": "application/json",
+    Authorization: `Bearer ${import.meta.env.VITE_API_TOKEN}`,
   },
 });
 
 // Typed API functions
 export const generateManual = (data: GenerateRequest) =>
-  apiClient.post<GenerateResponse>('/generate', data);
+  apiClient.post<GenerateResponse>("/generate", data);
 
 export const sendChatMessage = (sessionId: string, data: ChatRequest) =>
   apiClient.post<ChatResponse>(`/chat/${sessionId}`, data);
@@ -353,13 +367,17 @@ export const getJobStatus = (jobId: string) =>
   apiClient.get<JobStatusResponse>(`/jobs/${jobId}`);
 
 export const downloadExport = (jobId: string, format: string) =>
-  apiClient.get(`/export/${jobId}?format=${format}`, { responseType: 'blob' });
+  apiClient.get(`/export/${jobId}?format=${format}`, { responseType: "blob" });
 
-export const uploadReplacementScreenshot = (jobId: string, stepIndex: number, file: File) => {
+export const uploadReplacementScreenshot = (
+  jobId: string,
+  stepIndex: number,
+  file: File,
+) => {
   const formData = new FormData();
-  formData.append('file', file);
+  formData.append("file", file);
   return apiClient.post(`/jobs/${jobId}/assets/${stepIndex}`, formData, {
-    headers: { 'Content-Type': 'multipart/form-data' }
+    headers: { "Content-Type": "multipart/form-data" },
   });
 };
 ```
@@ -371,62 +389,63 @@ export const uploadReplacementScreenshot = (jobId: string, stepIndex: number, fi
 ```typescript
 // src/hooks/useSSEStream.ts
 
-import { useEffect } from 'react';
-import { useManualStore } from '../store/useManualStore';
+import { useEffect } from "react";
+import { useManualStore } from "../store/useManualStore";
 
 export function useSSEStream(jobId: string | null) {
-  const { setJobStatus, setMarkdownContent, updateStepStatus } = useManualStore();
-  
+  const { setJobStatus, setMarkdownContent, updateStepStatus } =
+    useManualStore();
+
   useEffect(() => {
     if (!jobId) return;
-    
+
     const eventSource = new EventSource(
       `${import.meta.env.VITE_API_BASE_URL}/stream/${jobId}`,
-      { withCredentials: true }
+      { withCredentials: true },
     );
-    
+
     eventSource.onmessage = (event) => {
       const data = JSON.parse(event.data);
       handleSSEEvent(data);
     };
-    
+
     eventSource.onerror = () => {
       eventSource.close();
-      setJobStatus('failed');
+      setJobStatus("failed");
     };
-    
+
     function handleSSEEvent(event: SSEEvent) {
       switch (event.type) {
-        case 'pipeline_started':
-          setJobStatus('analyzing');
+        case "pipeline_started":
+          setJobStatus("analyzing");
           break;
-        case 'script_analyzed':
-          setJobStatus('capturing');
+        case "script_analyzed":
+          setJobStatus("capturing");
           break;
-        case 'capture_progress':
+        case "capture_progress":
           updateStepStatus({
             stepIndex: event.step_index,
-            status: event.status === 'captured' ? 'captured' : 'fallback',
+            status: event.status === "captured" ? "captured" : "fallback",
             error: event.error,
           });
           break;
-        case 'draft_compiled':
-          setJobStatus('reviewing');
+        case "draft_compiled":
+          setJobStatus("reviewing");
           break;
-        case 'document_ready':
+        case "document_ready":
           setMarkdownContent(event.markdown);
-          setJobStatus('awaiting_input');
+          setJobStatus("awaiting_input");
           break;
-        case 'document_updated':
+        case "document_updated":
           setMarkdownContent(event.markdown);
-          setJobStatus('awaiting_input');
+          setJobStatus("awaiting_input");
           break;
-        case 'job_failed':
-          setJobStatus('failed');
+        case "job_failed":
+          setJobStatus("failed");
           break;
       }
     }
-    
+
     return () => eventSource.close();
   }, [jobId]);
 }
@@ -445,15 +464,15 @@ import { useManualStore } from '../store/useManualStore';
 export function useWebSocket(sessionId: string | null) {
   const wsRef = useRef<WebSocket | null>(null);
   const { addChatMessage, setMarkdownContent, setChatLoading } = useManualStore();
-  
+
   useEffect(() => {
     if (!sessionId) return;
-    
+
     const ws = new WebSocket(
       `wss://${import.meta.env.VITE_API_HOST}/api/v1/ws/chat/${sessionId}?token=${import.meta.env.VITE_API_TOKEN}`
     );
     wsRef.current = ws;
-    
+
     ws.onmessage = (event) => {
       const data = JSON.parse(event.data);
       if (data.type === 'agent_response') {
@@ -462,33 +481,33 @@ export function useWebSocket(sessionId: string | null) {
         setChatLoading(false);
       }
     };
-    
+
     // Heartbeat to keep connection alive
     const heartbeat = setInterval(() => {
       if (ws.readyState === WebSocket.OPEN) {
         ws.send(JSON.stringify({ type: 'ping' }));
       }
     }, 30000);
-    
+
     return () => {
       clearInterval(heartbeat);
       ws.close();
     };
   }, [sessionId]);
-  
+
   const sendMessage = useCallback((message: string) => {
     if (!wsRef.current || wsRef.current.readyState !== WebSocket.OPEN) return;
-    
+
     addChatMessage({ role: 'user', content: message, ... });
     setChatLoading(true);
-    
+
     wsRef.current.send(JSON.stringify({
       type: 'user_message',
       content: message,
       timestamp: new Date().toISOString(),
     }));
   }, []);
-  
+
   return { sendMessage };
 }
 ```
@@ -506,7 +525,7 @@ import { useManualStore } from '../../store/useManualStore';
 
 export function EditorPane() {
   const { markdownContent, setMarkdownContent } = useManualStore();
-  
+
   return (
     <Editor
       height="100%"
@@ -541,27 +560,27 @@ useEffect(() => {
 ```typescript
 // src/hooks/useExport.ts
 
-import { downloadExport } from '../api/client';
-import { useManualStore } from '../store/useManualStore';
+import { downloadExport } from "../api/client";
+import { useManualStore } from "../store/useManualStore";
 
 export function useExport() {
   const { jobId } = useManualStore();
-  
-  const handleExport = async (format: 'markdown' | 'html' | 'pdf') => {
+
+  const handleExport = async (format: "markdown" | "html" | "pdf") => {
     if (!jobId) return;
-    
+
     const response = await downloadExport(jobId, format);
     const blob = new Blob([response.data]);
     const url = URL.createObjectURL(blob);
-    
-    const link = document.createElement('a');
+
+    const link = document.createElement("a");
     link.href = url;
-    link.download = `manual_${jobId}.${format === 'markdown' ? 'md' : format}`;
+    link.download = `manual_${jobId}.${format === "markdown" ? "md" : format}`;
     link.click();
-    
+
     URL.revokeObjectURL(url);
   };
-  
+
   return { handleExport };
 }
 ```
@@ -626,22 +645,22 @@ npm run preview
 
 ```typescript
 // vite.config.ts
-import { defineConfig } from 'vite';
-import react from '@vitejs/plugin-react';
+import { defineConfig } from "vite";
+import react from "@vitejs/plugin-react";
 
 export default defineConfig({
   plugins: [react()],
   server: {
     port: 5173,
     proxy: {
-      '/api': 'http://localhost:8000',   // Proxy API calls to FastAPI in dev
-      '/assets': 'http://localhost:8000', // Proxy screenshot assets
-    }
+      "/api": "http://localhost:8000", // Proxy API calls to FastAPI in dev
+      "/assets": "http://localhost:8000", // Proxy screenshot assets
+    },
   },
   build: {
-    outDir: 'dist',
+    outDir: "dist",
     sourcemap: true,
-  }
+  },
 });
 ```
 
@@ -664,7 +683,7 @@ interface ProgressBarProps {
 ```typescript
 interface ExportBarProps {
   jobId: string;
-  availableFormats: ('markdown' | 'html' | 'pdf')[];
+  availableFormats: ("markdown" | "html" | "pdf")[];
   isJobComplete: boolean;
 }
 ```
@@ -673,7 +692,7 @@ interface ExportBarProps {
 
 ```typescript
 interface ChatMessageProps {
-  role: 'user' | 'assistant';
+  role: "user" | "assistant";
   content: string;
   timestamp: string;
   isLoading?: boolean;
@@ -682,18 +701,18 @@ interface ChatMessageProps {
 
 ### StepStatus Badge Colors
 
-| Status | Color | Tailwind Class |
-|--------|-------|---------------|
-| `pending` | Gray | `bg-gray-400` |
+| Status     | Color | Tailwind Class |
+| ---------- | ----- | -------------- |
+| `pending`  | Gray  | `bg-gray-400`  |
 | `captured` | Green | `bg-green-500` |
 | `fallback` | Amber | `bg-amber-500` |
-| `error` | Red | `bg-red-500` |
+| `error`    | Red   | `bg-red-500`   |
 
 ---
 
-*← Previous: [Browser Automation Engine](./05_browser_automation_engine.md)*  
-*→ Next: [Deployment & Operations Guide](./07_deployment_operations.md)*
+_← Previous: [Browser Automation Engine](./05_browser_automation_engine.md)_  
+_→ Next: [Deployment & Operations Guide](./07_deployment_operations.md)_
 
 ---
 
-*Document ID: DOC-006 · Version: 1.0.0 · DocuAgent AI Technical Documentation Suite*
+_Document ID: DOC-006 · Version: 1.0.0 · DocuAgent AI Technical Documentation Suite_

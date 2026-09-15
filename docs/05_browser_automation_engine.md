@@ -31,22 +31,22 @@ The **Playwright Visual Capture Engine** is the browser automation subsystem res
 
 ### 1.1 Key Capabilities
 
-| Capability | Description |
-|-----------|-------------|
-| **Headless Browser Execution** | Uses Chromium in headless mode for server-side screenshot capture |
-| **Dynamic DOM Highlighting** | Injects real-time CSS outlines and overlays to annotate target elements |
-| **Multi-Browser Compatibility** | Supports Chromium, Firefox, and WebKit via Playwright API |
-| **Auth Session Injection** | Supports username/password login and browser storage-based session injection |
-| **Viewport Auto-Scroll** | Scrolls target elements into center viewport before capture |
-| **Graceful Fallback** | Continues pipeline on selector failure with a full-viewport fallback screenshot |
+| Capability                      | Description                                                                     |
+| ------------------------------- | ------------------------------------------------------------------------------- |
+| **Headless Browser Execution**  | Uses Chromium in headless mode for server-side screenshot capture               |
+| **Dynamic DOM Highlighting**    | Injects real-time CSS outlines and overlays to annotate target elements         |
+| **Multi-Browser Compatibility** | Supports Chromium, Firefox, and WebKit via Playwright API                       |
+| **Auth Session Injection**      | Supports username/password login and browser storage-based session injection    |
+| **Viewport Auto-Scroll**        | Scrolls target elements into center viewport before capture                     |
+| **Graceful Fallback**           | Continues pipeline on selector failure with a full-viewport fallback screenshot |
 
 ### 1.2 Technology
 
-| Component | Technology | Version |
-|-----------|-----------|---------|
-| Browser Engine | Playwright Python SDK (Chromium) | 1.40+ |
-| Python Runtime | Python 3.11+ | 3.11+ |
-| Async Interface | `asyncio` + `playwright.async_api` | — |
+| Component       | Technology                         | Version |
+| --------------- | ---------------------------------- | ------- |
+| Browser Engine  | Playwright Python SDK (Chromium)   | 1.40+   |
+| Python Runtime  | Python 3.11+                       | 3.11+   |
+| Async Interface | `asyncio` + `playwright.async_api` | —       |
 
 ---
 
@@ -89,7 +89,7 @@ import asyncio
 from playwright.async_api import async_playwright, Browser, BrowserContext, Page
 
 class PlaywrightCaptureEngine:
-    
+
     async def __aenter__(self):
         self._playwright = await async_playwright().start()
         self.browser: Browser = await self._playwright.chromium.launch(
@@ -109,7 +109,7 @@ class PlaywrightCaptureEngine:
         )
         self.page: Page = await self.context.new_page()
         return self
-    
+
     async def __aexit__(self, *args):
         await self.browser.close()
         await self._playwright.stop()
@@ -117,13 +117,13 @@ class PlaywrightCaptureEngine:
 
 ### 3.1 Browser Configuration Parameters
 
-| Parameter | Value | Rationale |
-|-----------|-------|-----------|
-| `headless` | `True` | Server-side execution without display |
-| `viewport` | `1440×900` | Standard widescreen resolution |
-| `ignore_https_errors` | `True` | Staging environments often use self-signed certificates |
-| `--no-sandbox` | enabled | Required for containerized environments (Docker) |
-| `locale` | `en-US` | Consistent UI language rendering |
+| Parameter             | Value      | Rationale                                               |
+| --------------------- | ---------- | ------------------------------------------------------- |
+| `headless`            | `True`     | Server-side execution without display                   |
+| `viewport`            | `1440×900` | Standard widescreen resolution                          |
+| `ignore_https_errors` | `True`     | Staging environments often use self-signed certificates |
+| `--no-sandbox`        | enabled    | Required for containerized environments (Docker)        |
+| `locale`              | `en-US`    | Consistent UI language rendering                        |
 
 ---
 
@@ -137,7 +137,7 @@ For applications using standard login forms:
 async def authenticate(self, credentials: dict, login_url: str):
     """Perform form-based login and wait for successful navigation."""
     await self.page.goto(login_url, wait_until="networkidle")
-    
+
     # Primary selectors with fallbacks
     username_selectors = [
         "input[name='username']",
@@ -151,10 +151,10 @@ async def authenticate(self, credentials: dict, login_url: str):
         "#password",
         "[data-testid='password-input']"
     ]
-    
+
     await self._fill_first_matching(username_selectors, credentials["username"])
     await self._fill_first_matching(password_selectors, credentials["password"])
-    
+
     # Submit form
     await self.page.keyboard.press("Enter")
     await self.page.wait_for_load_state("networkidle", timeout=30000)
@@ -191,7 +191,7 @@ Each `StepSchema` is executed by a dispatcher that maps `action_type` to the app
 ```python
 async def execute_action(self, step: StepSchema) -> None:
     """Dispatch browser action based on step action_type."""
-    
+
     action_map = {
         "navigate":     self._action_navigate,
         "click":        self._action_click,
@@ -200,11 +200,11 @@ async def execute_action(self, step: StepSchema) -> None:
         "wait":         self._action_wait,
         "authenticate": self._action_authenticate,
     }
-    
+
     handler = action_map.get(step.action_type)
     if not handler:
         raise ValueError(f"Unknown action_type: {step.action_type}")
-    
+
     await handler(step)
 
 
@@ -241,7 +241,7 @@ The highlight engine applies real-time CSS modifications to the live DOM before 
 async def highlight_element(self, selector: str) -> bool:
     """
     Inject visual highlight styles onto the target element.
-    
+
     Returns True if element was found and highlighted; False otherwise.
     """
     try:
@@ -252,14 +252,14 @@ async def highlight_element(self, selector: str) -> bool:
                     el.removeAttribute('style');
                     el.removeAttribute('data-docuagent-highlight');
                 }});
-                
+
                 // Apply highlight to target element
                 const target = document.querySelector('{selector}');
                 if (!target) return false;
-                
+
                 // Scroll target into center viewport
                 target.scrollIntoView({{ behavior: 'instant', block: 'center' }});
-                
+
                 // Apply highlight styles
                 target.setAttribute('data-docuagent-highlight', 'true');
                 target.style.outline = '4px solid #06b6d4';        // Cyan border
@@ -267,7 +267,7 @@ async def highlight_element(self, selector: str) -> bool:
                 target.style.boxShadow = '0 0 0 8px rgba(6, 182, 212, 0.2)';  // Glow effect
                 target.style.borderRadius = '4px';
                 target.style.transition = 'none';
-                
+
                 // Dim non-target regions (semi-transparent overlay on body)
                 const overlay = document.createElement('div');
                 overlay.setAttribute('data-docuagent-overlay', 'true');
@@ -276,7 +276,7 @@ async def highlight_element(self, selector: str) -> bool:
                     background: rgba(0, 0, 0, 0.15); pointer-events: none; z-index: 9998;
                 `;
                 document.body.appendChild(overlay);
-                
+
                 return true;
             }})()
         """)
@@ -307,13 +307,13 @@ async def cleanup_highlights(self):
 
 ### 6.3 Highlight Visual Specification
 
-| Style Property | Value | Purpose |
-|---------------|-------|---------|
-| `outline` | `4px solid #06b6d4` | Cyan border — high contrast on both light and dark UIs |
-| `outlineOffset` | `2px` | Small gap between element boundary and outline |
-| `boxShadow` | `0 0 0 8px rgba(6,182,212,0.2)` | Soft glow effect to increase visibility |
-| `borderRadius` | `4px` | Smooth corner rounding to match modern UI aesthetics |
-| Background overlay opacity | `0.15` | Subtle darkening without obscuring context |
+| Style Property             | Value                           | Purpose                                                |
+| -------------------------- | ------------------------------- | ------------------------------------------------------ |
+| `outline`                  | `4px solid #06b6d4`             | Cyan border — high contrast on both light and dark UIs |
+| `outlineOffset`            | `2px`                           | Small gap between element boundary and outline         |
+| `boxShadow`                | `0 0 0 8px rgba(6,182,212,0.2)` | Soft glow effect to increase visibility                |
+| `borderRadius`             | `4px`                           | Smooth corner rounding to match modern UI aesthetics   |
+| Background overlay opacity | `0.15`                          | Subtle darkening without obscuring context             |
 
 ---
 
@@ -325,32 +325,32 @@ async def cleanup_highlights(self):
 async def capture_screenshot(self, step_index: int, job_id: str) -> str:
     """
     Capture a full-page or viewport screenshot and save to disk.
-    
+
     Returns the absolute file path of the saved screenshot.
     """
     output_dir = Path(f"assets/{job_id}")
     output_dir.mkdir(parents=True, exist_ok=True)
-    
+
     file_path = output_dir / f"step_{step_index:03d}.png"
-    
+
     await self.page.screenshot(
         path=str(file_path),
         full_page=False,       # Viewport only — preserves highlight position context
         type="png",
         animations="disabled"  # Freeze animations for clean capture
     )
-    
+
     return str(file_path)
 ```
 
 ### 7.2 Screenshot Specifications
 
-| Parameter | Value | Rationale |
-|-----------|-------|-----------|
-| Format | PNG | Lossless — preserves highlight color accuracy |
-| Capture Area | Viewport (1440×900) | Matches the rendered UI experience |
-| `animations` | `disabled` | Prevents motion blur from CSS transitions |
-| `full_page` | `False` | Target element is scrolled into viewport; full-page can shift context |
+| Parameter    | Value               | Rationale                                                             |
+| ------------ | ------------------- | --------------------------------------------------------------------- |
+| Format       | PNG                 | Lossless — preserves highlight color accuracy                         |
+| Capture Area | Viewport (1440×900) | Matches the rendered UI experience                                    |
+| `animations` | `disabled`          | Prevents motion blur from CSS transitions                             |
+| `full_page`  | `False`             | Target element is scrolled into viewport; full-page can shift context |
 
 ### 7.3 File Naming Convention
 
@@ -393,7 +393,7 @@ Continue to next step — pipeline does NOT abort
 async def _locate_element(self, selector: str, fallback_selectors: list[str]):
     """Locate element with primary selector and fallback chain."""
     all_selectors = [selector] + (fallback_selectors or [])
-    
+
     for sel in all_selectors:
         try:
             element = await self.page.wait_for_selector(sel, timeout=10000)
@@ -401,19 +401,19 @@ async def _locate_element(self, selector: str, fallback_selectors: list[str]):
                 return element
         except Exception:
             continue
-    
+
     raise ElementNotFoundError(f"None of the selectors matched: {all_selectors}")
 ```
 
 ### 8.3 Anti-Bot & Dynamic SPA Considerations
 
-| Challenge | Strategy |
-|-----------|---------|
-| Client-side render delay | Use `wait_for_load_state("networkidle")` after navigation |
-| Shadow DOM elements | Use Playwright's `>>` shadow piercing syntax in selectors |
-| Dynamic class names | Use `[data-testid]` attributes or `:has-text()` pseudo-selectors |
-| Anti-bot detection | Use `stealth` browser launch args; rotate `user_agent` strings |
-| CAPTCHA blocks | Log error; insert `[Insert Screenshot Here]` placeholder in document |
+| Challenge                | Strategy                                                             |
+| ------------------------ | -------------------------------------------------------------------- |
+| Client-side render delay | Use `wait_for_load_state("networkidle")` after navigation            |
+| Shadow DOM elements      | Use Playwright's `>>` shadow piercing syntax in selectors            |
+| Dynamic class names      | Use `[data-testid]` attributes or `:has-text()` pseudo-selectors     |
+| Anti-bot detection       | Use `stealth` browser launch args; rotate `user_agent` strings       |
+| CAPTCHA blocks           | Log error; insert `[Insert Screenshot Here]` placeholder in document |
 
 ### 8.4 Graceful Degradation Text Placeholder
 
@@ -480,17 +480,17 @@ Response 200:
 
 Recommended selector patterns for common UI element types:
 
-| Element Type | Recommended Selector | Example |
-|-------------|---------------------|---------|
-| Buttons | `button:has-text("Label")` | `button:has-text("Save")` |
-| Navigation links | `nav a[href="/path"]` | `nav a[href="/users"]` |
-| Form inputs | `input[name="fieldname"]` | `input[name="email"]` |
-| Test-ID attributes | `[data-testid="id"]` | `[data-testid="add-user-btn"]` |
-| ARIA labels | `[aria-label="label"]` | `[aria-label="Close dialog"]` |
-| Dropdowns | `select[name="fieldname"]` | `select[name="role"]` |
-| Checkboxes | `input[type="checkbox"][name="n"]` | `input[type="checkbox"][name="active"]` |
-| Modal dialogs | `.modal:visible >> button` | `.modal:visible >> button:has-text("Confirm")` |
-| Shadow DOM | `host-element >> inner-element` | `my-component >> .inner-btn` |
+| Element Type       | Recommended Selector               | Example                                        |
+| ------------------ | ---------------------------------- | ---------------------------------------------- |
+| Buttons            | `button:has-text("Label")`         | `button:has-text("Save")`                      |
+| Navigation links   | `nav a[href="/path"]`              | `nav a[href="/users"]`                         |
+| Form inputs        | `input[name="fieldname"]`          | `input[name="email"]`                          |
+| Test-ID attributes | `[data-testid="id"]`               | `[data-testid="add-user-btn"]`                 |
+| ARIA labels        | `[aria-label="label"]`             | `[aria-label="Close dialog"]`                  |
+| Dropdowns          | `select[name="fieldname"]`         | `select[name="role"]`                          |
+| Checkboxes         | `input[type="checkbox"][name="n"]` | `input[type="checkbox"][name="active"]`        |
+| Modal dialogs      | `.modal:visible >> button`         | `.modal:visible >> button:has-text("Confirm")` |
+| Shadow DOM         | `host-element >> inner-element`    | `my-component >> .inner-btn`                   |
 
 ---
 
@@ -498,18 +498,18 @@ Recommended selector patterns for common UI element types:
 
 The capture engine is configured via environment variables:
 
-| Variable | Default | Description |
-|----------|---------|-------------|
-| `PLAYWRIGHT_BROWSER` | `chromium` | Browser engine: `chromium`, `firefox`, `webkit` |
-| `PLAYWRIGHT_HEADLESS` | `true` | Run browser headlessly |
-| `PLAYWRIGHT_VIEWPORT_WIDTH` | `1440` | Browser viewport width in pixels |
-| `PLAYWRIGHT_VIEWPORT_HEIGHT` | `900` | Browser viewport height in pixels |
-| `PLAYWRIGHT_SELECTOR_TIMEOUT_MS` | `10000` | Per-selector timeout in milliseconds |
-| `PLAYWRIGHT_NAVIGATION_TIMEOUT_MS` | `30000` | Page navigation timeout in milliseconds |
-| `PLAYWRIGHT_SCREENSHOT_DIR` | `./assets` | Base directory for screenshot storage |
-| `PLAYWRIGHT_HIGHLIGHT_COLOR` | `#06b6d4` | Hex color for element highlight outlines |
-| `PLAYWRIGHT_HIGHLIGHT_OPACITY` | `0.15` | Background overlay opacity (0.0–1.0) |
-| `PLAYWRIGHT_MAX_RETRIES` | `2` | Selector retry attempts before fallback |
+| Variable                           | Default    | Description                                     |
+| ---------------------------------- | ---------- | ----------------------------------------------- |
+| `PLAYWRIGHT_BROWSER`               | `chromium` | Browser engine: `chromium`, `firefox`, `webkit` |
+| `PLAYWRIGHT_HEADLESS`              | `true`     | Run browser headlessly                          |
+| `PLAYWRIGHT_VIEWPORT_WIDTH`        | `1440`     | Browser viewport width in pixels                |
+| `PLAYWRIGHT_VIEWPORT_HEIGHT`       | `900`      | Browser viewport height in pixels               |
+| `PLAYWRIGHT_SELECTOR_TIMEOUT_MS`   | `10000`    | Per-selector timeout in milliseconds            |
+| `PLAYWRIGHT_NAVIGATION_TIMEOUT_MS` | `30000`    | Page navigation timeout in milliseconds         |
+| `PLAYWRIGHT_SCREENSHOT_DIR`        | `./assets` | Base directory for screenshot storage           |
+| `PLAYWRIGHT_HIGHLIGHT_COLOR`       | `#06b6d4`  | Hex color for element highlight outlines        |
+| `PLAYWRIGHT_HIGHLIGHT_OPACITY`     | `0.15`     | Background overlay opacity (0.0–1.0)            |
+| `PLAYWRIGHT_MAX_RETRIES`           | `2`        | Selector retry attempts before fallback         |
 
 ---
 
@@ -531,13 +531,13 @@ Job C ──► Celery Worker 3 ──► Playwright Browser Instance C
 
 ### 12.3 Resource Limits
 
-| Resource | Recommended Limit | Notes |
-|----------|------------------|-------|
-| Concurrent browser instances | 5 (per server) | Each Chromium instance uses ~200MB RAM |
-| Max steps per job | 50 | Prevents runaway automation loops |
-| Screenshot file size | ~500KB avg (PNG) | 1440×900 viewport |
-| Selector timeout | 10 seconds | Balance between reliability and speed |
-| Job timeout (total) | 10 minutes | Hard-kill fallback for stuck jobs |
+| Resource                     | Recommended Limit | Notes                                  |
+| ---------------------------- | ----------------- | -------------------------------------- |
+| Concurrent browser instances | 5 (per server)    | Each Chromium instance uses ~200MB RAM |
+| Max steps per job            | 50                | Prevents runaway automation loops      |
+| Screenshot file size         | ~500KB avg (PNG)  | 1440×900 viewport                      |
+| Selector timeout             | 10 seconds        | Balance between reliability and speed  |
+| Job timeout (total)          | 10 minutes        | Hard-kill fallback for stuck jobs      |
 
 ### 12.4 💡 Optimization Tips
 
@@ -547,9 +547,9 @@ Job C ──► Celery Worker 3 ──► Playwright Browser Instance C
 
 ---
 
-*← Previous: [API Reference](./04_api_reference.md)*  
-*→ Next: [Frontend Developer Guide](./06_frontend_developer_guide.md)*
+_← Previous: [API Reference](./04_api_reference.md)_  
+_→ Next: [Frontend Developer Guide](./06_frontend_developer_guide.md)_
 
 ---
 
-*Document ID: DOC-005 · Version: 1.0.0 · DocuAgent AI Technical Documentation Suite*
+_Document ID: DOC-005 · Version: 1.0.0 · DocuAgent AI Technical Documentation Suite_

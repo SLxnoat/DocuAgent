@@ -31,14 +31,14 @@
 
 DocuAgent AI handles **sensitive staging environment credentials**, **proprietary workflow scripts**, and **enterprise application data**. The security architecture is designed around the following principles:
 
-| Principle | Implementation |
-|-----------|---------------|
+| Principle                       | Implementation                                                                |
+| ------------------------------- | ----------------------------------------------------------------------------- |
 | **Minimal Credential Exposure** | Staging credentials held in-memory only for the duration of browser execution |
-| **Zero Credential Persistence** | Credentials are never written to disk, logs, or state stores |
-| **Encrypted Communications** | All external API communications use TLS 1.2+ |
-| **LLM Data Isolation** | Ollama Cloud does not retain customer prompt data for training |
-| **Defence in Depth** | Multiple overlapping security controls at each layer |
-| **Least Privilege** | Services operate with the minimum permissions required |
+| **Zero Credential Persistence** | Credentials are never written to disk, logs, or state stores                  |
+| **Encrypted Communications**    | All external API communications use TLS 1.2+                                  |
+| **LLM Data Isolation**          | Ollama Cloud does not retain customer prompt data for training                |
+| **Defence in Depth**            | Multiple overlapping security controls at each layer                          |
+| **Least Privilege**             | Services operate with the minimum permissions required                        |
 
 ---
 
@@ -46,26 +46,26 @@ DocuAgent AI handles **sensitive staging environment credentials**, **proprietar
 
 ### 2.1 Assets to Protect
 
-| Asset | Sensitivity | Location |
-|-------|------------|----------|
-| Staging application credentials | 🔴 Critical | In-memory only during execution |
-| Workflow script content | 🟠 High | In-memory, Redis (TTL-gated), LLM API |
-| Generated Markdown documents | 🟡 Medium | Server disk (assets volume), browser |
-| Screenshot PNG files | 🟡 Medium | Server disk (assets volume) |
-| API Bearer tokens | 🔴 Critical | Client-side env vars, server config |
-| Ollama Cloud API keys | 🔴 Critical | Server-side env vars only |
+| Asset                           | Sensitivity | Location                              |
+| ------------------------------- | ----------- | ------------------------------------- |
+| Staging application credentials | 🔴 Critical | In-memory only during execution       |
+| Workflow script content         | 🟠 High     | In-memory, Redis (TTL-gated), LLM API |
+| Generated Markdown documents    | 🟡 Medium   | Server disk (assets volume), browser  |
+| Screenshot PNG files            | 🟡 Medium   | Server disk (assets volume)           |
+| API Bearer tokens               | 🔴 Critical | Client-side env vars, server config   |
+| Ollama Cloud API keys           | 🔴 Critical | Server-side env vars only             |
 
 ### 2.2 Primary Threat Vectors
 
-| Threat | Likelihood | Impact | Mitigation |
-|--------|-----------|--------|-----------|
-| Credential leakage via logs | Medium | Critical | Credential scrubbing in all log handlers |
-| Bearer token interception | Low | High | TLS enforcement; token rotation policy |
-| Prompt injection via script input | Medium | High | Input sanitization; LLM output validation |
-| Insecure direct object reference (job_id) | Low | Medium | Job ownership validation per authenticated user |
-| Screenshot asset unauthorized access | Low | Medium | Asset paths are non-guessable UUIDs |
-| Redis state store compromise | Low | High | Redis auth; network isolation; no plaintext creds in state |
-| Playwright SSRF (malicious target URLs) | Medium | High | URL allowlist/denylist; private IP range blocking |
+| Threat                                    | Likelihood | Impact   | Mitigation                                                 |
+| ----------------------------------------- | ---------- | -------- | ---------------------------------------------------------- |
+| Credential leakage via logs               | Medium     | Critical | Credential scrubbing in all log handlers                   |
+| Bearer token interception                 | Low        | High     | TLS enforcement; token rotation policy                     |
+| Prompt injection via script input         | Medium     | High     | Input sanitization; LLM output validation                  |
+| Insecure direct object reference (job_id) | Low        | Medium   | Job ownership validation per authenticated user            |
+| Screenshot asset unauthorized access      | Low        | Medium   | Asset paths are non-guessable UUIDs                        |
+| Redis state store compromise              | Low        | High     | Redis auth; network isolation; no plaintext creds in state |
+| Playwright SSRF (malicious target URLs)   | Medium     | High     | URL allowlist/denylist; private IP range blocking          |
 
 ---
 
@@ -105,25 +105,25 @@ Playwright session closes — browser memory cleared
 async def capture_screenshots_node(state: ManualState) -> ManualState:
     """
     Execute browser automation for all steps.
-    
+
     SECURITY: credentials are scrubbed from state immediately after
     authentication, before any state persistence occurs.
     """
     credentials = state.get("credentials", {})
-    
+
     async with PlaywrightCaptureEngine() as engine:
         # Use credentials for authentication
         if credentials:
             await engine.authenticate(credentials, state["target_url"])
-        
+
         # *** CRITICAL: Scrub credentials before any await that may trigger checkpointing ***
         state["credentials"] = {}
         credentials = None  # Remove local reference
-        
+
         # Continue with screenshot capture using established session
         for step in state["structured_steps"]:
             await engine.execute_step(step, state["job_id"])
-    
+
     return state
 ```
 
@@ -252,23 +252,23 @@ async def generate_manual(request: Request, ...):
 
 ### 5.1 Ollama Cloud Data Handling Guarantees
 
-| Guarantee | Detail |
-|-----------|--------|
+| Guarantee                      | Detail                                                        |
+| ------------------------------ | ------------------------------------------------------------- |
 | **No training data retention** | Customer prompt content is not used for Ollama model training |
-| **TLS encryption in transit** | All API requests to Ollama Cloud endpoints use TLS 1.2+ |
-| **Dedicated endpoints** | Enterprise customers receive isolated Ollama Cloud instances |
-| **No third-party sharing** | Prompt data is not shared with sub-processors |
+| **TLS encryption in transit**  | All API requests to Ollama Cloud endpoints use TLS 1.2+       |
+| **Dedicated endpoints**        | Enterprise customers receive isolated Ollama Cloud instances  |
+| **No third-party sharing**     | Prompt data is not shared with sub-processors                 |
 
 ### 5.2 Minimum Data Sent to LLM
 
 DocuAgent AI is designed to minimize what is sent to LLM endpoints:
 
-| Sent to LLM | Not Sent to LLM |
-|-------------|----------------|
-| Workflow script text | Staging credentials (scrubbed before LLM calls) |
-| Structured step descriptions | Raw screenshot binary data |
-| Generated Markdown content (for review) | Internal job metadata |
-| User chat messages | Redis state checksums |
+| Sent to LLM                             | Not Sent to LLM                                 |
+| --------------------------------------- | ----------------------------------------------- |
+| Workflow script text                    | Staging credentials (scrubbed before LLM calls) |
+| Structured step descriptions            | Raw screenshot binary data                      |
+| Generated Markdown content (for review) | Internal job metadata                           |
+| User chat messages                      | Redis state checksums                           |
 
 ### 5.3 On-Premise Deployment Option
 
@@ -306,7 +306,7 @@ In the Docker Compose deployment, all internal services communicate on an isolat
 networks:
   internal:
     driver: bridge
-    internal: true   # No direct external access
+    internal: true # No direct external access
 
 services:
   backend:
@@ -349,10 +349,10 @@ def validate_target_url(url: str) -> bool:
     Prevents SSRF attacks via the Playwright browser engine.
     """
     parsed = urlparse(url)
-    
+
     if parsed.scheme not in ALLOWED_SCHEMES:
         raise ValueError(f"URL scheme '{parsed.scheme}' is not permitted")
-    
+
     try:
         ip = ipaddress.ip_address(parsed.hostname)
         for blocked_range in BLOCKED_PRIVATE_RANGES:
@@ -360,19 +360,19 @@ def validate_target_url(url: str) -> bool:
                 raise ValueError(f"Target URL resolves to a private IP address")
     except ValueError:
         pass  # hostname is a domain name — allow (DNS resolution at Playwright time)
-    
+
     return True
 ```
 
 ### 6.3 Firewall Rules
 
-| Rule | Direction | Protocol | Port | Action |
-|------|-----------|---------|------|--------|
-| Allow HTTPS | Inbound | TCP | 443 | ALLOW |
-| Allow HTTP (redirect only) | Inbound | TCP | 80 | ALLOW |
-| Block all other inbound | Inbound | * | * | DENY |
-| Allow outbound HTTPS | Outbound | TCP | 443 | ALLOW |
-| Block outbound to private ranges | Outbound | TCP | * | DENY (SSRF prevention) |
+| Rule                             | Direction | Protocol | Port | Action                 |
+| -------------------------------- | --------- | -------- | ---- | ---------------------- |
+| Allow HTTPS                      | Inbound   | TCP      | 443  | ALLOW                  |
+| Allow HTTP (redirect only)       | Inbound   | TCP      | 80   | ALLOW                  |
+| Block all other inbound          | Inbound   | \*       | \*   | DENY                   |
+| Allow outbound HTTPS             | Outbound  | TCP      | 443  | ALLOW                  |
+| Block outbound to private ranges | Outbound  | TCP      | \*   | DENY (SSRF prevention) |
 
 ---
 
@@ -389,6 +389,7 @@ Screenshot files are stored on the server filesystem under `/app/assets/{job_id}
 Redis persistence (AOF + RDB) stores LangGraph state checkpoints. Credentials are never present in these snapshots (see [Section 3](#3-credential-handling)).
 
 **Recommended Production Practice:**
+
 - Enable Redis `requirepass` authentication.
 - Use disk encryption on the Redis data directory.
 - Apply strict filesystem permissions: `chmod 700 /var/lib/redis`.
@@ -405,7 +406,7 @@ def cleanup_expired_jobs():
     """Delete screenshot assets for jobs older than retention period."""
     retention_hours = settings.ASSET_RETENTION_HOURS  # Default: 24
     cutoff = datetime.utcnow() - timedelta(hours=retention_hours)
-    
+
     for job_dir in Path(settings.SCREENSHOT_DIR).iterdir():
         if job_dir.stat().st_mtime < cutoff.timestamp():
             shutil.rmtree(job_dir)
@@ -419,11 +420,11 @@ def cleanup_expired_jobs():
 
 All client-server and server-to-LLM communications must use TLS:
 
-| Connection | Minimum TLS Version | Certificate Requirement |
-|-----------|--------------------|-----------------------|
-| Client → Nginx | TLS 1.2 | Valid CA-signed certificate |
-| Nginx → FastAPI | TLS 1.2 (or trusted LAN) | Self-signed acceptable for internal |
-| FastAPI → Ollama Cloud | TLS 1.2 | Valid CA-signed certificate |
+| Connection             | Minimum TLS Version      | Certificate Requirement             |
+| ---------------------- | ------------------------ | ----------------------------------- |
+| Client → Nginx         | TLS 1.2                  | Valid CA-signed certificate         |
+| Nginx → FastAPI        | TLS 1.2 (or trusted LAN) | Self-signed acceptable for internal |
+| FastAPI → Ollama Cloud | TLS 1.2                  | Valid CA-signed certificate         |
 
 **Nginx TLS Configuration:**
 
@@ -455,11 +456,11 @@ add_header Content-Security-Policy "default-src 'self'; script-src 'self'; img-s
 
 The LangGraph `RedisCheckpointer` serializes `ManualState` to Redis. The following fields are explicitly excluded from serialization:
 
-| Field | Exclusion Method |
-|-------|----------------|
-| `credentials` | Cleared to `{}` before first checkpoint (see Section 3.2) |
-| Raw request headers | Never included in state |
-| API tokens | Never included in state |
+| Field               | Exclusion Method                                          |
+| ------------------- | --------------------------------------------------------- |
+| `credentials`       | Cleared to `{}` before first checkpoint (see Section 3.2) |
+| Raw request headers | Never included in state                                   |
+| API tokens          | Never included in state                                   |
 
 ### 9.2 Redis Authentication
 
@@ -501,9 +502,9 @@ worker:
   cap_drop:
     - ALL
   cap_add:
-    - SYS_ADMIN   # Required by Chromium sandbox (--no-sandbox alternative)
+    - SYS_ADMIN # Required by Chromium sandbox (--no-sandbox alternative)
   tmpfs:
-    - /tmp        # tmpfs for Chromium temp files — not persisted to disk
+    - /tmp # tmpfs for Chromium temp files — not persisted to disk
 ```
 
 ### 10.2 Chromium Sandbox Mode
@@ -561,12 +562,12 @@ def load_secrets_from_vault():
 
 If using `.env` files:
 
-| Practice | Implementation |
-|---------|---------------|
-| Never commit `.env` to version control | Add `.env` to `.gitignore` |
-| Restrict file permissions | `chmod 600 .env` |
-| Use different secrets per environment | Separate `.env.dev`, `.env.prod` |
-| Rotate secrets regularly | Quarterly rotation at minimum |
+| Practice                               | Implementation                   |
+| -------------------------------------- | -------------------------------- |
+| Never commit `.env` to version control | Add `.env` to `.gitignore`       |
+| Restrict file permissions              | `chmod 600 .env`                 |
+| Use different secrets per environment  | Separate `.env.dev`, `.env.prod` |
+| Rotate secrets regularly               | Quarterly rotation at minimum    |
 
 ---
 
@@ -620,18 +621,18 @@ Report security vulnerabilities to the designated security team. Do not file pub
 
 ## 14. Compliance Considerations
 
-| Standard | Relevant Controls in DocuAgent AI |
-|----------|----------------------------------|
-| **GDPR** | No PII stored by default; credential scrubbing; 24h data retention; right-to-erasure via `DELETE /api/v1/jobs/{job_id}` |
-| **SOC 2 Type II** | TLS encryption; access logging; credential non-persistence; audit trails in execution logs |
-| **ISO 27001** | Threat model documented; access controls; secure development practices; incident response |
-| **OWASP Top 10** | Injection prevention (input validation); broken access control mitigation (ownership checks); security misconfiguration avoidance |
+| Standard          | Relevant Controls in DocuAgent AI                                                                                                 |
+| ----------------- | --------------------------------------------------------------------------------------------------------------------------------- |
+| **GDPR**          | No PII stored by default; credential scrubbing; 24h data retention; right-to-erasure via `DELETE /api/v1/jobs/{job_id}`           |
+| **SOC 2 Type II** | TLS encryption; access logging; credential non-persistence; audit trails in execution logs                                        |
+| **ISO 27001**     | Threat model documented; access controls; secure development practices; incident response                                         |
+| **OWASP Top 10**  | Injection prevention (input validation); broken access control mitigation (ownership checks); security misconfiguration avoidance |
 
 ---
 
-*← Previous: [Deployment & Operations Guide](./07_deployment_operations.md)*  
-*→ Next: [Non-Functional Requirements](./09_non_functional_requirements.md)*
+_← Previous: [Deployment & Operations Guide](./07_deployment_operations.md)_  
+_→ Next: [Non-Functional Requirements](./09_non_functional_requirements.md)_
 
 ---
 
-*Document ID: DOC-008 · Version: 1.0.0 · DocuAgent AI Technical Documentation Suite*
+_Document ID: DOC-008 · Version: 1.0.0 · DocuAgent AI Technical Documentation Suite_

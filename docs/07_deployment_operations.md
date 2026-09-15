@@ -65,13 +65,13 @@ DocuAgent AI is deployed as a set of containerized services orchestrated via Doc
 
 ### 1.2 Port Map
 
-| Service | Internal Port | External (via Nginx) |
-|---------|--------------|---------------------|
-| Nginx | 80, 443 | 80, 443 |
-| FastAPI | 8000 | `/api/*` (proxied) |
-| React SPA | 3000 | `/` (served by Nginx) |
-| Redis | 6379 | Internal only |
-| Celery Flower (monitoring) | 5555 | `/flower/*` (proxied, auth-gated) |
+| Service                    | Internal Port | External (via Nginx)              |
+| -------------------------- | ------------- | --------------------------------- |
+| Nginx                      | 80, 443       | 80, 443                           |
+| FastAPI                    | 8000          | `/api/*` (proxied)                |
+| React SPA                  | 3000          | `/` (served by Nginx)             |
+| Redis                      | 6379          | Internal only                     |
+| Celery Flower (monitoring) | 5555          | `/flower/*` (proxied, auth-gated) |
 
 ---
 
@@ -79,24 +79,24 @@ DocuAgent AI is deployed as a set of containerized services orchestrated via Doc
 
 ### 2.1 System Requirements
 
-| Component | Minimum | Recommended |
-|-----------|---------|-------------|
-| CPU | 4 vCPUs | 8 vCPUs |
-| RAM | 8 GB | 16 GB |
-| Disk | 50 GB SSD | 200 GB SSD |
-| OS | Ubuntu 22.04 LTS | Ubuntu 22.04 LTS |
-| Docker | 24.0+ | Latest |
-| Docker Compose | 2.20+ | Latest |
-| Python | 3.11+ | 3.11+ |
-| Node.js | 18+ | 20 LTS |
+| Component      | Minimum          | Recommended      |
+| -------------- | ---------------- | ---------------- |
+| CPU            | 4 vCPUs          | 8 vCPUs          |
+| RAM            | 8 GB             | 16 GB            |
+| Disk           | 50 GB SSD        | 200 GB SSD       |
+| OS             | Ubuntu 22.04 LTS | Ubuntu 22.04 LTS |
+| Docker         | 24.0+            | Latest           |
+| Docker Compose | 2.20+            | Latest           |
+| Python         | 3.11+            | 3.11+            |
+| Node.js        | 18+              | 20 LTS           |
 
 ### 2.2 Network Requirements
 
-| Destination | Protocol | Port | Purpose |
-|-------------|---------|------|---------|
-| Ollama Cloud endpoint | HTTPS | 443 | LLM inference |
+| Destination                  | Protocol   | Port    | Purpose               |
+| ---------------------------- | ---------- | ------- | --------------------- |
+| Ollama Cloud endpoint        | HTTPS      | 443     | LLM inference         |
 | Staging application (target) | HTTP/HTTPS | 80, 443 | Playwright automation |
-| Redis (internal) | TCP | 6379 | Task queue & state |
+| Redis (internal)             | TCP        | 6379    | Task queue & state    |
 
 ### 2.3 Software Installation
 
@@ -290,12 +290,12 @@ appendonly yes  # Write-ahead log for durability
 
 ### 6.2 Redis Database Allocation
 
-| DB Index | Purpose | TTL |
-|----------|---------|-----|
-| `0` | LangGraph state checkpoints | 24 hours |
-| `1` | Celery task broker | Auto (by Celery) |
-| `2` | Celery result backend | 1 hour |
-| `3` | SSE PubSub channels | Session-duration |
+| DB Index | Purpose                     | TTL              |
+| -------- | --------------------------- | ---------------- |
+| `0`      | LangGraph state checkpoints | 24 hours         |
+| `1`      | Celery task broker          | Auto (by Celery) |
+| `2`      | Celery result backend       | 1 hour           |
+| `3`      | SSE PubSub channels         | Session-duration |
 
 ---
 
@@ -334,10 +334,9 @@ ollama list
 ```yaml
 # docker-compose.yml
 
-version: '3.9'
+version: "3.9"
 
 services:
-  
   # Redis — Task Queue & State Persistence
   redis:
     image: redis:7-alpine
@@ -347,13 +346,13 @@ services:
       - ./config/redis.conf:/etc/redis/redis.conf
       - redis_data:/data
     ports:
-      - "127.0.0.1:6379:6379"   # Bind to localhost only
+      - "127.0.0.1:6379:6379" # Bind to localhost only
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 10s
       timeout: 5s
       retries: 3
-  
+
   # FastAPI Backend
   backend:
     build:
@@ -374,7 +373,7 @@ services:
       interval: 30s
       timeout: 10s
       retries: 3
-  
+
   # Celery Worker
   worker:
     build:
@@ -390,8 +389,8 @@ services:
       - redis
       - backend
     deploy:
-      replicas: 2   # Scale workers horizontally
-  
+      replicas: 2 # Scale workers horizontally
+
   # Celery Flower (monitoring dashboard)
   flower:
     image: mher/flower:2.0
@@ -403,7 +402,7 @@ services:
       - "127.0.0.1:5555:5555"
     depends_on:
       - redis
-  
+
   # Frontend (served by Nginx)
   frontend:
     build:
@@ -414,7 +413,7 @@ services:
       - frontend_dist:/usr/share/nginx/html:ro
     ports:
       - "127.0.0.1:3000:3000"
-  
+
   # Nginx Reverse Proxy
   nginx:
     image: nginx:alpine
@@ -491,36 +490,36 @@ celery -A app.tasks worker -Q export --concurrency=2 --loglevel=info
 events { worker_connections 1024; }
 
 http {
-    
+
     # Rate limiting
     limit_req_zone $binary_remote_addr zone=api_limit:10m rate=10r/s;
-    
+
     # Upstream services
     upstream backend  { server backend:8000; }
     upstream flower   { server flower:5555; }
-    
+
     server {
         listen 80;
         server_name docuagent.yourdomain.com;
         return 301 https://$host$request_uri;
     }
-    
+
     server {
         listen 443 ssl http2;
         server_name docuagent.yourdomain.com;
-        
+
         ssl_certificate     /etc/nginx/ssl/fullchain.pem;
         ssl_certificate_key /etc/nginx/ssl/privkey.pem;
         ssl_protocols       TLSv1.2 TLSv1.3;
         ssl_ciphers         HIGH:!aNULL:!MD5;
-        
+
         # Frontend SPA
         root /usr/share/nginx/html;
         index index.html;
         location / {
             try_files $uri $uri/ /index.html;  # React SPA fallback routing
         }
-        
+
         # Backend API
         location /api/ {
             limit_req zone=api_limit burst=20 nodelay;
@@ -530,7 +529,7 @@ http {
             proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
             proxy_read_timeout 300s;   # Allow long-running SSE connections
         }
-        
+
         # SSE Streaming — disable buffering for real-time delivery
         location /api/v1/stream/ {
             proxy_pass http://backend;
@@ -541,7 +540,7 @@ http {
             proxy_read_timeout 600s;
             chunked_transfer_encoding on;
         }
-        
+
         # WebSocket Chat
         location /api/v1/ws/ {
             proxy_pass http://backend;
@@ -550,14 +549,14 @@ http {
             proxy_set_header Connection "upgrade";
             proxy_read_timeout 3600s;   # 1 hour WebSocket keep-alive
         }
-        
+
         # Screenshot Assets
         location /assets/ {
             alias /usr/share/nginx/assets/;
             expires 1h;
             add_header Cache-Control "public, no-transform";
         }
-        
+
         # Celery Flower (auth-protected)
         location /flower/ {
             proxy_pass http://flower;
@@ -574,33 +573,33 @@ http {
 
 ### 11.1 Service Health Endpoints
 
-| Service | Health Check URL | Expected Response |
-|---------|-----------------|------------------|
-| FastAPI Backend | `GET /health` | `{"status": "ok"}` |
-| Redis | `redis-cli ping` | `PONG` |
-| Celery Workers | `celery -A app.tasks inspect ping` | Worker heartbeat |
-| Flower Dashboard | `http://localhost:5555` | Web UI |
+| Service          | Health Check URL                   | Expected Response  |
+| ---------------- | ---------------------------------- | ------------------ |
+| FastAPI Backend  | `GET /health`                      | `{"status": "ok"}` |
+| Redis            | `redis-cli ping`                   | `PONG`             |
+| Celery Workers   | `celery -A app.tasks inspect ping` | Worker heartbeat   |
+| Flower Dashboard | `http://localhost:5555`            | Web UI             |
 
 ### 11.2 Recommended Monitoring Stack
 
-| Tool | Purpose |
-|------|---------|
-| **Prometheus** | Metrics collection (FastAPI `/metrics` endpoint via `prometheus-fastapi-instrumentator`) |
-| **Grafana** | Metrics visualization dashboards |
-| **Celery Flower** | Celery task monitoring and worker management |
-| **Uptime Robot / Pingdom** | External uptime monitoring |
-| **Loki + Promtail** | Centralized log aggregation |
+| Tool                       | Purpose                                                                                  |
+| -------------------------- | ---------------------------------------------------------------------------------------- |
+| **Prometheus**             | Metrics collection (FastAPI `/metrics` endpoint via `prometheus-fastapi-instrumentator`) |
+| **Grafana**                | Metrics visualization dashboards                                                         |
+| **Celery Flower**          | Celery task monitoring and worker management                                             |
+| **Uptime Robot / Pingdom** | External uptime monitoring                                                               |
+| **Loki + Promtail**        | Centralized log aggregation                                                              |
 
 ### 11.3 Key Metrics to Monitor
 
-| Metric | Alert Threshold |
-|--------|----------------|
-| API response time (p95) | > 2 seconds |
-| Generation job success rate | < 95% |
-| Celery queue depth | > 20 pending tasks |
-| Redis memory usage | > 80% of `maxmemory` |
-| Failed Playwright captures | > 20% of total captures |
-| Ollama API error rate | > 5% |
+| Metric                      | Alert Threshold         |
+| --------------------------- | ----------------------- |
+| API response time (p95)     | > 2 seconds             |
+| Generation job success rate | < 95%                   |
+| Celery queue depth          | > 20 pending tasks      |
+| Redis memory usage          | > 80% of `maxmemory`    |
+| Failed Playwright captures  | > 20% of total captures |
+| Ollama API error rate       | > 5%                    |
 
 ---
 
@@ -608,12 +607,12 @@ http {
 
 ### 12.1 Horizontal Scaling
 
-| Bottleneck | Solution |
-|-----------|---------|
-| High API request volume | Add FastAPI instances behind Nginx upstream with `least_conn` load balancing |
-| Slow Playwright captures | Increase `worker` service replicas in Docker Compose (`--replicas N`) |
-| LLM inference latency | Provision additional Ollama Cloud capacity; enable model caching |
-| Redis saturation | Upgrade to Redis Cluster mode; increase `maxmemory` |
+| Bottleneck               | Solution                                                                     |
+| ------------------------ | ---------------------------------------------------------------------------- |
+| High API request volume  | Add FastAPI instances behind Nginx upstream with `least_conn` load balancing |
+| Slow Playwright captures | Increase `worker` service replicas in Docker Compose (`--replicas N`)        |
+| LLM inference latency    | Provision additional Ollama Cloud capacity; enable model caching             |
+| Redis saturation         | Upgrade to Redis Cluster mode; increase `maxmemory`                          |
 
 ### 12.2 Production Kubernetes Considerations
 
@@ -631,12 +630,12 @@ For production deployments at scale, migrate from Docker Compose to **Kubernetes
 
 ### 13.1 What to Back Up
 
-| Data | Location | Backup Method |
-|------|----------|--------------|
-| Redis state data | Docker volume `redis_data` | `redis-cli BGSAVE` → copy `/data/dump.rdb` |
-| Screenshot assets | Docker volume `screenshot_assets` | rsync to S3/NFS |
-| Export files | Docker volume `export_files` | rsync to S3/NFS |
-| Application configuration | `.env` files | Vault / secret manager |
+| Data                      | Location                          | Backup Method                              |
+| ------------------------- | --------------------------------- | ------------------------------------------ |
+| Redis state data          | Docker volume `redis_data`        | `redis-cli BGSAVE` → copy `/data/dump.rdb` |
+| Screenshot assets         | Docker volume `screenshot_assets` | rsync to S3/NFS                            |
+| Export files              | Docker volume `export_files`      | rsync to S3/NFS                            |
+| Application configuration | `.env` files                      | Vault / secret manager                     |
 
 ### 13.2 Backup Schedule
 
@@ -656,14 +655,14 @@ For production deployments at scale, migrate from Docker Compose to **Kubernetes
 
 ### 14.1 Common Issues
 
-| Issue | Symptom | Resolution |
-|-------|---------|-----------|
-| Playwright browser crash | Step capture errors, `--no-sandbox` errors | Add `--no-sandbox --disable-dev-shm-usage` to Chromium args; check system memory |
-| Redis connection refused | `ConnectionRefusedError: [Errno 111]` | Verify Redis container is running; check `REDIS_URL` in `.env` |
-| Ollama API timeout | `LLM_INFERENCE_TIMEOUT` errors | Increase `OLLAMA_TIMEOUT_SECONDS`; check Ollama Cloud endpoint status |
-| SSE connection drops | Progress bar stops; incomplete generation | Verify Nginx `proxy_read_timeout` is ≥ 600s; check `proxy_buffering off` |
-| WeasyPrint PDF failure | Export returns 500 error | Install WeasyPrint system dependencies: `apt install libpango-1.0-0 libharfbuzz0b` |
-| Celery tasks not processing | Queue depth grows; no worker activity | Restart Celery workers: `docker compose restart worker` |
+| Issue                       | Symptom                                    | Resolution                                                                         |
+| --------------------------- | ------------------------------------------ | ---------------------------------------------------------------------------------- |
+| Playwright browser crash    | Step capture errors, `--no-sandbox` errors | Add `--no-sandbox --disable-dev-shm-usage` to Chromium args; check system memory   |
+| Redis connection refused    | `ConnectionRefusedError: [Errno 111]`      | Verify Redis container is running; check `REDIS_URL` in `.env`                     |
+| Ollama API timeout          | `LLM_INFERENCE_TIMEOUT` errors             | Increase `OLLAMA_TIMEOUT_SECONDS`; check Ollama Cloud endpoint status              |
+| SSE connection drops        | Progress bar stops; incomplete generation  | Verify Nginx `proxy_read_timeout` is ≥ 600s; check `proxy_buffering off`           |
+| WeasyPrint PDF failure      | Export returns 500 error                   | Install WeasyPrint system dependencies: `apt install libpango-1.0-0 libharfbuzz0b` |
+| Celery tasks not processing | Queue depth grows; no worker activity      | Restart Celery workers: `docker compose restart worker`                            |
 
 ### 14.2 Log Locations
 
@@ -686,9 +685,9 @@ docker compose logs -f --timestamps
 
 ---
 
-*← Previous: [Frontend Developer Guide](./06_frontend_developer_guide.md)*  
-*→ Next: [Security & Data Privacy](./08_security_data_privacy.md)*
+_← Previous: [Frontend Developer Guide](./06_frontend_developer_guide.md)_  
+_→ Next: [Security & Data Privacy](./08_security_data_privacy.md)_
 
 ---
 
-*Document ID: DOC-007 · Version: 1.0.0 · DocuAgent AI Technical Documentation Suite*
+_Document ID: DOC-007 · Version: 1.0.0 · DocuAgent AI Technical Documentation Suite_
