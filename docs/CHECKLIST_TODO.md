@@ -92,11 +92,11 @@ Each item is categorized by priority tag:
 
 ### 3.2 Data Models & Pydantic Schemas
 
-- [ ] **[P0]** Define `StepSchema` model with `index`, `description`, `action_type`, `target_selector`, `input_value`, `expected_url`, `domain_context`, `selector_hints`.
-- [ ] **[P0]** Define `ChatMessage` model (`role`, `content`, `timestamp`).
-- [ ] **[P0]** Define `GenerateRequest` model with input validation (minimum script length, valid URL).
-- [ ] **[P0]** Define `GenerateResponse`, `JobStatusResponse`, and `ChatResponse` models.
-- [ ] **[P0]** Define standard `ErrorResponse` schema matching DOC-004 specification.
+- [x] **[P0]** Define `StepSchema` model with `index`, `description`, `action_type`, `target_selector`, `input_value`, `expected_url`, `domain_context`, `selector_hints`.
+- [x] **[P0]** Define `ChatMessage` model (`role`, `content`, `timestamp`).
+- [x] **[P0]** Define `GenerateRequest` model with input validation (minimum script length, valid URL).
+- [x] **[P0]** Define `GenerateResponse`, `JobStatusResponse`, and `ChatResponse` models.
+- [x] **[P0]** Define standard `ErrorResponse` schema matching DOC-004 specification.
 
 ### 3.3 REST API Endpoints
 
