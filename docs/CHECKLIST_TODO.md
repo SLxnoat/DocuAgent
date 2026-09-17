@@ -73,9 +73,9 @@ Each item is categorized by priority tag:
 ### 2.4 Infrastructure & Tooling Prerequisites
 
 - [x] **[P0]** Verify Docker and Docker Compose v2.20+ installation.
-- [ ] **[P0]** Test network connectivity and authentication to Ollama Cloud LLM endpoint.
-- [ ] **[P0]** Verify availability of models `llama3.3:70b` and `qwen2.5:72b` on Ollama Cloud instance.
-- [ ] **[P0]** Run initial Playwright headless installation verification (`playwright install chromium && playwright install-deps`).
+- [x] **[P0]** Test network connectivity and authentication to Ollama Cloud LLM endpoint.
+- [x] **[P0]** Verify availability of models `llama3.3:70b` and `qwen2.5:72b` on Ollama Cloud instance.
+- [x] **[P0]** Run initial Playwright headless installation verification (`playwright install chromium && playwright install-deps`).
 
 ---
 
@@ -83,12 +83,12 @@ Each item is categorized by priority tag:
 
 ### 3.1 Config, Logging & Middleware
 
-- [ ] **[P0]** Implement `backend/app/config.py` using `pydantic-settings` to parse and validate all environment variables.
-- [ ] **[P0]** Implement `SensitiveDataFilter` in `backend/app/utils/logging.py` to redact credentials and tokens from logs.
-- [ ] **[P0]** Implement custom structured JSON logging middleware emitting timestamp, log level, request ID, and message.
-- [ ] **[P0]** Implement Bearer token verification middleware in `backend/app/middleware/auth.py`.
-- [ ] **[P1]** Implement CORS middleware with explicit allowed origins for local and staging domains.
-- [ ] **[P1]** Implement API rate limiting using `slowapi` on generation endpoints.
+- [x] **[P0]** Implement `backend/app/config.py` using `pydantic-settings` to parse and validate all environment variables.
+- [x] **[P0]** Implement `SensitiveDataFilter` in `backend/app/utils/logging.py` to redact credentials and tokens from logs.
+- [x] **[P0]** Implement custom structured JSON logging middleware emitting timestamp, log level, request ID, and message.
+- [x] **[P0]** Implement Bearer token verification middleware in `backend/app/middleware/auth.py`.
+- [x] **[P1]** Implement CORS middleware with explicit allowed origins for local and staging domains.
+- [x] **[P1]** Implement API rate limiting using `slowapi` on generation endpoints.
 
 ### 3.2 Data Models & Pydantic Schemas
 
