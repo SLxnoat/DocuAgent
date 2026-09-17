@@ -128,11 +128,11 @@ Each item is categorized by priority tag:
 
 ### 4.3 Agent 3: Technical Writer & Layout Agent (`compile_markdown_node`)
 
-- [ ] **[P0]** Configure LLM client with Llama 3.3 70B for technical document synthesis.
-- [ ] **[P0]** Implement prompt structuring standard sections: Prerequisites, System Overview, Step-by-Step Walkthrough, and Troubleshooting.
-- [ ] **[P0]** Map screenshot assets (`screenshot_assets[step_index]`) to corresponding Markdown image markdown tags.
-- [ ] **[P1]** Format callout blocks (`> 💡 Tip:`, `> ⚠️ Warning:`, `> 📌 Note:`).
-- [ ] **[P1]** Implement logic to consume `quality_feedback` when re-compiling after a quality rejection loop.
+- [x] **[P0]** Configure LLM client with Llama 3.3 70B for technical document synthesis.
+- [x] **[P0]** Implement prompt structuring standard sections: Prerequisites, System Overview, Step-by-Step Walkthrough, and Troubleshooting.
+- [x] **[P0]** Map screenshot assets (`screenshot_assets[step_index]`) to corresponding Markdown image markdown tags.
+- [x] **[P1]** Format callout blocks (`> 💡 Tip:`, `> ⚠️ Warning:`, `> 📌 Note:`).
+- [x] **[P1]** Implement logic to consume `quality_feedback` when re-compiling after a quality rejection loop.
 
 ### 4.4 Agent 4: Quality & Verification Agent (`quality_review_node`)
 

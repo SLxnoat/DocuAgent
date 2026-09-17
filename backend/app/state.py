@@ -22,3 +22,4 @@ class ManualState(TypedDict):
     execution_logs: list[str]
     quality_approved: bool
     error_states: dict[str, Any]
+    quality_feedback: str | None  # Structured feedback from quality review (Agent 4)
