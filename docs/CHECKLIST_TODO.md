@@ -100,12 +100,12 @@ Each item is categorized by priority tag:
 
 ### 3.3 REST API Endpoints
 
-- [ ] **[P0]** Implement `GET /health` with system status, active version, and timestamp.
-- [ ] **[P0]** Implement `POST /api/v1/generate` to accept payload, validate URL, trigger task, and return `job_id` + `session_id`.
-- [ ] **[P0]** Implement `GET /api/v1/jobs/{job_id}` for polling job execution state and metadata.
-- [ ] **[P1]** Implement `DELETE /api/v1/jobs/{job_id}` to terminate active execution and purge temporary assets.
-- [ ] **[P1]** Implement `POST /api/v1/recapture/{job_id}/{step_index}` to trigger targeted single-step re-execution.
-- [ ] **[P1]** Implement `POST /api/v1/jobs/{job_id}/assets/{step_index}` for multipart screenshot replacement uploads.
+- [x] **[P0]** Implement `GET /health` with system status, active version, and timestamp.
+- [x] **[P0]** Implement `POST /api/v1/generate` to accept payload, validate URL, trigger task, and return `job_id` + `session_id`.
+- [x] **[P0]** Implement `GET /api/v1/jobs/{job_id}` for polling job execution state and metadata.
+- [x] **[P1]** Implement `DELETE /api/v1/jobs/{job_id}` to terminate active execution and purge temporary assets.
+- [x] **[P1]** Implement `POST /api/v1/recapture/{job_id}/{step_index}` to trigger targeted single-step re-execution.
+- [x] **[P1]** Implement `POST /api/v1/jobs/{job_id}/assets/{step_index}` for multipart screenshot replacement uploads.
 
 ---
 

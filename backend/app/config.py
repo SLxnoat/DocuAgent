@@ -9,6 +9,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 class Settings(BaseSettings):
     # Application & Server Settings
     app_name: str = "DocuAgent AI"
+    app_version: str = Field(default="1.0.0", env="APP_VERSION")
     app_env: str = Field(default="development", env="APP_ENV")
     app_debug: bool = Field(default=True, env="APP_DEBUG")
     app_host: str = Field(default="0.0.0.0", env="APP_HOST")
