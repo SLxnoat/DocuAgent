@@ -229,10 +229,10 @@ Each item is categorized by priority tag:
 
 ### 6.3 Bidirectional Chat (WebSocket)
 
-- [ ] **[P0]** Implement `WS /api/v1/ws/chat/{session_id}` WebSocket handler.
-- [ ] **[P0]** Handle client incoming message validation and dispatch to Agent 5.
-- [ ] **[P0]** Stream agent document updates back over WebSocket connection.
-- [ ] **[P1]** Implement keep-alive ping/pong framing.
+- [x] **[P0]** Implement `WS /api/v1/ws/chat/{session_id}` WebSocket handler.
+- [x] **[P0]** Handle client incoming message validation and dispatch to Agent 5.
+- [x] **[P0]** Stream agent document updates back over WebSocket connection.
+- [x] **[P1]** Implement keep-alive ping/pong framing.
 
 ---
 

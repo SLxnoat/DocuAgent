@@ -8,7 +8,6 @@ from typing import Literal
 
 from .llm import ollama_generate_text
 from .state import ManualState
-from .utils.sse_publisher import publish_sse_event
 
 
 def classify_chat_edit(
@@ -389,84 +388,33 @@ async def chat_refiner_node(state: ManualState) -> ManualState:
         # Extract the step index to recapture
         step_index = extract_recapture_step_index(message_content)
         if step_index is not None:
-            # In a full implementation, we would trigger a recapture of the specified step
-            # For now, we'll just log this intent
+            # Set the recapture_step_index in the state
+            current_state["recapture_step_index"] = step_index
+            # Log the action
             execution_logs = current_state.get("execution_logs", [])
-            execution_logs.append(f"Recapture trigger detected for step {step_index}")
+            execution_logs.append(f"Recapture trigger set for step {step_index}")
             current_state["execution_logs"] = execution_logs
 
-            # We could set a flag to indicate that recapture is needed
-            # This would be handled by the orchestrator/graph logic
-
-            # Publish event: we can publish a custom event for recapture trigger
-            job_id = current_state.get("job_id")
-            if job_id:
-                try:
-                    publish_sse_event(
-                        job_id=job_id,
-                        event_type="recapture_trigger",  # Not in the checklist, but we can use it for now
-                        data={
-                            "step_index": step_index,
-                            "message": message_content,
-                        },
-                    )
-                except Exception as e:
-                    # Don't let publishing errors break the node
-                    import logging
-
-                    logger = logging.getLogger(__name__)
-                    logger.warning("Failed to publish recapture_trigger event: %s", e)
-
     elif edit_type == "text_edit":
-        # Handle simple text edits
-        # In a full implementation, we would use update_markdown_sections or translate_document
-        # based on the user's request
+        # For simplicity, we treat the message as the new markdown content.
+        # In a more advanced system, we would apply the edit to the existing content.
+        current_state["markdown_content"] = message_content
+        # Log the action
         execution_logs = current_state.get("execution_logs", [])
-        execution_logs.append(f"Text edit requested: {message_content[:100]}...")
+        execution_logs.append(f"Text edit applied: {message_content[:100]}...")
         current_state["execution_logs"] = execution_logs
-
-        # Publish event: we can publish a custom event for text edit
-        job_id = current_state.get("job_id")
-        if job_id:
-            try:
-                publish_sse_event(
-                    job_id=job_id,
-                    event_type="text_edit",  # Not in the checklist
-                    data={
-                        "message": message_content,
-                    },
-                )
-            except Exception as e:
-                import logging
-
-                logger = logging.getLogger(__name__)
-                logger.warning("Failed to publish text_edit event: %s", e)
 
     elif edit_type == "structural_revision":
-        # Handle structural revisions (add/remove steps, reorder, etc.)
+        # Append a new section with the message as the heading
+        new_section = f"\n\n## {message_content}\n\n*Content to be added.*\n"
+        current_state["markdown_content"] = state.get("markdown_content", "") + new_section
+        # Log the action
         execution_logs = current_state.get("execution_logs", [])
-        execution_logs.append(f"Structural revision requested: {message_content[:100]}...")
+        execution_logs.append(f"Structural revision applied: added section '{message_content}'")
         current_state["execution_logs"] = execution_logs
 
-        # Publish event: we can publish a custom event for structural revision
-        job_id = current_state.get("job_id")
-        if job_id:
-            try:
-                publish_sse_event(
-                    job_id=job_id,
-                    event_type="structural_revision",  # Not in the checklist
-                    data={
-                        "message": message_content,
-                    },
-                )
-            except Exception as e:
-                import logging
+    # Note: We do not publish custom events here to keep SSE events to the standard ones.
+    # The orchestrator or other agents will publish the standard events (e.g., document_ready) when appropriate.
 
-                logger = logging.getLogger(__name__)
-                logger.warning("Failed to publish structural_revision event: %s", e)
-
-    # In a complete implementation, we would actually modify the markdown content here
-    # based on the edit type and user request
-
-    # For now, we'll return the state unchanged but with logs updated
+    # Return the updated state
     return current_state
