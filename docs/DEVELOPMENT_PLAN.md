@@ -117,7 +117,7 @@ P5 = E2E Integration          P10 = Release & Post-Launch
 
 - [x] Initialize Git monorepo with `/backend`, `/frontend`, `/deploy`, `/docs`, `/scripts` structure.
 - [x] Configure `.gitignore` for Python (`venv`, `__pycache__`, `.env`) and Node (`node_modules`, `dist`).
-- [ ] Add repository `README.md` with quickstart instructions and architecture diagram link.
+- [x] Add repository `README.md` with quickstart instructions and architecture diagram link.
 - [x] Set up branch protection rules on `main` and `develop`.
 - [x] Configure GitHub Actions CI pipeline skeleton (lint + build triggers).
 
@@ -126,36 +126,36 @@ P5 = E2E Integration          P10 = Release & Post-Launch
 - [x] Initialize Python 3.11 project with `pyproject.toml` (or `setup.py`).
 - [x] Create `requirements.txt` with all pinned dependencies (FastAPI, LangGraph, Playwright, Celery, etc.).
 - [x] Create `requirements-dev.txt` with dev dependencies (pytest, mypy, ruff, httpx test client).
-- [ ] Set up virtual environment instructions in `README.md`.
+- [x] Set up virtual environment instructions in `README.md`.
 - [x] Create `.env.example` with all required environment variable keys (no values).
 - [x] Configure `ruff` for Python linting and `mypy` for type checking.
-- [ ] Initialize `app/` package with `main.py`, `config.py`, `models/`, `api/`, `agents/`, `tasks/`, `utils/` directories.
+- [x] Initialize `app/` package with `main.py`, `config.py`, `models/`, `api/`, `agents/`, `tasks/`, `utils/` directories.
 
 ### 5.3 Frontend Environment
 
-- [ ] Initialize React + Vite + TypeScript project: `npm create vite@latest frontend -- --template react-ts`.
-- [ ] Install and configure Tailwind CSS + PostCSS.
-- [ ] Install and initialize `shadcn/ui` component library.
-- [ ] Install core dependencies: Zustand, Axios, Monaco Editor, react-markdown, Lucide Icons.
-- [ ] Configure ESLint + Prettier for TypeScript.
-- [ ] Create `.env.example` for frontend environment variables.
-- [ ] Set up `src/` directory structure (`components/`, `hooks/`, `store/`, `api/`, `types/`, `utils/`).
+- [x] Initialize React + Vite + TypeScript project: `npm create vite@latest frontend -- --template react-ts`.
+- [x] Install and configure Tailwind CSS + PostCSS.
+- [x] Install and initialize `shadcn/ui` component library.
+- [x] Install core dependencies: Zustand, Axios, Monaco Editor, react-markdown, Lucide Icons.
+- [x] Configure ESLint + Prettier for TypeScript.
+- [x] Create `.env.example` for frontend environment variables.
+- [x] Set up `src/` directory structure (`components/`, `hooks/`, `store/`, `api/`, `types/`, `utils/`).
 
 ### 5.4 Infrastructure Setup
 
-- [ ] Install Docker Desktop / Docker Engine + Docker Compose on all developer machines.
+- [x] Install Docker Desktop / Docker Engine + Docker Compose on all developer machines.
 - [ ] Create base `docker-compose.dev.yml` for local development (Redis + backend + frontend with hot-reload).
-- [ ] Pull and verify Ollama Cloud endpoint connectivity: `curl ${OLLAMA_BASE_URL}/api/tags`.
-- [ ] Pull required LLM models (Llama 3.3 70B, Qwen 2.5 72B) to Ollama Cloud instance.
-- [ ] Verify Playwright Chromium install: `playwright install chromium && playwright install-deps`.
+- [x] Pull and verify Ollama Cloud endpoint connectivity: `curl ${OLLAMA_BASE_URL}/api/tags`.
+- [x] Pull required LLM models (Llama 3.3 70B, Qwen 2.5 72B) to Ollama Cloud instance.
+- [x] Verify Playwright Chromium install: `playwright install chromium && playwright install-deps`.
 - [ ] Set up shared development Redis instance.
 
 ### 5.5 Communication & Tooling
 
 - [ ] Create project board (GitHub Projects or Jira) with Phases and task cards.
 - [ ] Set up team communication channel (Slack/Teams) with `#docuagent-dev`, `#docuagent-alerts`.
-- [ ] Define and document Git commit message convention (Conventional Commits).
-- [ ] Configure pre-commit hooks: `ruff`, `mypy`, `eslint`, `prettier`.
+- [x] Define and document Git commit message convention (Conventional Commits).
+- [x] Configure pre-commit hooks: `ruff`, `mypy`, `eslint`, `prettier`.
 
 ---
 
@@ -167,72 +167,81 @@ P5 = E2E Integration          P10 = Release & Post-Launch
 
 ### 6.1 FastAPI Application Core
 
-- [ ] Implement `app/main.py` — FastAPI application instance, middleware, exception handlers, CORS configuration.
-- [ ] Implement `app/config.py` — Pydantic `Settings` class loading all env vars with validation.
-- [ ] Implement `app/middleware/auth.py` — Bearer token authentication middleware.
-- [ ] Implement `app/middleware/logging.py` — Structured JSON logging + `SensitiveDataFilter`.
-- [ ] Implement `app/middleware/rate_limit.py` — `slowapi` rate limiting per endpoint.
-- [ ] Implement `GET /health` endpoint — service liveness check returning version and timestamp.
+- [x] Implement `app/main.py` — FastAPI application instance, middleware, exception handlers, CORS configuration.
+- [x] Implement `app/config.py` — Pydantic `Settings` class loading all env vars with validation.
+- [x] Implement `app/middleware/auth.py` — Bearer token authentication middleware.
+- [x] Implement `app/middleware/logging.py` — Structured JSON logging + `SensitiveDataFilter`.
+- [x] Implement `app/middleware/rate_limit.py` — `slowapi` rate limiting per endpoint.
+- [x] Implement `GET /health` endpoint — service liveness check returning version and timestamp.
 
 ### 6.2 Data Models & Schemas
 
-- [ ] Define `StepSchema` Pydantic model (index, description, action_type, target_selector, input_value, expected_url, domain_context, selector_hints).
-- [ ] Define `ChatMessage` Pydantic model (role, content, timestamp).
-- [ ] Define `ManualState` TypedDict (all fields per specification in DOC-003).
-- [ ] Define `GenerateRequest` Pydantic model with validators (URL format, script min length).
+- [x] Define `StepSchema` Pydantic model (index, description, action_type, target_selector, input_value, expected_url, domain_context, selector_hints).
+- [x] Define `ChatMessage` Pydantic model (role, content, timestamp).
+- [x] Define `ManualState` TypedDict (all fields per specification in DOC-003).
+- [x] Define `GenerateRequest` Pydantic model with validators (URL format, script min length).
 - [ ] Define `ChatRequest` Pydantic model.
-- [ ] Define `GenerateResponse`, `ChatResponse`, `JobStatusResponse` response models.
-- [ ] Define `ErrorResponse` standardized error schema.
+- [x] Define `GenerateResponse`, `ChatResponse`, `JobStatusResponse` response models.
+- [x] Define `ErrorResponse` standardized error schema.
 
 ### 6.3 LangGraph State Machine Setup
 
-- [ ] Install and configure LangGraph + LangChain Core + langchain-ollama.
-- [ ] Implement `app/graph/state.py` — `ManualState` TypedDict with all fields.
+- [x] Install and configure LangGraph + LangChain Core + langchain-ollama.
+- [x] Implement `app/graph/state.py` — `ManualState` TypedDict with all fields.
 - [ ] Implement `app/graph/graph.py` — `StateGraph` initialization, node registration, edge definitions.
-- [ ] Implement `route_after_quality_review()` conditional edge function.
-- [ ] Configure `MemorySaver` checkpointer for development.
-- [ ] Configure `RedisCheckpointer` for production.
+- [x] Implement `route_after_quality_review()` conditional edge function.
+- [x] Configure `MemorySaver` checkpointer for development.
+- [x] Configure `RedisCheckpointer` for production.
 - [ ] Implement HITL `interrupt_before=["chat_refiner_node"]` configuration.
 - [ ] Write unit tests for graph topology (verify node connections and conditional routing).
 
 ### 6.4 Agent 1 — Script & Domain Analyzer
 
-- [ ] Implement `app/agents/analyzer.py` — `analyze_script_node` function.
-- [ ] Implement `ChatOllama` client initialization with Qwen 2.5 72B.
-- [ ] Write Script Analyzer system prompt (per DOC-003 §12.1).
-- [ ] Implement Pydantic output parser for `list[StepSchema]` JSON response.
-- [ ] Implement retry logic (max 2 retries) for JSON parsing failures.
-- [ ] Implement domain context detection from script text.
+- [x] Implement `app/agents/analyzer.py` — `analyze_script_node` function.
+- [x] Implement `ChatOllama` client initialization with Qwen 2.5 72B.
+- [x] Write Script Analyzer system prompt (per DOC-003 §12.1).
+- [x] Implement Pydantic output parser for `list[StepSchema]` JSON response.
+- [x] Implement retry logic (max 2 retries) for JSON parsing failures.
+- [x] Implement domain context detection from script text.
 - [ ] Test with sample scripts across 5 different domains (E-commerce, CRM, Admin Portal, Finance, SaaS).
 
-### 6.5 Agent 3 — Technical Writer & Layout Agent
+### 6.5 Agent 2 — Playwright Visual Capturer (Orchestration Node)
 
-- [ ] Implement `app/agents/writer.py` — `compile_markdown_node` function.
-- [ ] Implement `ChatOllama` client initialization with Llama 3.3 70B.
-- [ ] Write Technical Writer system prompt (per DOC-003 §12.2) with domain-specific tone modes.
-- [ ] Implement Markdown template assembly (Prerequisites, Overview, Step sections, Troubleshooting).
-- [ ] Implement screenshot asset injection into Markdown image references.
-- [ ] Implement `quality_feedback` application when document is being re-compiled after QA rejection.
+- [ ] Implement `app/agents/capture_agent.py` — `capture_screenshots_node` function.
+- [ ] Connect state machine to `PlaywrightCaptureEngine` context manager (Phase 3).
+- [ ] Implement sequential iteration over `structured_steps` mapping actions to browser execution.
+- [ ] Populate `screenshot_assets` mapping (`{step_index: asset_path}`) in `ManualState`.
+- [ ] Implement credential scrubbing: wipe `state["credentials"] = {}` immediately after authentication.
+- [ ] Implement fault isolation registering errors in `error_states` without aborting pipeline.
+
+### 6.6 Agent 3 — Technical Writer & Layout Agent
+
+- [x] Implement `app/agents/writer.py` — `compile_markdown_node` function.
+- [x] Implement `ChatOllama` client initialization with Llama 3.3 70B.
+- [x] Write Technical Writer system prompt (per DOC-003 §12.2) with domain-specific tone modes.
+- [x] Implement Markdown template assembly (Prerequisites, Overview, Step sections, Troubleshooting).
+- [x] Implement screenshot asset injection into Markdown image references.
+- [x] Implement `quality_feedback` application when document is being re-compiled after QA rejection.
 - [ ] Test output quality across 3 domain types.
 
-### 6.6 Agent 4 — Quality & Verification Agent
+### 6.7 Agent 4 — Quality & Verification Agent
 
-- [ ] Implement `app/agents/reviewer.py` — `quality_review_node` function.
-- [ ] Implement quality review checklist evaluation prompt (step completeness, screenshot coverage, tone consistency, logical flow).
-- [ ] Implement `quality_approved` flag setting and `quality_feedback` note generation on rejection.
-- [ ] Implement retry counter with max 3 retries before force-approval.
+- [x] Implement `app/agents/reviewer.py` — `quality_review_node` function.
+- [x] Implement quality review checklist evaluation prompt (step completeness, screenshot coverage, tone consistency, logical flow).
+- [x] Implement `quality_approved` flag setting and `quality_feedback` note generation on rejection.
+- [x] Implement retry counter with max 3 retries before force-approval.
 - [ ] Test rejection/retry cycle with intentionally poor Markdown input.
 
-### 6.7 Agent 5 — Conversational Refiner Agent
+### 6.8 Agent 5 — Conversational Refiner Agent
 
-- [ ] Implement `app/agents/refiner.py` — `chat_refiner_node` function.
-- [ ] Implement edit classification logic (text edit / structural edit / re-capture trigger).
-- [ ] Implement `update_specific_section()` — Markdown section-level surgical update utility.
-- [ ] Implement re-capture trigger response (set `recapture_step_index` in response when applicable).
-- [ ] Write Conversational Refiner system prompt (per DOC-003 §12.3).
+- [x] Implement `app/agents/refiner.py` — `chat_refiner_node` function.
+- [x] Implement edit classification logic (text edit / structural edit / re-capture trigger).
+- [x] Implement `update_specific_section()` — Markdown section-level surgical update utility.
+- [x] Implement re-capture trigger response (set `recapture_step_index` in response when applicable).
+- [x] Write Conversational Refiner system prompt (per DOC-003 §12.3).
 - [ ] Test 10 different natural language edit request types.
 
-### 6.8 Task Queue (Celery + Redis)
+### 6.9 Task Queue (Celery + Redis)
 
 - [ ] Implement `app/tasks/celery_app.py` — Celery application instance with Redis broker/backend.
 - [ ] Implement `app/tasks/generate_manual.py` — `generate_manual` Celery task wrapping LangGraph execution.
@@ -241,22 +250,22 @@ P5 = E2E Integration          P10 = Release & Post-Launch
 - [ ] Implement `app/tasks/cleanup.py` — `cleanup_expired_jobs` periodic task with Celery Beat.
 - [ ] Configure task routing (generation, capture, export queues).
 
-### 6.9 API Endpoints — Generation & Job Management
+### 6.10 API Endpoints — Generation & Job Management
 
-- [ ] Implement `POST /api/v1/generate` — validate request, enqueue Celery task, return `job_id` + `session_id`.
-- [ ] Implement `GET /api/v1/jobs/{job_id}` — job status poll endpoint.
-- [ ] Implement `DELETE /api/v1/jobs/{job_id}` — job cancellation + asset cleanup.
-- [ ] Implement `POST /api/v1/jobs/{job_id}/assets/{step_index}` — screenshot upload replacement.
-- [ ] Implement `POST /api/v1/recapture/{job_id}/{step_index}` — single step re-capture trigger.
+- [x] Implement `POST /api/v1/generate` — validate request, enqueue Celery task, return `job_id` + `session_id`.
+- [x] Implement `GET /api/v1/jobs/{job_id}` — job status poll endpoint.
+- [x] Implement `DELETE /api/v1/jobs/{job_id}` — job cancellation + asset cleanup.
+- [x] Implement `POST /api/v1/jobs/{job_id}/assets/{step_index}` — screenshot upload replacement.
+- [x] Implement `POST /api/v1/recapture/{job_id}/{step_index}` — single step re-capture trigger.
 
-### 6.10 API Endpoints — Streaming & Chat
+### 6.11 API Endpoints — Streaming & Chat
 
 - [ ] Implement `GET /api/v1/stream/{job_id}` — SSE endpoint with Redis PubSub event relay.
 - [ ] Implement SSE event publisher in LangGraph agent callbacks.
 - [ ] Implement `POST /api/v1/chat/{session_id}` — REST chat endpoint (fallback for non-WS clients).
 - [ ] Implement `WS /api/v1/ws/chat/{session_id}` — WebSocket chat endpoint with heartbeat handling.
 
-### 6.11 Export Engine
+### 6.12 Export Engine
 
 - [ ] Implement `app/utils/export.py` — Markdown → HTML via Pandoc.
 - [ ] Implement Markdown → PDF via WeasyPrint with custom CSS stylesheet.
@@ -266,7 +275,7 @@ P5 = E2E Integration          P10 = Release & Post-Launch
 
 ---
 
-## 7. Phase 3 — Playwright Browser Automation Engine
+## 7. Phase 3 — Playwright Browser Automation Engine (Agent 2 Core Subsystem)
 
 **Duration:** Weeks 2–4  
 **Owner:** Backend Engineer (Playwright specialist)  

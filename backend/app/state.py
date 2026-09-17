@@ -23,3 +23,4 @@ class ManualState(TypedDict):
     quality_approved: bool
     error_states: dict[str, Any]
     quality_feedback: str | None  # Structured feedback from quality review (Agent 4)
+    quality_review_attempts: int  # Number of times quality review has been looped

@@ -126,7 +126,16 @@ Each item is categorized by priority tag:
 - [x] **[P1]** Add selector heuristic synthesis providing 2–3 fallback selectors per step.
 - [x] **[P1]** Add automatic retry and recovery for malformed LLM JSON output.
 
-### 4.3 Agent 3: Technical Writer & Layout Agent (`compile_markdown_node`)
+### 4.3 Agent 2: Playwright Visual Capturer (`capture_screenshots_node`)
+
+- [ ] **[P0]** Implement `capture_screenshots_node` in `backend/app/agents/capture_agent.py` orchestrating browser automation.
+- [ ] **[P0]** Connect state machine to `PlaywrightCaptureEngine` async context manager.
+- [ ] **[P0]** Iterate over `structured_steps` and execute browser action dispatch, highlight injection, and viewport capture sequence.
+- [ ] **[P0]** Map captured screenshots to `screenshot_assets` dictionary (`{step_index: asset_path}`) in `ManualState`.
+- [ ] **[P0]** Enforce immediate credential scrubbing (`state["credentials"] = {}`) immediately after browser authentication.
+- [ ] **[P1]** Register per-step capture errors into `error_states` and provide fallback placeholder handling without breaking pipeline.
+
+### 4.4 Agent 3: Technical Writer & Layout Agent (`compile_markdown_node`)
 
 - [x] **[P0]** Configure LLM client with Llama 3.3 70B for technical document synthesis.
 - [x] **[P0]** Implement prompt structuring standard sections: Prerequisites, System Overview, Step-by-Step Walkthrough, and Troubleshooting.
@@ -134,21 +143,21 @@ Each item is categorized by priority tag:
 - [x] **[P1]** Format callout blocks (`> 💡 Tip:`, `> ⚠️ Warning:`, `> 📌 Note:`).
 - [x] **[P1]** Implement logic to consume `quality_feedback` when re-compiling after a quality rejection loop.
 
-### 4.4 Agent 4: Quality & Verification Agent (`quality_review_node`)
+### 4.5 Agent 4: Quality & Verification Agent (`quality_review_node`)
 
-- [ ] **[P0]** Implement evaluation prompt auditing completeness, screenshot coverage, tone consistency, and logical sequencing.
-- [ ] **[P0]** Implement conditional edge evaluator `route_after_quality_review()`.
-- [ ] **[P0]** Implement loop guard enforcing maximum 3 re-generation attempts before forced approval.
-- [ ] **[P1]** Populate structured `quality_feedback` notes on review failure.
+- [x] **[P0]** Implement evaluation prompt auditing completeness, screenshot coverage, tone consistency, and logical sequencing.
+- [x] **[P0]** Implement conditional edge evaluator `route_after_quality_review()`.
+- [x] **[P0]** Implement loop guard enforcing maximum 3 re-generation attempts before forced approval.
+- [x] **[P1]** Populate structured `quality_feedback` notes on review failure.
 
-### 4.5 Agent 5: Conversational Refiner Agent (`chat_refiner_node`)
+### 4.6 Agent 5: Conversational Refiner Agent (`chat_refiner_node`)
 
-- [ ] **[P0]** Implement chat edit classifier distinguishing text edits, structural revisions, and recapture triggers.
-- [ ] **[P0]** Implement surgical Markdown section updater replacing only affected heading blocks.
-- [ ] **[P1]** Implement full-document translation logic preserving structure and image links.
-- [ ] **[P1]** Handle recapture signals returning `recapture_step_index` to orchestrator.
+- [x] **[P0]** Implement chat edit classifier distinguishing text edits, structural revisions, and recapture triggers.
+- [x] **[P0]** Implement surgical Markdown section updater replacing only affected heading blocks.
+- [x] **[P1]** Implement full-document translation logic preserving structure and image links.
+- [x] **[P1]** Handle recapture signals returning `recapture_step_index` to orchestrator.
 
-### 4.6 Graph Compilation & Interrupt Handling
+### 4.7 Graph Compilation & Interrupt Handling
 
 - [ ] **[P0]** Construct `StateGraph(ManualState)` wiring all nodes and conditional edges.
 - [ ] **[P0]** Set `interrupt_before=["chat_refiner_node"]` to halt graph execution for human interaction.
@@ -156,7 +165,7 @@ Each item is categorized by priority tag:
 
 ---
 
-## 5. Phase 4: Playwright Browser Automation Engine
+## 5. Phase 4: Playwright Browser Automation Engine (Agent 2 Infrastructure)
 
 ### 5.1 Async Automation Harness
 
@@ -191,6 +200,13 @@ Each item is categorized by priority tag:
 - [ ] **[P0]** Implement selector timeout fallback (try primary → try selector hints → capture general viewport fallback).
 - [ ] **[P0]** Record failure diagnostics in `state["error_states"][step.index]` without breaking pipeline execution.
 - [ ] **[P1]** Implement full text-only fallback generating placeholder tags (`[Insert Screenshot Here: ...]`) if browser crashes or encounters CAPTCHA.
+
+### 5.6 Agent 2 Integration & State Coordination
+
+- [ ] **[P0]** Implement `app/agents/capture_agent.py` binding `capture_screenshots_node` to `PlaywrightCaptureEngine`.
+- [ ] **[P0]** Implement per-step event publishing for SSE streaming (`capture_progress`) via Redis Pub/Sub.
+- [ ] **[P0]** Verify staging credentials in `ManualState.credentials` are purged immediately following authentication.
+- [ ] **[P1]** Integrate target element highlight verification against common frontend component patterns.
 
 ---
 

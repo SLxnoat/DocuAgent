@@ -104,6 +104,78 @@ If quality_feedback is provided, pay close attention to the feedback and address
 """
 
 
+# Prompt for Agent 4: Quality & Verification Agent
+# Evaluates the generated document for completeness, screenshot coverage, tone consistency, and logical sequencing
+QUALITY_REVIEW_PROMPT = """
+You are an expert quality assurance specialist and technical editor.
+Your task is to evaluate a technical document for quality and provide structured feedback.
+
+Evaluate the document based on these four criteria:
+
+1. COMPLETENESS
+   - Does the document cover all steps in the workflow?
+   - Are all prerequisites listed?
+   - Is the system overview comprehensive?
+   - Does the step-by-step walkthrough have clear instructions for each step?
+   - Does the troubleshooting section address common issues?
+   - Are there any missing sections or incomplete explanations?
+
+2. SCREENSHOT COVERAGE
+   - Does each step in the workflow have a corresponding screenshot reference?
+   - Are screenshot references in the correct format: ![Step X](assets/{job_id}/step_{index:03d}.png)?
+   - Are all screenshots accounted for in the document?
+   - Are there any extra or missing screenshot references?
+
+3. TONE CONSISTENCY
+   - Is the document written in a consistent, professional tone?
+   - Is the second person perspective ("you") used consistently for instructions?
+   - Is the language clear, concise, and free of jargon where possible?
+   - Are callout blocks (> 💡 Tip:, > ⚠️ Warning:, > 📌 Note:) used appropriately?
+
+4. LOGICAL SEQUENCING
+   - Does the document flow logically from prerequisites to troubleshooting?
+   - Are steps in the correct order?
+   - Does the information build upon itself appropriately?
+   - Are there any gaps or jumps in logic?
+
+Provide your evaluation as a JSON object with the following structure:
+{
+  "completeness": {
+    "score": 0-100,
+    "feedback": "Detailed feedback on completeness issues"
+  },
+  "screenshot_coverage": {
+    "score": 0-100,
+    "feedback": "Detailed feedback on screenshot coverage issues"
+  },
+  "tone_consistency": {
+    "score": 0-100,
+    "feedback": "Detailed feedback on tone consistency issues"
+  },
+  "logical_sequencing": {
+    "score": 0-100,
+    "feedback": "Detailed feedback on logical sequencing issues"
+  },
+  "overall_pass": true/false,
+  "summary": "Overall summary of the quality review"
+}
+
+Consider the document to pass only if all four criteria score 80 or above.
+Provide specific, actionable feedback in each section.
+If the document passes, still provide feedback on any minor improvements that could be made.
+
+Workflow steps and context:
+{structured_steps}
+Screenshot assets: {screenshot_assets}
+Domain context: {domain_context}
+Raw input script: {raw_input_script}
+Generated markdown content:
+{markdown_content}
+
+Remember: Output ONLY the JSON object.
+"""
+
+
 def format_screenshot_markdown(step_index: int, file_path: str, job_id: str = "") -> str:
     """
     Format a screenshot asset as a Markdown image tag.
