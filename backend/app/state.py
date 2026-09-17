@@ -24,3 +24,20 @@ class ManualState(TypedDict):
     error_states: dict[str, Any]
     quality_feedback: str | None  # Structured feedback from quality review (Agent 4)
     quality_review_attempts: int  # Number of times quality review has been looped
+
+
+def clear_credentials(state: ManualState) -> ManualState:
+    """
+    Clear the credentials in the state by setting them to an empty dict.
+    This should be called after authentication to prevent sensitive data from persisting.
+
+    Args:
+        state: The current ManualState.
+
+    Returns:
+        A new ManualState with credentials cleared.
+    """
+    return {
+        **state,
+        "credentials": {},
+    }

@@ -169,23 +169,23 @@ Each item is categorized by priority tag:
 
 ### 5.1 Async Automation Harness
 
-- [ ] **[P0]** Implement `PlaywrightCaptureEngine` async context manager (`__aenter__` / `__aexit__`).
-- [ ] **[P0]** Configure Chromium launch arguments (`--no-sandbox`, `--disable-dev-shm-usage`, `--disable-gpu`, `--window-size=1440,900`).
-- [ ] **[P0]** Configure browser context with viewport (1440×900), locale (`en-US`), and `ignore_https_errors=True`.
-- [ ] **[P0]** Enforce SSRF protection in `validate_target_url()` blocking loopback and RFC 1918 private subnets.
+- [x] **[P0]** Implement `PlaywrightCaptureEngine` async context manager (`__aenter__` / `__aexit__`).
+- [x] **[P0]** Configure Chromium launch arguments (`--no-sandbox`, `--disable-dev-shm-usage`, `--disable-gpu`, `--window-size=1440,900`).
+- [x] **[P0]** Configure browser context with viewport (1440×900), locale (`en-US`), and `ignore_https_errors=True`.
+- [x] **[P0]** Enforce SSRF protection in `validate_target_url()` blocking loopback and RFC 1918 private subnets.
 
 ### 5.2 Authentication & Session Injector
 
-- [ ] **[P0]** Implement form login handler finding username/password inputs via robust selector chains.
-- [ ] **[P0]** Implement pre-authenticated storage injection (`localStorage`, `sessionStorage`, cookies).
-- [ ] **[P0]** Ensure staging credentials in `ManualState.credentials` are cleared immediately following authentication.
+- [x] **[P0]** Implement form login handler finding username/password inputs via robust selector chains.
+- [x] **[P0]** Implement pre-authenticated storage injection (`localStorage`, `sessionStorage`, cookies).
+- [x] **[P0]** Ensure staging credentials in `ManualState.credentials` are cleared immediately following authentication.
 
 ### 5.3 Action Execution Dispatcher
 
-- [ ] **[P0]** Implement `execute_action()` dispatcher supporting `navigate`, `click`, `type`, `scroll`, `wait`, `authenticate`.
-- [ ] **[P0]** Implement human-like type delay (30–50ms) to bypass basic UI input debounce issues.
-- [ ] **[P0]** Implement automatic scroll-into-view before click and input actions.
-- [ ] **[P1]** Implement intelligent wait states (`wait_for_load_state("networkidle")` with fallback to `"domcontentloaded"`).
+- [x] **[P0]** Implement `execute_action()` dispatcher supporting `navigate`, `click`, `type`, `scroll`, `wait`, `authenticate`.
+- [x] **[P0]** Implement human-like type delay (30–50ms) to bypass basic UI input debounce issues.
+- [x] **[P0]** Implement automatic scroll-into-view before click and input actions.
+- [x] **[P1]** Implement intelligent wait states (`wait_for_load_state("networkidle")` with fallback to `"domcontentloaded"`).
 
 ### 5.4 Dynamic Highlight & Overlay Injector
 
