@@ -113,18 +113,18 @@ Each item is categorized by priority tag:
 
 ### 4.1 State Definition & Checkpointing
 
-- [ ] **[P0]** Define `ManualState` TypedDict with fields: `raw_input_script`, `target_url`, `credentials`, `structured_steps`, `screenshot_assets`, `markdown_content`, `chat_history`, `execution_logs`, `quality_approved`, `error_states`.
-- [ ] **[P0]** Configure development checkpointer using `MemorySaver`.
-- [ ] **[P0]** Configure production checkpointer using `RedisSaver` (`langgraph.checkpoint.redis`).
-- [ ] **[P0]** Ensure `credentials` dictionary is purged from state prior to checkpointer serialization.
+- [x] **[P0]** Define `ManualState` TypedDict with fields: `raw_input_script`, `target_url`, `credentials`, `structured_steps`, `screenshot_assets`, `markdown_content`, `chat_history`, `execution_logs`, `quality_approved`, `error_states`.
+- [x] **[P0]** Configure development checkpointer using `MemorySaver`.
+- [x] **[P0]** Configure production checkpointer using `RedisSaver` (`langgraph.checkpoint.redis`).
+- [x] **[P0]** Ensure `credentials` dictionary is purged from state prior to checkpointer serialization.
 
 ### 4.2 Agent 1: Script & Domain Analyzer (`analyze_script_node`)
 
-- [ ] **[P0]** Configure LLM client with Qwen 2.5 72B for JSON and structured reasoning.
-- [ ] **[P0]** Implement prompt template extracting actionable UI interactions into a JSON DAG of `StepSchema` objects.
-- [ ] **[P0]** Implement domain classification logic (E-commerce, CRM, SaaS, Admin Portal, Finance).
-- [ ] **[P1]** Add selector heuristic synthesis providing 2–3 fallback selectors per step.
-- [ ] **[P1]** Add automatic retry and recovery for malformed LLM JSON output.
+- [x] **[P0]** Configure LLM client with Qwen 2.5 72B for JSON and structured reasoning.
+- [x] **[P0]** Implement prompt template extracting actionable UI interactions into a JSON DAG of `StepSchema` objects.
+- [x] **[P0]** Implement domain classification logic (E-commerce, CRM, SaaS, Admin Portal, Finance).
+- [x] **[P1]** Add selector heuristic synthesis providing 2–3 fallback selectors per step.
+- [x] **[P1]** Add automatic retry and recovery for malformed LLM JSON output.
 
 ### 4.3 Agent 3: Technical Writer & Layout Agent (`compile_markdown_node`)
 
