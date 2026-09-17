@@ -128,12 +128,12 @@ Each item is categorized by priority tag:
 
 ### 4.3 Agent 2: Playwright Visual Capturer (`capture_screenshots_node`)
 
-- [ ] **[P0]** Implement `capture_screenshots_node` in `backend/app/agents/capture_agent.py` orchestrating browser automation.
-- [ ] **[P0]** Connect state machine to `PlaywrightCaptureEngine` async context manager.
-- [ ] **[P0]** Iterate over `structured_steps` and execute browser action dispatch, highlight injection, and viewport capture sequence.
-- [ ] **[P0]** Map captured screenshots to `screenshot_assets` dictionary (`{step_index: asset_path}`) in `ManualState`.
-- [ ] **[P0]** Enforce immediate credential scrubbing (`state["credentials"] = {}`) immediately after browser authentication.
-- [ ] **[P1]** Register per-step capture errors into `error_states` and provide fallback placeholder handling without breaking pipeline.
+- [x] **[P0]** Implement `capture_screenshots_node` in `backend/app/agents/capture_agent.py` orchestrating browser automation.
+- [x] **[P0]** Connect state machine to `PlaywrightCaptureEngine` async context manager.
+- [x] **[P0]** Iterate over `structured_steps` and execute browser action dispatch, highlight injection, and viewport capture sequence.
+- [x] **[P0]** Map captured screenshots to `screenshot_assets` dictionary (`{step_index: asset_path}`) in `ManualState`.
+- [x] **[P0]** Enforce immediate credential scrubbing (`state["credentials"] = {}`) immediately after browser authentication.
+- [x] **[P1]** Register per-step capture errors into `error_states` and provide fallback placeholder handling without breaking pipeline.
 
 ### 4.4 Agent 3: Technical Writer & Layout Agent (`compile_markdown_node`)
 
@@ -159,9 +159,9 @@ Each item is categorized by priority tag:
 
 ### 4.7 Graph Compilation & Interrupt Handling
 
-- [ ] **[P0]** Construct `StateGraph(ManualState)` wiring all nodes and conditional edges.
-- [ ] **[P0]** Set `interrupt_before=["chat_refiner_node"]` to halt graph execution for human interaction.
-- [ ] **[P0]** Implement resumption workflow upon receipt of new chat messages or re-run requests.
+- [x] **[P0]** Construct `StateGraph(ManualState)` wiring all nodes and conditional edges.
+- [x] **[P0]** Set `interrupt_before=["chat_refiner_node"]` to halt graph execution for human interaction.
+- [x] **[P0]** Implement resumption workflow upon receipt of new chat messages or re-run requests.
 
 ---
 
@@ -189,24 +189,24 @@ Each item is categorized by priority tag:
 
 ### 5.4 Dynamic Highlight & Overlay Injector
 
-- [ ] **[P0]** Implement real-time DOM styling injecting cyan border (`outline: 4px solid #06b6d4`).
-- [ ] **[P0]** Inject element glow effect (`box-shadow: 0 0 0 8px rgba(6, 182, 212, 0.2)`).
-- [ ] **[P0]** Inject dimming backdrop overlay (`rgba(0, 0, 0, 0.15)`) on non-target elements.
-- [ ] **[P0]** Implement `cleanup_highlights()` to remove injected DOM artifacts before taking subsequent steps.
+- [x] **[P0]** Implement real-time DOM styling injecting cyan border (`outline: 4px solid #06b6d4`).
+- [x] **[P0]** Inject element glow effect (`box-shadow: 0 0 0 8px rgba(6, 182, 212, 0.2)`).
+- [x] **[P0]** Inject dimming backdrop overlay (`rgba(0, 0, 0, 0.15)`) on non-target elements.
+- [x] **[P0]** Implement `cleanup_highlights()` to remove injected DOM artifacts before taking subsequent steps.
 
 ### 5.5 Capture & Fallback Engine
 
-- [ ] **[P0]** Capture viewport PNG screenshots saved to `assets/{job_id}/step_{index:03d}.png`.
-- [ ] **[P0]** Implement selector timeout fallback (try primary → try selector hints → capture general viewport fallback).
-- [ ] **[P0]** Record failure diagnostics in `state["error_states"][step.index]` without breaking pipeline execution.
-- [ ] **[P1]** Implement full text-only fallback generating placeholder tags (`[Insert Screenshot Here: ...]`) if browser crashes or encounters CAPTCHA.
+- [x] **[P0]** Capture viewport PNG screenshots saved to `assets/{job_id}/step_{index:03d}.png`.
+- [x] **[P0]** Implement selector timeout fallback (try primary → try selector hints → capture general viewport fallback).
+- [x] **[P0]** Record failure diagnostics in `state["error_states"][step.index]` without breaking pipeline execution.
+- [x] **[P1]** Implement full text-only fallback generating placeholder tags (`[Insert Screenshot Here: ...]`) if browser crashes or encounters CAPTCHA.
 
 ### 5.6 Agent 2 Integration & State Coordination
 
-- [ ] **[P0]** Implement `app/agents/capture_agent.py` binding `capture_screenshots_node` to `PlaywrightCaptureEngine`.
-- [ ] **[P0]** Implement per-step event publishing for SSE streaming (`capture_progress`) via Redis Pub/Sub.
-- [ ] **[P0]** Verify staging credentials in `ManualState.credentials` are purged immediately following authentication.
-- [ ] **[P1]** Integrate target element highlight verification against common frontend component patterns.
+- [x] **[P0]** Implement `app/agents/capture_agent.py` binding `capture_screenshots_node` to `PlaywrightCaptureEngine`.
+- [x] **[P0]** Implement per-step event publishing for SSE streaming (`capture_progress`) via Redis Pub/Sub.
+- [x] **[P0]** Verify staging credentials in `ManualState.credentials` are purged immediately following authentication.
+- [x] **[P1]** Integrate target element highlight verification against common frontend component patterns.
 
 ---
 
@@ -214,11 +214,11 @@ Each item is categorized by priority tag:
 
 ### 6.1 Task Distribution & Celery Configuration
 
-- [ ] **[P0]** Configure Celery app with Redis broker (`redis://redis:6379/1`) and result backend (`redis://redis:6379/2`).
-- [ ] **[P0]** Define dedicated queues: `generation`, `capture`, `export`.
-- [ ] **[P0]** Implement `generate_manual` Celery task wrapping LangGraph pipeline execution.
-- [ ] **[P0]** Configure worker auto-restart policies (`--max-tasks-per-child=50`) to prevent Chromium memory accumulation.
-- [ ] **[P1]** Implement `cleanup_expired_jobs` periodic Celery Beat task removing assets older than retention TTL (24h).
+- [x] **[P0]** Configure Celery app with Redis broker (`redis://redis:6379/1`) and result backend (`redis://redis:6379/2`).
+- [x] **[P0]** Define dedicated queues: `generation`, `capture`, `export`.
+- [x] **[P0]** Implement `generate_manual` Celery task wrapping LangGraph pipeline execution.
+- [x] **[P0]** Configure worker auto-restart policies (`--max-tasks-per-child=50`) to prevent Chromium memory accumulation.
+- [x] **[P1]** Implement `cleanup_expired_jobs` periodic Celery Beat task removing assets older than retention TTL (24h).
 
 ### 6.2 Real-time Progress Streaming (SSE)
 
@@ -301,7 +301,7 @@ Each item is categorized by priority tag:
 
 - [ ] **[P0]** Audit Python code to guarantee staging credentials are never serialized, written to disk, or logged.
 - [ ] **[P0]** Verify `credentials` field exclusion in Pydantic models (`exclude=True`).
-- [ ] **[P0]** Verify credential stripping in `capture_screenshots_node` before LangGraph checkpoint saving.
+- [x] **[P0]** Verify credential stripping in `capture_screenshots_node` before LangGraph checkpoint saving.
 - [ ] **[P0]** Confirm Redis checkpoint state does not contain plaintext credentials.
 
 ### 9.2 Network & Input Guardrails

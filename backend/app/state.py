@@ -14,6 +14,8 @@ class ManualState(TypedDict):
 
     raw_input_script: str
     target_url: str
+    job_id: str  # Unique identifier for the job
+    session_id: str  # Unique identifier for the session
     credentials: dict[str, Any]  # Auth credentials (purge after use by Agent 2)
     structured_steps: list[StepSchema]
     screenshot_assets: dict[int, str]  # step_index -> file_path

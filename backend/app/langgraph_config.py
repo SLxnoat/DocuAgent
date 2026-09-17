@@ -2,6 +2,7 @@
 LangGraph configuration for DocuAgent AI.
 Handles checkpointer setup for development and production environments.
 Includes conditional edge evaluators for the LangGraph state machine.
+Constructs the StateGraph with all nodes and edges for the DocuAgent workflow.
 """
 
 import json
@@ -9,9 +10,15 @@ from typing import Literal
 
 from langgraph.checkpoint.memory import MemorySaver
 from langgraph.checkpoint.redis import RedisSaver
+from langgraph.graph import END, StateGraph
+from langgraph.graph.state import CompiledStateGraph
 
+from app.agents.capture_agent import capture_screenshots_node
+from app.chat_refiner import chat_refiner_node
 from app.config import settings
+from app.quality_review import quality_review_node
 from app.state import ManualState
+from app.technical_writer import compile_markdown_node
 
 
 def get_checkpointer():
@@ -140,3 +147,51 @@ def route_after_quality_review(
     else:
         # We have exhausted all attempts, force approval and proceed to chat_refiner_node.
         return "chat_refiner_node"
+
+
+def create_docuagent_graph() -> CompiledStateGraph:
+    """
+    Create and compile the DocuAgent LangGraph workflow with all nodes and edges.
+
+    Returns:
+        CompiledStateGraph: The compiled DocuAgent workflow graph
+    """
+    # Initialize the state graph with our ManualState schema
+    workflow = StateGraph(ManualState)
+
+    # Add all the agent nodes
+    workflow.add_node("capture_screenshots_node", capture_screenshots_node)
+    workflow.add_node("compile_markdown_node", compile_markdown_node)
+    workflow.add_node("quality_review_node", quality_review_node)
+    workflow.add_node("chat_refiner_node", chat_refiner_node)
+
+    # Set the entry point
+    workflow.set_entry_point("capture_screenshots_node")
+
+    # Add edges between nodes in sequence
+    workflow.add_edge("capture_screenshots_node", "compile_markdown_node")
+    workflow.add_edge("compile_markdown_node", "quality_review_node")
+
+    # Add conditional edge from quality review node
+    workflow.add_conditional_edges(
+        "quality_review_node",
+        route_after_quality_review,
+        {
+            "compile_markdown_node": "compile_markdown_node",
+            "chat_refiner_node": "chat_refiner_node",
+            "__end__": END,
+        },
+    )
+
+    # After chat refiner node, we can either end or loop back for more refinements
+    # For now, we'll end after the chat refiner node (human interaction point)
+    workflow.add_edge("chat_refiner_node", END)
+
+    # Get the appropriate checkpointer
+    checkpointer = get_checkpointer()
+
+    # Compile the graph with interrupt handling
+    # We interrupt before the chat_refiner_node to allow for human interaction
+    app = workflow.compile(checkpointer=checkpointer, interrupt_before=["chat_refiner_node"])
+
+    return app

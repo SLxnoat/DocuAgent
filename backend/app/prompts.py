@@ -179,19 +179,31 @@ Remember: Output ONLY the JSON object.
 def format_screenshot_markdown(step_index: int, file_path: str, job_id: str = "") -> str:
     """
     Format a screenshot asset as a Markdown image tag.
+    If the file_path is a placeholder indicator (starts with "PLACEHOLDER:"),
+    returns a text-only placeholder tag instead.
 
     Args:
         step_index: The step index (0-based)
-        file_path: The file path to the screenshot
+        file_path: The file path to the screenshot, or a placeholder indicator
+                  starting with "PLACEHOLDER:" followed by placeholder text
         job_id: The job ID (used for validation or context, optional)
 
     Returns:
         A Markdown image tag string: ![Step X](file_path)
+        Or a placeholder tag: [Insert Screenshot Here: placeholder_text]
 
     Example:
         >>> format_screenshot_markdown(0, "assets/job123/step_000.png")
         '![Step 0](assets/job123/step_000.png)'
+        >>> format_screenshot_markdown(0, "PLACEHOLDER:Click login button")
+        '[Insert Screenshot Here: Click login button]'
     """
+    # Check if this is a placeholder indicator
+    if file_path.startswith("PLACEHOLDER:"):
+        # Extract the placeholder text (everything after "PLACEHOLDER:")
+        placeholder_text = file_path[12:]  # Remove "PLACEHOLDER:" prefix
+        return f"[Insert Screenshot Here: {placeholder_text}]"
+
     # Ensure the file_path is relative or absolute as needed
     # The screenshot_assets in ManualState should already contain the correct path
     return f"![Step {step_index}]({file_path})"

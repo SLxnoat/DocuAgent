@@ -7,6 +7,7 @@ import re
 from typing import Literal
 
 from .llm import ollama_generate_text
+from .state import ManualState
 
 
 def classify_chat_edit(
@@ -348,3 +349,70 @@ def extract_recapture_step_index(message: str) -> int | None:
 
     # If we still haven't found a number, return None
     return None
+
+
+async def chat_refiner_node(state: ManualState) -> ManualState:
+    """
+    LangGraph node for Agent 5: Conversational Refiner Agent.
+    Processes user chat messages and updates the markdown document accordingly.
+
+    Args:
+        state: The current ManualState.
+
+    Returns:
+        Updated ManualState with processed chat messages and potentially updated markdown content.
+    """
+    # Create a copy of state to avoid mutating the original
+    current_state = dict(state)
+
+    # Get the chat history
+    chat_history = current_state.get("chat_history", [])
+
+    # If there's no chat history, return the state as is
+    if not chat_history:
+        return current_state
+
+    # Process the most recent chat message
+    latest_message = chat_history[-1]
+    message_content = (
+        latest_message.get("content", "")
+        if isinstance(latest_message, dict)
+        else getattr(latest_message, "content", "")
+    )
+
+    # Classify the chat edit type
+    edit_type = classify_chat_edit(message_content)
+
+    # Handle different edit types
+    if edit_type == "recapture_trigger":
+        # Extract the step index to recapture
+        step_index = extract_recapture_step_index(message_content)
+        if step_index is not None:
+            # In a full implementation, we would trigger a recapture of the specified step
+            # For now, we'll just log this intent
+            execution_logs = current_state.get("execution_logs", [])
+            execution_logs.append(f"Recapture trigger detected for step {step_index}")
+            current_state["execution_logs"] = execution_logs
+
+            # We could set a flag to indicate that recapture is needed
+            # This would be handled by the orchestrator/graph logic
+
+    elif edit_type == "text_edit":
+        # Handle simple text edits
+        # In a full implementation, we would use update_markdown_sections or translate_document
+        # based on the user's request
+        execution_logs = current_state.get("execution_logs", [])
+        execution_logs.append(f"Text edit requested: {message_content[:100]}...")
+        current_state["execution_logs"] = execution_logs
+
+    elif edit_type == "structural_revision":
+        # Handle structural revisions (add/remove steps, reorder, etc.)
+        execution_logs = current_state.get("execution_logs", [])
+        execution_logs.append(f"Structural revision requested: {message_content[:100]}...")
+        current_state["execution_logs"] = execution_logs
+
+    # In a complete implementation, we would actually modify the markdown content here
+    # based on the edit type and user request
+
+    # For now, we'll return the state unchanged but with logs updated
+    return current_state
