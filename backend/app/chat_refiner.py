@@ -8,6 +8,7 @@ from typing import Literal
 
 from .llm import ollama_generate_text
 from .state import ManualState
+from .utils.sse_publisher import publish_sse_event
 
 
 def classify_chat_edit(
@@ -397,6 +398,25 @@ async def chat_refiner_node(state: ManualState) -> ManualState:
             # We could set a flag to indicate that recapture is needed
             # This would be handled by the orchestrator/graph logic
 
+            # Publish event: we can publish a custom event for recapture trigger
+            job_id = current_state.get("job_id")
+            if job_id:
+                try:
+                    publish_sse_event(
+                        job_id=job_id,
+                        event_type="recapture_trigger",  # Not in the checklist, but we can use it for now
+                        data={
+                            "step_index": step_index,
+                            "message": message_content,
+                        },
+                    )
+                except Exception as e:
+                    # Don't let publishing errors break the node
+                    import logging
+
+                    logger = logging.getLogger(__name__)
+                    logger.warning("Failed to publish recapture_trigger event: %s", e)
+
     elif edit_type == "text_edit":
         # Handle simple text edits
         # In a full implementation, we would use update_markdown_sections or translate_document
@@ -405,11 +425,45 @@ async def chat_refiner_node(state: ManualState) -> ManualState:
         execution_logs.append(f"Text edit requested: {message_content[:100]}...")
         current_state["execution_logs"] = execution_logs
 
+        # Publish event: we can publish a custom event for text edit
+        job_id = current_state.get("job_id")
+        if job_id:
+            try:
+                publish_sse_event(
+                    job_id=job_id,
+                    event_type="text_edit",  # Not in the checklist
+                    data={
+                        "message": message_content,
+                    },
+                )
+            except Exception as e:
+                import logging
+
+                logger = logging.getLogger(__name__)
+                logger.warning("Failed to publish text_edit event: %s", e)
+
     elif edit_type == "structural_revision":
         # Handle structural revisions (add/remove steps, reorder, etc.)
         execution_logs = current_state.get("execution_logs", [])
         execution_logs.append(f"Structural revision requested: {message_content[:100]}...")
         current_state["execution_logs"] = execution_logs
+
+        # Publish event: we can publish a custom event for structural revision
+        job_id = current_state.get("job_id")
+        if job_id:
+            try:
+                publish_sse_event(
+                    job_id=job_id,
+                    event_type="structural_revision",  # Not in the checklist
+                    data={
+                        "message": message_content,
+                    },
+                )
+            except Exception as e:
+                import logging
+
+                logger = logging.getLogger(__name__)
+                logger.warning("Failed to publish structural_revision event: %s", e)
 
     # In a complete implementation, we would actually modify the markdown content here
     # based on the edit type and user request

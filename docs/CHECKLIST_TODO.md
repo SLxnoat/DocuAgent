@@ -222,10 +222,10 @@ Each item is categorized by priority tag:
 
 ### 6.2 Real-time Progress Streaming (SSE)
 
-- [ ] **[P0]** Implement `GET /api/v1/stream/{job_id}` Server-Sent Events endpoint using `EventSourceResponse`.
-- [ ] **[P0]** Implement Redis PubSub publisher inside LangGraph agent lifecycle callbacks.
-- [ ] **[P0]** Standardize SSE event payloads: `pipeline_started`, `script_analyzed`, `capture_progress`, `draft_compiled`, `quality_approved`, `document_ready`, `job_failed`.
-- [ ] **[P1]** Add heartbeat ping events every 15s to keep proxy connections alive.
+- [x] **[P0]** Implement `GET /api/v1/stream/{job_id}` Server-Sent Events endpoint using `EventSourceResponse`.
+- [x] **[P0]** Implement Redis PubSub publisher inside LangGraph agent lifecycle callbacks.
+- [x] **[P0]** Standardize SSE event payloads: `pipeline_started`, `script_analyzed`, `capture_progress`, `draft_compiled`, `quality_approved`, `document_ready`, `job_failed`.
+- [x] **[P1]** Add heartbeat ping events every 15s to keep proxy connections alive.
 
 ### 6.3 Bidirectional Chat (WebSocket)
 
