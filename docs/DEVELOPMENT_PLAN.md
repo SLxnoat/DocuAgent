@@ -363,9 +363,9 @@ P5 = E2E Integration          P10 = Release & Post-Launch
 
 ### 8.1 Application Shell & Layout
 
-- [ ] Implement `AppShell.tsx` — root layout with sidebar + main content area.
+- [x] Implement `AppShell.tsx` — root layout with sidebar + main content area.
 - [ ] Implement `Sidebar.tsx` — navigation links, project branding, status indicators.
-- [ ] Configure Tailwind dark mode (`class` strategy) and base theme tokens.
+- [x] Configure Tailwind dark mode (`class` strategy) and base theme tokens.
 - [ ] Implement responsive breakpoints (desktop-first, minimum 768px).
 - [ ] Implement global error boundary component.
 
@@ -380,7 +380,7 @@ P5 = E2E Integration          P10 = Release & Post-Launch
 
 ### 8.3 Zustand State Store
 
-- [ ] Implement `useManualStore.ts` with full schema (jobId, sessionId, jobStatus, markdownContent, stepStatuses, chatHistory, isChatLoading, exportFormats).
+- [x] Implement `useManualStore.ts` with full schema (jobId, sessionId, jobStatus, markdownContent, stepStatuses, chatHistory, isChatLoading, exportFormats).
 - [ ] Implement all action creators (setJobId, setSessionId, setJobStatus, setMarkdownContent, updateStepStatus, addChatMessage, setChatLoading, reset).
 - [ ] Write unit tests for all store actions and state transitions.
 
