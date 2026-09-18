@@ -254,11 +254,11 @@ Each item is categorized by priority tag:
 
 ### 7.3 Split-Screen Editor & Preview
 
-- [ ] **[P0]** Implement `SplitScreen` resizable divider container.
-- [ ] **[P0]** Integrate `@monaco-editor/react` configured for Markdown, dark theme, word wrap, and synchronized value binding.
-- [ ] **[P0]** Implement cursor position preservation when external updates modify Monaco content.
-- [ ] **[P0]** Implement `PreviewPane` rendering Markdown via `react-markdown` and `remark-gfm`.
-- [ ] **[P0]** Implement `ScreenshotImage` component in preview supporting click-to-recapture and manual upload overlays.
+- [x] **[P0]** Implement `SplitScreen` resizable divider container.
+- [x] **[P0]** Integrate `@monaco-editor/react` configured for Markdown, dark theme, word wrap, and synchronized value binding.
+- [x] **[P0]** Implement cursor position preservation when external updates modify Monaco content.
+- [x] **[P0]** Implement `PreviewPane` rendering Markdown via `react-markdown` and `remark-gfm`.
+- [x] **[P0]** Implement `ScreenshotImage` component in preview supporting click-to-recapture and manual upload overlays.
 
 ### 7.4 Live Progress & Chat Interface
 
