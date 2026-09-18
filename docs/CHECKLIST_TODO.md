@@ -247,9 +247,9 @@ Each item is categorized by priority tag:
 
 ### 7.2 Workflow Script Input
 
-- [ ] **[P0]** Implement `ScriptInputForm` with script textarea, staging URL input, and credential inputs.
-- [ ] **[P0]** Sanitize credential inputs to ensure values are wiped from React state immediately upon dispatch.
-- [ ] **[P0]** Add client-side validation rules (URL format, script minimum 10 characters).
+- [x] **[P0]** Implement `ScriptInputForm` with script textarea, staging URL input, and credential inputs.
+- [x] **[P0]** Sanitize credential inputs to ensure values are wiped from React state immediately upon dispatch.
+- [x] **[P0]** Add client-side validation rules (URL format, script minimum 10 characters).
 - [ ] **[P1]** Add options panel (language selector, output formats selector).
 
 ### 7.3 Split-Screen Editor & Preview
