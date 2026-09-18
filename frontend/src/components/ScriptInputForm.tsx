@@ -3,8 +3,18 @@ import { useManualStore } from "@/store/useManualStore";
 import { generateManual } from "@/api/client";
 
 export function ScriptInputForm() {
-  const { setJobId, setSessionId, setJobStatus, setMarkdownContent, reset } =
-    useManualStore();
+  const {
+    setJobId,
+    setSessionId,
+    setJobStatus,
+    setMarkdownContent,
+    reset,
+    setDefaultLanguage,
+    setPreferredOutputFormat,
+    defaultLanguage,
+    preferredOutputFormat,
+    exportFormats,
+  } = useManualStore();
 
   const [script, setScript] = React.useState("");
   const [url, setUrl] = React.useState("");
@@ -179,6 +189,50 @@ export function ScriptInputForm() {
           {formErrors.password && (
             <p className="mt-1 text-sm text-red-600">{formErrors.password}</p>
           )}
+        </div>
+      </div>
+
+      {/* Options Panel */}
+      <div className="border-t border-b pt-4 pb-2 mb-4">
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Language
+            </label>
+            <select
+              value={defaultLanguage}
+              onChange={(e) => {
+                setDefaultLanguage(e.target.value);
+              }}
+              className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+            >
+              <option value="en">English</option>
+              <option value="es">Spanish</option>
+              <option value="fr">French</option>
+              <option value="de">German</option>
+              <option value="ja">Japanese</option>
+              <option value="zh">Chinese</option>
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Output Format
+            </label>
+            <select
+              value={preferredOutputFormat}
+              onChange={(e) => {
+                setPreferredOutputFormat(e.target.value);
+              }}
+              className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+            >
+              {exportFormats.map((format) => (
+                <option key={format} value={format}>
+                  {format.toUpperCase()}
+                </option>
+              ))}
+            </select>
+          </div>
         </div>
       </div>
 

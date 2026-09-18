@@ -59,7 +59,7 @@ export const useManualStore = create<ManualStoreState>()(
       stepStatuses: [],
       chatHistory: [],
       isChatLoading: false,
-      exportFormats: [],
+      exportFormats: ["markdown", "html", "pdf"],
       darkMode: false, // Start with light mode
       preferredOutputFormat: "markdown", // Default format
       defaultLanguage: "en", // Default language
