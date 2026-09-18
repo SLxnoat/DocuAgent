@@ -9,11 +9,20 @@ import json
 from typing import Literal
 
 from langgraph.checkpoint.memory import MemorySaver
-from langgraph.checkpoint.redis import RedisSaver
+
+try:
+    from langgraph.checkpoint.redis import RedisSaver
+except ImportError:
+    try:
+        from langgraph_checkpoint_redis import RedisSaver
+    except ImportError:
+        RedisSaver = None
+
 from langgraph.graph import END, StateGraph
 from langgraph.graph.state import CompiledStateGraph
 
 from app.agents.capture_agent import capture_screenshots_node
+from app.analyze_script import analyze_script_node
 from app.chat_refiner import chat_refiner_node
 from app.config import settings
 from app.quality_review import quality_review_node
@@ -26,14 +35,17 @@ def get_checkpointer():
     Get the appropriate checkpointer based on the environment.
 
     Returns:
-        MemorySaver for development, RedisSaver for production
+        MemorySaver for development, RedisSaver for production (or fallback to MemorySaver)
     """
-    if settings.app_env == "production":
-        # Production: Use RedisSaver with connection from settings
-        return RedisSaver.from_conn_string(
-            conn_string=settings.redis_url,
-            ttl=settings.asset_retention_hours * 3600,  # Convert hours to seconds
-        )
+    if settings.app_env == "production" and RedisSaver is not None:
+        try:
+            # Production: Use RedisSaver with connection from settings
+            return RedisSaver.from_conn_string(
+                conn_string=settings.redis_url,
+                ttl=settings.asset_retention_hours * 3600,  # Convert hours to seconds
+            )
+        except Exception:
+            return MemorySaver()
     else:
         # Development/testing: Use in-memory MemorySaver
         return MemorySaver()
@@ -49,21 +61,22 @@ def get_development_checkpointer() -> MemorySaver:
     return MemorySaver()
 
 
-def get_production_checkpointer() -> RedisSaver | None:
+def get_production_checkpointer():
     """
     Get production checkpointer using RedisSaver.
 
     Returns:
-        RedisSaver instance for production use, or None if not configured
+        RedisSaver instance for production use, or MemorySaver fallback
     """
-    try:
-        return RedisSaver.from_conn_string(
-            conn_string=settings.redis_url,
-            ttl=settings.asset_retention_hours * 3600,  # Convert hours to seconds
-        )
-    except Exception:
-        # Fallback to memory saver if Redis is not available
-        return MemorySaver()
+    if RedisSaver is not None:
+        try:
+            return RedisSaver.from_conn_string(
+                conn_string=settings.redis_url,
+                ttl=settings.asset_retention_hours * 3600,  # Convert hours to seconds
+            )
+        except Exception:
+            return MemorySaver()
+    return MemorySaver()
 
 
 def route_after_quality_review(
@@ -160,15 +173,17 @@ def create_docuagent_graph() -> CompiledStateGraph:
     workflow = StateGraph(ManualState)
 
     # Add all the agent nodes
+    workflow.add_node("analyze_script_node", analyze_script_node)
     workflow.add_node("capture_screenshots_node", capture_screenshots_node)
     workflow.add_node("compile_markdown_node", compile_markdown_node)
     workflow.add_node("quality_review_node", quality_review_node)
     workflow.add_node("chat_refiner_node", chat_refiner_node)
 
-    # Set the entry point
-    workflow.set_entry_point("capture_screenshots_node")
+    # Set the entry point to start with script analysis
+    workflow.set_entry_point("analyze_script_node")
 
     # Add edges between nodes in sequence
+    workflow.add_edge("analyze_script_node", "capture_screenshots_node")
     workflow.add_edge("capture_screenshots_node", "compile_markdown_node")
     workflow.add_edge("compile_markdown_node", "quality_review_node")
 

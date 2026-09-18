@@ -144,7 +144,7 @@ P5 = E2E Integration          P10 = Release & Post-Launch
 ### 5.4 Infrastructure Setup
 
 - [x] Install Docker Desktop / Docker Engine + Docker Compose on all developer machines.
-- [ ] Create base `docker-compose.dev.yml` for local development (Redis + backend + frontend with hot-reload).
+- [x] Create base `docker-compose.dev.yml` for local development (Redis + backend + frontend with hot-reload).
 - [x] Pull and verify Ollama Cloud endpoint connectivity: `curl ${OLLAMA_BASE_URL}/api/tags`.
 - [x] Pull required LLM models (Llama 3.3 70B, Qwen 2.5 72B) to Ollama Cloud instance.
 - [x] Verify Playwright Chromium install: `playwright install chromium && playwright install-deps`.
@@ -180,7 +180,7 @@ P5 = E2E Integration          P10 = Release & Post-Launch
 - [x] Define `ChatMessage` Pydantic model (role, content, timestamp).
 - [x] Define `ManualState` TypedDict (all fields per specification in DOC-003).
 - [x] Define `GenerateRequest` Pydantic model with validators (URL format, script min length).
-- [ ] Define `ChatRequest` Pydantic model.
+- [x] Define `ChatRequest` Pydantic model.
 - [x] Define `GenerateResponse`, `ChatResponse`, `JobStatusResponse` response models.
 - [x] Define `ErrorResponse` standardized error schema.
 

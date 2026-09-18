@@ -1,0 +1,7 @@
+"""
+Celery instance re-export for DocuAgent AI.
+"""
+
+from app.celery_config import celery_app
+
+__all__ = ["celery_app"]

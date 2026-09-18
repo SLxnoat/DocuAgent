@@ -1,0 +1,107 @@
+version: "3.8"
+
+services:
+  # Redis for caching, session storage, and Celery broker/backend
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    command: redis-server --save 60 1 --loglevel warning
+    networks:
+      - docuagent-network
+
+  # Backend FastAPI service
+  backend:
+    build:
+      context: ../backend
+      dockerfile: Dockerfile.dev
+    ports:
+      - "8000:8000"
+    volumes:
+      - ../backend:/app:cached
+      - ../assets:/app/assets:cached
+      - ../exports:/app/exports:cached
+    environment:
+      - DEBUG=True
+      - APP_ENV=development
+      - REDIS_URL=redis://redis:6379/0
+      - CELERY_BROKER_URL=redis://redis:6379/1
+      - CELERY_RESULT_BACKEND=redis://redis:6379/2
+      - OLLAMA_BASE_URL=${OLLAMA_BASE_URL:-http://host.docker.internal:11434}
+      - API_TOKEN=${API_TOKEN:-dev-token-change-in-production}
+    depends_on:
+      - redis
+    networks:
+      - docuagent-network
+    # Enable hot-reload for development
+    command: >
+      sh -c "pip install debugpy &&
+             uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload"
+
+  # Frontend React service
+  frontend:
+    build:
+      context: ../frontend
+      dockerfile: Dockerfile.dev
+    ports:
+      - "5173:5173"
+    volumes:
+      - ../frontend:/app:cached
+      - /app/node_modules
+    environment:
+      - VITE_API_URL=http://localhost:8000/api/v1
+      - VITE_WS_URL=ws://localhost:8000/api/v1/ws
+    depends_on:
+      - backend
+    networks:
+      - docuagent-network
+    # Enable hot-reload for development
+    command: npm run dev -- --host
+
+  # Optional: Celery worker for background tasks
+  worker:
+    build:
+      context: ../backend
+      dockerfile: Dockerfile.dev
+    volumes:
+      - ../backend:/app:cached
+      - ../assets:/app/assets:cached
+      - ../exports:/app/exports:cached
+    environment:
+      - DEBUG=True
+      - APP_ENV=development
+      - REDIS_URL=redis://redis:6379/0
+      - CELERY_BROKER_URL=redis://redis:6379/1
+      - CELERY_RESULT_BACKEND=redis://redis:6379/2
+      - OLLAMA_BASE_URL=${OLLAMA_BASE_URL:-http://host.docker.internal:11434}
+      - API_TOKEN=${API_TOKEN:-dev-token-change-in-production}
+    depends_on:
+      - redis
+      - backend
+    networks:
+      - docuagent-network
+    command: celery -A app.celery_app.celery_app worker --loglevel=info
+
+  # Optional: Celery Flower for monitoring
+  flower:
+    image: mher/flower:latest
+    ports:
+      - "5555:5555"
+    environment:
+      - CELERY_BROKER_URL=redis://redis:6379/1
+      - CELERY_RESULT_BACKEND=redis://redis:6379/2
+    depends_on:
+      - redis
+    networks:
+      - docuagent-network
+
+volumes:
+  redis_data:
+  assets:
+  exports:
+
+networks:
+  docuagent-network:
+    driver: bridge

@@ -60,7 +60,7 @@ async def execute_action(
 
 async def _navigate(page: Page, params: dict[str, Any]) -> None:
     """
-    Navigate to a URL.
+    Navigate to a URL with intelligent wait states.
 
     Args:
         page: Playwright Page object
@@ -73,8 +73,14 @@ async def _navigate(page: Page, params: dict[str, Any]) -> None:
     # Validate URL for SSRF protection
     validate_target_url(url)
 
-    # Navigate to the URL
-    await page.goto(url, wait_until="networkidle")
+    # Navigate to the URL with intelligent wait states
+    # Try networkidle first, fall back to domcontentloaded
+    try:
+        await page.goto(url)
+        await page.wait_for_load_state("networkidle", timeout=10000)
+    except Exception:
+        # Fallback to domcontentloaded if networkidle fails or times out
+        await page.wait_for_load_state("domcontentloaded", timeout=10000)
 
 
 async def _click(page: Page, params: dict[str, Any]) -> None:

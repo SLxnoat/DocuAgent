@@ -12,7 +12,7 @@ from .state import ManualState
 from .utils.sse_publisher import publish_sse_event
 
 
-def quality_review_node(state: ManualState) -> ManualState:
+async def quality_review_node(state: ManualState) -> ManualState:
     """
     LangGraph node for Agent 4: Quality & Verification Agent.
     Evaluates the generated document for quality and provides structured feedback.
@@ -24,9 +24,6 @@ def quality_review_node(state: ManualState) -> ManualState:
     Returns:
         Updated ManualState with quality_feedback set and quality_review_attempts incremented.
     """
-    # Publish event: quality review started? We'll publish a custom event if needed, but the checklist has "quality_approved"
-    # We'll publish "quality_approved" if the review passes.
-
     # Determine the domain context from target_url and raw_input_script
     domain_context = classify_domain(state["target_url"], state["raw_input_script"])
 
@@ -41,7 +38,7 @@ def quality_review_node(state: ManualState) -> ManualState:
 
     # Call the LLM to get the quality feedback in JSON format
     try:
-        feedback_dict: dict[str, Any] = ollama_generate_json_with_retry(
+        feedback_dict: dict[str, Any] = await ollama_generate_json_with_retry(
             prompt=prompt,
             temperature=0.1,  # Low temperature for consistent JSON output
             max_retries=2,
@@ -77,7 +74,7 @@ def quality_review_node(state: ManualState) -> ManualState:
         try:
             overall_pass = feedback_dict.get("overall_pass", False)
             if overall_pass:
-                publish_sse_event(
+                await publish_sse_event(
                     job_id=job_id,
                     event_type="quality_approved",
                     data={

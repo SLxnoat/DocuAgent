@@ -78,10 +78,12 @@ async def capture_screenshot_with_fallback(
     primary_selector: str,
     selector_hints: list[str],
     state: ManualState | None = None,
+    step_description: str | None = None,
 ) -> str:
     """
     Capture a screenshot with fallback mechanism.
     Try primary selector, then selector hints, then general viewport fallback.
+    If all capture methods fail, generate a text placeholder.
 
     Args:
         page: Playwright Page object
@@ -90,14 +92,17 @@ async def capture_screenshot_with_fallback(
         primary_selector: Primary CSS/XPath selector for the target element
         selector_hints: List of alternative selector strings (CSS/XPath) ordered by preference
         state: Optional ManualState to record failure diagnostics
+        step_description: Optional description of the step for placeholder generation
 
     Returns:
-        str: The file path where the screenshot was saved
+        str: The file path where the screenshot was saved, or a text placeholder if all capture methods fail
 
     Note:
         This function attempts to capture a screenshot of a specific element first.
         If that fails, it tries the selector hints. If all selector-based attempts fail,
         it falls back to capturing the general viewport.
+        If all capture methods fail (including viewport), it generates a text placeholder
+        in the format "[Insert Screenshot Here: Description]".
         Failure diagnostics are recorded in state["error_states"][step.index] without
         breaking pipeline execution.
     """
@@ -140,7 +145,7 @@ async def capture_screenshot_with_fallback(
         result = await capture_viewport_screenshot(page, job_id, step_index, state)
         return result
     except Exception as e:
-        # If viewport capture also fails, record the error and re-raise
+        # If viewport capture also fails, record the error and generate a text placeholder
         if state is not None:
             error_states = state.get("error_states", {}).copy()
             error_states[str(step_index)] = {
@@ -153,5 +158,11 @@ async def capture_screenshot_with_fallback(
                 "selectors_attempted": selectors_to_try,
                 "last_exception": str(last_exception) if last_exception else None,
             }
-        # Re-raise the exception
-        raise
+
+        # Generate text placeholder if all capture methods fail
+        # Use provided step description or generate a default one
+        if step_description is None:
+            step_description = f"Step {step_index}"
+
+        # Return text placeholder in the internal format expected by the system
+        return f"PLACEHOLDER:{step_description}"

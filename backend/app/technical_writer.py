@@ -11,7 +11,7 @@ from .state import ManualState
 from .utils.sse_publisher import publish_sse_event
 
 
-def compile_markdown_node(state: ManualState) -> ManualState:
+async def compile_markdown_node(state: ManualState) -> ManualState:
     """
     LangGraph node for Agent 3: Technical Writer & Layout Agent.
     Synthesizes a comprehensive technical document based on workflow steps and screenshot assets.
@@ -22,23 +22,11 @@ def compile_markdown_node(state: ManualState) -> ManualState:
     Returns:
         Updated ManualState with markdown_content set.
     """
-    # Publish event: pipeline_started? Or script_analyzed?
-    # Since this agent is responsible for compiling the markdown, we can publish:
-    #   - "draft_compiled" when the draft is ready
-    # But note: the checklist has "script_analyzed" for Agent 1 and "draft_compiled" for Agent 3.
-
-    # We'll publish "script_analyzed" here? Actually, the script analysis is done by Agent 1.
-    # We don't have access to Agent 1's output in this node? We do have the structured_steps in the state.
-
-    # Let's publish "script_analyzed" at the beginning of this node to indicate that the script has been analyzed
-    # and we are ready to compile the draft.
-    # However, note that the state already has the structured_steps, which is the output of Agent 1.
-
-    # We'll publish a "script_analyzed" event with the structured_steps in the data.
+    # Publish event: script_analyzed
     job_id = state.get("job_id")
     if job_id:
         try:
-            publish_sse_event(
+            await publish_sse_event(
                 job_id=job_id,
                 event_type="script_analyzed",
                 data={
@@ -74,7 +62,7 @@ def compile_markdown_node(state: ManualState) -> ManualState:
 
     # Call the LLM to get the markdown document
     try:
-        markdown_content = ollama_generate_text(
+        markdown_content = await ollama_generate_text(
             prompt=prompt,
             temperature=0.3,  # Moderate temperature for balanced creativity and consistency
             max_retries=2,
@@ -100,7 +88,7 @@ Unable to generate system overview due to documentation generation failure.
     job_id = state.get("job_id")
     if job_id:
         try:
-            publish_sse_event(
+            await publish_sse_event(
                 job_id=job_id,
                 event_type="draft_compiled",
                 data={
@@ -118,7 +106,7 @@ Unable to generate system overview due to documentation generation failure.
     job_id = state.get("job_id")
     if job_id:
         try:
-            publish_sse_event(
+            await publish_sse_event(
                 job_id=job_id,
                 event_type="document_ready",
                 data={

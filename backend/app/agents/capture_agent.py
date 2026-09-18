@@ -70,12 +70,35 @@ async def capture_screenshots_node(state: ManualState) -> ManualState:
             raise RuntimeError("Failed to initialize Playwright browser")
 
         try:
+            # Publish pipeline started event
+            job_id = current_state.get("job_id")
+            if job_id:
+                try:
+                    await publish_sse_event(
+                        job_id=job_id,
+                        event_type="pipeline_started",
+                        data={
+                            "target_url": current_state.get("target_url"),
+                            "session_id": current_state.get("session_id"),
+                        },
+                    )
+                except Exception as e:
+                    # Don't let publishing errors break the node
+                    import logging
+
+                    logger = logging.getLogger(__name__)
+                    logger.warning("Failed to publish pipeline_started event: %s", e)
+
             # Publish navigation start event
             await publish_sse_event(
                 job_id=job_id,
-                step_index=-1,  # Special index for overall job events
-                event_type="navigate_started",
-                data={"url": target_url},
+                event_type="screenshot_capture_started",
+                data={
+                    "job_id": job_id,
+                    "step_index": -1,  # Special index for overall job events
+                    "capture_event_type": "navigate_started",
+                    "url": target_url,
+                },
             )
 
             # Navigate to target URL
@@ -86,9 +109,13 @@ async def capture_screenshots_node(state: ManualState) -> ManualState:
             # Publish navigation completed event
             await publish_sse_event(
                 job_id=job_id,
-                step_index=-1,
-                event_type="navigate_completed",
-                data={"url": target_url},
+                event_type="screenshot_capture_started",
+                data={
+                    "job_id": job_id,
+                    "step_index": -1,
+                    "capture_event_type": "navigate_completed",
+                    "url": target_url,
+                },
             )
 
             # Handle authentication if credentials are provided
@@ -101,9 +128,13 @@ async def capture_screenshots_node(state: ManualState) -> ManualState:
                     # Publish authentication start event
                     await publish_sse_event(
                         job_id=job_id,
-                        step_index=-1,
-                        event_type="authenticate_started",
-                        data={"username": username},
+                        event_type="screenshot_capture_started",
+                        data={
+                            "job_id": job_id,
+                            "step_index": -1,
+                            "capture_event_type": "authenticate_started",
+                            "username": username,
+                        },
                     )
 
                     # Perform authentication
@@ -121,9 +152,13 @@ async def capture_screenshots_node(state: ManualState) -> ManualState:
                     # Publish authentication completed event
                     await publish_sse_event(
                         job_id=job_id,
-                        step_index=-1,
-                        event_type="authenticate_completed",
-                        data={"username": username},
+                        event_type="screenshot_capture_started",
+                        data={
+                            "job_id": job_id,
+                            "step_index": -1,
+                            "capture_event_type": "authenticate_completed",
+                            "username": username,
+                        },
                     )
 
                     # Inject storage data if provided
@@ -136,9 +171,11 @@ async def capture_screenshots_node(state: ManualState) -> ManualState:
                     # Publish step start event
                     await publish_sse_event(
                         job_id=job_id,
-                        step_index=step_index,
-                        event_type="step_started",
+                        event_type="screenshot_capture_started",
                         data={
+                            "job_id": job_id,
+                            "step_index": step_index,
+                            "capture_event_type": "step_started",
                             "action_type": getattr(step, "action_type", None),
                             "target_selector": getattr(step, "target_selector", None),
                         },
@@ -153,6 +190,17 @@ async def capture_screenshots_node(state: ManualState) -> ManualState:
                     input_value = getattr(step, "input_value", None)
                     selector_hints = getattr(step, "selector_hints", [])
 
+                    # Get step description for placeholder generation
+                    step_description = f"Step {step_index}"
+                    try:
+                        if hasattr(step, "description"):
+                            step_description = f"Step {step_index}: {step.description}"
+                        elif isinstance(step, dict) and "description" in step:
+                            step_description = f"Step {step_index}: {step['description']}"
+                    except Exception:
+                        # If we can't get the description, just use the step index
+                        pass
+
                     # If we have a target selector, highlight the target element
                     if target_selector and action_type in ["click", "type"]:
                         try:
@@ -160,9 +208,13 @@ async def capture_screenshots_node(state: ManualState) -> ManualState:
                             # Publish highlight injected event
                             await publish_sse_event(
                                 job_id=job_id,
-                                step_index=step_index,
-                                event_type="highlight_injected",
-                                data={"selector": target_selector},
+                                event_type="screenshot_capture_started",
+                                data={
+                                    "job_id": job_id,
+                                    "step_index": step_index,
+                                    "capture_event_type": "highlight_injected",
+                                    "selector": target_selector,
+                                },
                             )
                             # Small delay to let user see the highlight
                             await page.wait_for_timeout(100)
@@ -181,9 +233,14 @@ async def capture_screenshots_node(state: ManualState) -> ManualState:
                             # Publish highlight failed event
                             await publish_sse_event(
                                 job_id=job_id,
-                                step_index=step_index,
-                                event_type="highlight_failed",
-                                data={"selector": target_selector, "error": str(highlight_error)},
+                                event_type="screenshot_capture_started",
+                                data={
+                                    "job_id": job_id,
+                                    "step_index": step_index,
+                                    "capture_event_type": "highlight_failed",
+                                    "selector": target_selector,
+                                    "error": str(highlight_error),
+                                },
                             )
 
                     # Execute the action if specified
@@ -193,9 +250,11 @@ async def capture_screenshots_node(state: ManualState) -> ManualState:
                         # Publish action start event
                         await publish_sse_event(
                             job_id=job_id,
-                            step_index=step_index,
-                            event_type="action_started",
+                            event_type="screenshot_capture_started",
                             data={
+                                "job_id": job_id,
+                                "step_index": step_index,
+                                "capture_event_type": "action_started",
                                 "action_type": action_type,
                                 "selector": target_selector,
                                 "has_input": input_value is not None,
@@ -216,9 +275,11 @@ async def capture_screenshots_node(state: ManualState) -> ManualState:
                         # Publish action completed event
                         await publish_sse_event(
                             job_id=job_id,
-                            step_index=step_index,
-                            event_type="action_completed",
+                            event_type="screenshot_capture_started",
                             data={
+                                "job_id": job_id,
+                                "step_index": step_index,
+                                "capture_event_type": "action_completed",
                                 "action_type": action_type,
                                 "selector": target_selector,
                                 "has_input": input_value is not None,
@@ -233,9 +294,11 @@ async def capture_screenshots_node(state: ManualState) -> ManualState:
                     # Publish screenshot capture start event
                     await publish_sse_event(
                         job_id=job_id,
-                        step_index=step_index,
                         event_type="screenshot_capture_started",
                         data={
+                            "job_id": job_id,
+                            "step_index": step_index,
+                            "capture_event_type": "screenshot_capture_started",
                             "primary_selector": primary_selector,
                             "has_selector_hints": len(selector_hints) > 0,
                         },
@@ -248,6 +311,7 @@ async def capture_screenshots_node(state: ManualState) -> ManualState:
                         primary_selector=primary_selector,
                         selector_hints=selector_hints,
                         state=current_state,
+                        step_description=step_description,
                     )
 
                     # Update screenshot_assets in state
@@ -256,9 +320,11 @@ async def capture_screenshots_node(state: ManualState) -> ManualState:
                     # Publish screenshot captured event
                     await publish_sse_event(
                         job_id=job_id,
-                        step_index=step_index,
-                        event_type="screenshot_captured",
+                        event_type="screenshot_capture_started",
                         data={
+                            "job_id": job_id,
+                            "step_index": step_index,
+                            "capture_event_type": "screenshot_captured",
                             "file_path": screenshot_path,
                             "is_element_screenshot": target_selector is not None,
                         },
@@ -269,9 +335,12 @@ async def capture_screenshots_node(state: ManualState) -> ManualState:
                     # Publish highlight removed event
                     await publish_sse_event(
                         job_id=job_id,
-                        step_index=step_index,
-                        event_type="highlight_removed",
-                        data={},
+                        event_type="screenshot_capture_started",
+                        data={
+                            "job_id": job_id,
+                            "step_index": step_index,
+                            "capture_event_type": "highlight_removed",
+                        },
                     )
 
                     # Add delay between steps to simulate human interaction
@@ -280,9 +349,14 @@ async def capture_screenshots_node(state: ManualState) -> ManualState:
                     # Publish step completed event
                     await publish_sse_event(
                         job_id=job_id,
-                        step_index=step_index,
-                        event_type="step_completed",
-                        data={"screenshot_path": screenshot_path, "success": True},
+                        event_type="screenshot_capture_started",
+                        data={
+                            "job_id": job_id,
+                            "step_index": step_index,
+                            "capture_event_type": "step_completed",
+                            "screenshot_path": screenshot_path,
+                            "success": True,
+                        },
                     )
 
                 except Exception as step_error:
@@ -308,9 +382,14 @@ async def capture_screenshots_node(state: ManualState) -> ManualState:
                     # Publish step failed event
                     await publish_sse_event(
                         job_id=job_id,
-                        step_index=step_index,
-                        event_type="step_failed",
-                        data={"error": str(step_error), "error_type": type(step_error).__name__},
+                        event_type="screenshot_capture_started",
+                        data={
+                            "job_id": job_id,
+                            "step_index": step_index,
+                            "capture_event_type": "step_failed",
+                            "error": str(step_error),
+                            "error_type": type(step_error).__name__,
+                        },
                     )
 
                     # Still try to capture a viewport screenshot for debugging purposes
@@ -322,15 +401,18 @@ async def capture_screenshots_node(state: ManualState) -> ManualState:
                             primary_selector="body",
                             selector_hints=[],
                             state=current_state,
+                            step_description=step_description,
                         )
                         current_state["screenshot_assets"][step_index] = screenshot_path
 
                         # Publish screenshot captured (fallback) event
                         await publish_sse_event(
                             job_id=job_id,
-                            step_index=step_index,
-                            event_type="screenshot_captured_fallback",
+                            event_type="screenshot_capture_started",
                             data={
+                                "job_id": job_id,
+                                "step_index": step_index,
+                                "capture_event_type": "screenshot_captured_fallback",
                                 "file_path": screenshot_path,
                                 "reason": "viewport_fallback_after_step_failure",
                             },
@@ -359,9 +441,11 @@ async def capture_screenshots_node(state: ManualState) -> ManualState:
                         # Publish placeholder generated event
                         await publish_sse_event(
                             job_id=job_id,
-                            step_index=step_index,
-                            event_type="placeholder_generated",
+                            event_type="screenshot_capture_started",
                             data={
+                                "job_id": job_id,
+                                "step_index": step_index,
+                                "capture_event_type": "placeholder_generated",
                                 "placeholder_text": step_description,
                                 "reason": "all_capture_methods_failed",
                             },
@@ -373,9 +457,11 @@ async def capture_screenshots_node(state: ManualState) -> ManualState:
             # Publish job completed event
             await publish_sse_event(
                 job_id=job_id,
-                step_index=-1,
-                event_type="job_completed",
+                event_type="screenshot_capture_started",
                 data={
+                    "job_id": job_id,
+                    "step_index": -1,
+                    "capture_event_type": "job_completed",
                     "total_steps": len(structured_steps),
                     "successful_steps": len(
                         [
@@ -399,9 +485,14 @@ async def capture_screenshots_node(state: ManualState) -> ManualState:
             # Publish job failed event
             await publish_sse_event(
                 job_id=job_id,
-                step_index=-1,
-                event_type="job_failed",
-                data={"error": str(e), "error_type": type(e).__name__},
+                event_type="screenshot_capture_started",
+                data={
+                    "job_id": job_id,
+                    "step_index": -1,
+                    "capture_event_type": "job_failed",
+                    "error": str(e),
+                    "error_type": type(e).__name__,
+                },
             )
 
             # Record the overall error

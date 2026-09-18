@@ -29,7 +29,20 @@ class ChatMessage(BaseModel):
 
 class GenerateRequest(BaseModel):
     script: str = Field(..., min_length=10)
-    url: HttpUrl
+    target_url: HttpUrl | None = Field(default=None, description="Target staging environment URL")
+    url: HttpUrl | None = Field(default=None, description="Alias for target_url")
+    credentials: dict[str, Any] | None = Field(
+        default=None, description="Optional login credentials (ephemeral)"
+    )
+    options: dict[str, Any] | None = Field(default=None, description="Generation options")
+
+    def get_target_url(self) -> str:
+        """Return target_url or fallback to url."""
+        if self.target_url is not None:
+            return str(self.target_url)
+        if self.url is not None:
+            return str(self.url)
+        raise ValueError("Either target_url or url must be provided")
 
     class Config:
         from_attributes = True
