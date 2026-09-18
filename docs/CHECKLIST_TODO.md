@@ -240,9 +240,9 @@ Each item is categorized by priority tag:
 
 ### 7.1 Layout & State Store
 
-- [ ] **[P0]** Implement `AppShell` with navigation sidebar, status headers, and workspace container.
-- [ ] **[P0]** Implement `useManualStore` (Zustand) tracking `jobId`, `sessionId`, `jobStatus`, `markdownContent`, `stepStatuses`, `chatHistory`.
-- [ ] **[P1]** Add dark mode theme toggling with Tailwind CSS classes.
+- [x] **[P0]** Implement `AppShell` with navigation sidebar, status headers, and workspace container.
+- [x] **[P0]** Implement `useManualStore` (Zustand) tracking `jobId`, `sessionId`, `jobStatus`, `markdownContent`, `stepStatuses`, `chatHistory`.
+- [x] **[P1]** Add dark mode theme toggling with Tailwind CSS classes.
 - [ ] **[P1]** Add persistent settings storage (preferred output format, default language).
 
 ### 7.2 Workflow Script Input
