@@ -325,27 +325,20 @@ def extract_recapture_step_index(message: str) -> int | None:
     match = re.search(step_pattern, msg_lower)
     if match:
         step_number = int(match.group(1))
-        # Convert to 0-based index (assuming user input is 1-based)
-        return step_number - 1
+        # Convert to 0-based index (user input is 1-based, unless 0 was provided)
+        return max(0, step_number - 1) if step_number > 0 else 0
 
     # If not found, try to find a pattern: <number> step
     step_pattern2 = r"(\d+)\s+step"
     match = re.search(step_pattern2, msg_lower)
     if match:
         step_number = int(match.group(1))
-        return step_number - 1
+        return max(0, step_number - 1) if step_number > 0 else 0
 
-    # If still not found, look for any number in the message (as a fallback)
-    # But we want to be careful: we don't want to return a number that is not a step.
-    # We'll look for numbers that are not part of other things (like version numbers, etc.)
-    # For simplicity, we'll just look for the first number and assume it's the step.
-    # This is a heuristic and might not be perfect.
     numbers = re.findall(r"\b\d+\b", msg_lower)
     if numbers:
-        # Take the first number
         step_number = int(numbers[0])
-        # Assume 1-based and convert to 0-based
-        return step_number - 1
+        return max(0, step_number - 1) if step_number > 0 else 0
 
     # If we still haven't found a number, return None
     return None

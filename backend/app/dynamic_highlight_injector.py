@@ -21,7 +21,7 @@ async def inject_highlight_effects(page: Page, selector: str) -> None:
 
     # Inject the highlight effects using page.evaluate
     await page.evaluate(
-        r"""([selector]) => {
+        r"""(selector) => {
         // Remove any existing highlights first to avoid duplication
         const existingHighlight = document.querySelector('.docuagent-highlight-overlay');
         if (existingHighlight) {
@@ -224,3 +224,7 @@ async def cleanup_highlights(page: Page) -> None:
         page: Playwright Page object
     """
     await remove_highlight_effects(page)
+
+
+# Convenient alias
+inject_highlight = inject_highlight_effects

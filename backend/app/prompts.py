@@ -23,7 +23,7 @@ Do not include any additional text, explanation, or formatting outside the JSON 
 
 Example output format:
 [
-  {
+  {{
     "index": 0,
     "description": "Navigate to the login page",
     "action_type": "navigate",
@@ -32,8 +32,8 @@ Example output format:
     "expected_url": "https://example.com/login",
     "domain_context": "saas dashboard",
     "selector_hints": ["body", "html", "*"]
-  },
-  {
+  }},
+  {{
     "index": 1,
     "description": "Enter username in the username field",
     "action_type": "type",
@@ -42,7 +42,7 @@ Example output format:
     "expected_url": "https://example.com/login",
     "domain_context": "saas dashboard",
     "selector_hints": ["#username", "input[name='username']", ".username-field"]
-  }
+  }}
 ]
 
 Now, analyze the following workflow script and extract the steps:
@@ -73,7 +73,7 @@ Include purpose, main components, and relevant domain context.
 For each step in the workflow, provide:
 1. A clear description of what the step accomplishes
 2. Instructions for executing the step
-3. The corresponding screenshot (refer to it as ![Step X](assets/{job_id}/step_{index:03d}.png))
+3. The corresponding screenshot (refer to it as ![Step X](assets/{{job_id}}/step_{{index:03d}}.png))
 4. Any important notes, tips, or warnings related to this step
 
 ## Troubleshooting
@@ -122,7 +122,7 @@ Evaluate the document based on these four criteria:
 
 2. SCREENSHOT COVERAGE
    - Does each step in the workflow have a corresponding screenshot reference?
-   - Are screenshot references in the correct format: ![Step X](assets/{job_id}/step_{index:03d}.png)?
+   - Are screenshot references in the correct format: ![Step X](assets/{{job_id}}/step_{{index:03d}}.png)?
    - Are all screenshots accounted for in the document?
    - Are there any extra or missing screenshot references?
 
@@ -139,26 +139,26 @@ Evaluate the document based on these four criteria:
    - Are there any gaps or jumps in logic?
 
 Provide your evaluation as a JSON object with the following structure:
-{
-  "completeness": {
+{{
+  "completeness": {{
     "score": 0-100,
     "feedback": "Detailed feedback on completeness issues"
-  },
-  "screenshot_coverage": {
+  }},
+  "screenshot_coverage": {{
     "score": 0-100,
     "feedback": "Detailed feedback on screenshot coverage issues"
-  },
-  "tone_consistency": {
+  }},
+  "tone_consistency": {{
     "score": 0-100,
     "feedback": "Detailed feedback on tone consistency issues"
-  },
-  "logical_sequencing": {
+  }},
+  "logical_sequencing": {{
     "score": 0-100,
     "feedback": "Detailed feedback on logical sequencing issues"
-  },
+  }},
   "overall_pass": true/false,
   "summary": "Overall summary of the quality review"
-}
+}}
 
 Consider the document to pass only if all four criteria score 80 or above.
 Provide specific, actionable feedback in each section.

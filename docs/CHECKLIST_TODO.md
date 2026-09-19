@@ -262,17 +262,17 @@ Each item is categorized by priority tag:
 
 ### 7.4 Live Progress & Chat Interface
 
-- [ ] **[P0]** Implement `useSSEStream` custom hook handling automatic reconnection and store dispatches.
-- [ ] **[P0]** Implement `ProgressBar` and `StepStatus` badges visualizing step-by-step progress.
-- [ ] **[P0]** Implement `ChatPanel` with conversational bubble history, auto-scroll, and message composer.
-- [ ] **[P0]** Implement `useWebSocket` hook maintaining persistent bidirectional connection.
-- [ ] **[P1]** Add typing indicator ("DocuAgent is refining the document...").
+- [x] **[P0]** Implement `useSSEStream` custom hook handling automatic reconnection and store dispatches.
+- [x] **[P0]** Implement `ProgressBar` and `StepStatus` badges visualizing step-by-step progress.
+- [x] **[P0]** Implement `ChatPanel` with conversational bubble history, auto-scroll, and message composer.
+- [x] **[P0]** Implement `useWebSocket` hook maintaining persistent bidirectional connection.
+- [x] **[P1]** Add typing indicator ("DocuAgent is refining the document...").
 
 ### 7.5 Export Control Bar
 
-- [ ] **[P0]** Implement `ExportBar` with download triggers for Markdown (`.md`), HTML (`.html`), and PDF (`.pdf`).
-- [ ] **[P0]** Implement `useExport` hook streaming file downloads via Blob object URLs.
-- [ ] **[P1]** Display export generation spinners during conversion process.
+- [x] **[P0]** Implement `ExportBar` with download triggers for Markdown (`.md`), HTML (`.html`), and PDF (`.pdf`).
+- [x] **[P0]** Implement `useExport` hook streaming file downloads via Blob object URLs.
+- [x] **[P1]** Display export generation spinners during conversion process.
 
 ---
 
@@ -280,18 +280,18 @@ Each item is categorized by priority tag:
 
 ### 8.1 Export Engine Subsystem
 
-- [ ] **[P0]** Implement Pandoc Markdown-to-HTML conversion utility.
-- [ ] **[P0]** Implement base64 inline image embedding for standalone single-file HTML distributions.
-- [ ] **[P0]** Implement WeasyPrint HTML-to-PDF compiler with custom print stylesheet (`backend/app/templates/pdf_style.css`).
-- [ ] **[P0]** Implement `GET /api/v1/export/{job_id}?format={format}` endpoint streaming binary response.
-- [ ] **[P1]** Optimize PDF page breaks (prevent orphan headings and split screenshot cards).
+- [x] **[P0]** Implement Pandoc Markdown-to-HTML conversion utility.
+- [x] **[P0]** Implement base64 inline image embedding for standalone single-file HTML distributions.
+- [x] **[P0]** Implement WeasyPrint HTML-to-PDF compiler with custom print stylesheet (`backend/app/templates/pdf_style.css`).
+- [x] **[P0]** Implement `GET /api/v1/export/{job_id}?format={format}` endpoint streaming binary response.
+- [x] **[P1]** Optimize PDF page breaks (prevent orphan headings and split screenshot cards).
 
 ### 8.2 Media Asset Pipeline
 
-- [ ] **[P0]** Enforce structured file organization (`assets/{job_id}/step_{index:03d}.png`).
-- [ ] **[P0]** Expose static assets route in FastAPI / Nginx with cache headers.
-- [ ] **[P1]** Implement image thumbnail generation for quick chat previews.
-- [ ] **[P1]** Implement manual upload endpoint overwriting existing step screenshot asset.
+- [x] **[P0]** Enforce structured file organization (`assets/{job_id}/step_{index:03d}.png`).
+- [x] **[P0]** Expose static assets route in FastAPI / Nginx with cache headers.
+- [x] **[P1]** Implement image thumbnail generation for quick chat previews.
+- [x] **[P1]** Implement manual upload endpoint overwriting existing step screenshot asset.
 
 ---
 
@@ -299,23 +299,23 @@ Each item is categorized by priority tag:
 
 ### 9.1 Credential Protection & Data Isolation
 
-- [ ] **[P0]** Audit Python code to guarantee staging credentials are never serialized, written to disk, or logged.
-- [ ] **[P0]** Verify `credentials` field exclusion in Pydantic models (`exclude=True`).
+- [x] **[P0]** Audit Python code to guarantee staging credentials are never serialized, written to disk, or logged.
+- [x] **[P0]** Verify `credentials` field exclusion in Pydantic models (`exclude=True`).
 - [x] **[P0]** Verify credential stripping in `capture_screenshots_node` before LangGraph checkpoint saving.
-- [ ] **[P0]** Confirm Redis checkpoint state does not contain plaintext credentials.
+- [x] **[P0]** Confirm Redis checkpoint state does not contain plaintext credentials.
 
 ### 9.2 Network & Input Guardrails
 
-- [ ] **[P0]** Implement SSRF IP validation blocking private networks (`10.0.0.0/8`, `172.16.0.0/12`, `192.168.0.0/16`, `127.0.0.0/8`).
-- [ ] **[P0]** Implement Playwright route interception to reject redirects to internal network hosts.
-- [ ] **[P0]** Sanitize Markdown preview rendering to neutralize Cross-Site Scripting (XSS).
-- [ ] **[P0]** Enforce non-enumerable UUIDv4 identifiers for `job_id` and `session_id`.
+- [x] **[P0]** Implement SSRF IP validation blocking private networks (`10.0.0.0/8`, `172.16.0.0/12`, `192.168.0.0/16`, `127.0.0.0/8`).
+- [x] **[P0]** Implement Playwright route interception to reject redirects to internal network hosts.
+- [x] **[P0]** Sanitize Markdown preview rendering to neutralize Cross-Site Scripting (XSS).
+- [x] **[P0]** Enforce non-enumerable UUIDv4 identifiers for `job_id` and `session_id`.
 
 ### 9.3 Hardening & Audit
 
-- [ ] **[P0]** Run `pip audit` and fix all high/critical vulnerabilities.
-- [ ] **[P0]** Run `npm audit` on frontend dependencies and resolve critical alerts.
-- [ ] **[P1]** Configure security headers: HSTS, CSP, X-Frame-Options, X-Content-Type-Options.
+- [x] **[P0]** Run `pip audit` and fix all high/critical vulnerabilities.
+- [x] **[P0]** Run `npm audit` on frontend dependencies and resolve critical alerts.
+- [x] **[P1]** Configure security headers: HSTS, CSP, X-Frame-Options, X-Content-Type-Options.
 - [ ] **[P1]** Perform OWASP ZAP baseline vulnerability scan.
 
 ---
@@ -324,32 +324,32 @@ Each item is categorized by priority tag:
 
 ### 10.1 Automated Unit Tests
 
-- [ ] **[P0]** Unit tests for Agent 1 (Script Analyzer) on 5 sample input workflows.
-- [ ] **[P0]** Unit tests for Agent 3 (Technical Writer) verifying Markdown structure.
-- [ ] **[P0]** Unit tests for Agent 4 (Quality Reviewer) approval and rejection logic.
-- [ ] **[P0]** Unit tests for Agent 5 (Refiner) section-level replacements.
-- [ ] **[P0]** Unit tests for URL validation and SSRF blocking rules.
-- [ ] **[P0]** Unit tests for Zustand store actions and state transitions.
+- [x] **[P0]** Unit tests for Agent 1 (Script Analyzer) on 5 sample input workflows.
+- [x] **[P0]** Unit tests for Agent 3 (Technical Writer) verifying Markdown structure.
+- [x] **[P0]** Unit tests for Agent 4 (Quality Reviewer) approval and rejection logic.
+- [x] **[P0]** Unit tests for Agent 5 (Refiner) section-level replacements.
+- [x] **[P0]** Unit tests for URL validation and SSRF blocking rules.
+- [x] **[P0]** Unit tests for Zustand store actions and state transitions.
 
 ### 10.2 Integration & Pipeline Tests
 
-- [ ] **[P0]** Integration test of the full LangGraph cyclic graph with mocked LLM responses.
-- [ ] **[P0]** Integration test of Playwright highlight injection and screenshot capture against local mock HTML pages.
-- [ ] **[P0]** Integration test of SSE streaming event emission from Celery worker through Redis to FastAPI client.
-- [ ] **[P0]** Integration test of export generation (Markdown, HTML, PDF).
+- [x] **[P0]** Integration test of the full LangGraph cyclic graph with mocked LLM responses.
+- [x] **[P0]** Integration test of Playwright highlight injection and screenshot capture against local mock HTML pages.
+- [x] **[P0]** Integration test of SSE streaming event emission from Celery worker through Redis to FastAPI client.
+- [x] **[P0]** Integration test of export generation (Markdown, HTML, PDF).
 
 ### 10.3 End-to-End Functional Tests
 
-- [ ] **[P0]** Complete user flow: Submit script → Wait for generation → Inspect in editor → Export PDF.
-- [ ] **[P0]** Refinement flow: Submit chat message → Verify targeted Markdown edit in Monaco editor.
-- [ ] **[P0]** Re-capture flow: Click re-capture on screenshot → Verify updated asset in preview.
-- [ ] **[P1]** Fault tolerance test: Run workflow with invalid CSS selector → Verify fallback screenshot and document completion.
+- [x] **[P0]** Complete user flow: Submit script → Wait for generation → Inspect in editor → Export PDF.
+- [x] **[P0]** Refinement flow: Submit chat message → Verify targeted Markdown edit in Monaco editor.
+- [x] **[P0]** Re-capture flow: Click re-capture on screenshot → Verify updated asset in preview.
+- [x] **[P1]** Fault tolerance test: Run workflow with invalid CSS selector → Verify fallback screenshot and document completion.
 
 ### 10.4 Performance & Stress Tests
 
-- [ ] **[P1]** Run k6 load test: 5 concurrent 10-step generation workflows completed within 5 minutes.
-- [ ] **[P1]** Run API stress test: 100 concurrent health and status checks with p95 ≤ 200ms.
-- [ ] **[P1]** Verify frontend Core Web Vitals (LCP ≤ 2.5s, TTI ≤ 3.5s).
+- [x] **[P1]** Run k6 load test: 5 concurrent 10-step generation workflows completed within 5 minutes.
+- [x] **[P1]** Run API stress test: 100 concurrent health and status checks with p95 ≤ 200ms.
+- [x] **[P1]** Verify frontend Core Web Vitals (LCP ≤ 2.5s, TTI ≤ 3.5s).
 
 ---
 
@@ -357,31 +357,31 @@ Each item is categorized by priority tag:
 
 ### 11.1 Containerization
 
-- [ ] **[P0]** Write `backend/Dockerfile` with Python 3.11, system dependencies for Playwright, and Gunicorn runner.
-- [ ] **[P0]** Write `backend/Dockerfile.worker` for Celery task processing.
-- [ ] **[P0]** Write `frontend/Dockerfile` multi-stage build (Node build → Nginx static serve).
-- [ ] **[P0]** Create root `docker-compose.yml` defining `backend`, `worker`, `frontend`, `redis`, `nginx`, `flower`.
-- [ ] **[P0]** Verify named volume persistence for Redis data, screenshots, and export files.
+- [x] **[P0]** Write `backend/Dockerfile` with Python 3.11, system dependencies for Playwright, and Gunicorn runner.
+- [x] **[P0]** Write `backend/Dockerfile.worker` for Celery task processing.
+- [x] **[P0]** Write `frontend/Dockerfile` multi-stage build (Node build → Nginx static serve).
+- [x] **[P0]** Create root `docker-compose.yml` defining `backend`, `worker`, `frontend`, `redis`, `nginx`, `flower`.
+- [x] **[P0]** Verify named volume persistence for Redis data, screenshots, and export files.
 
 ### 11.2 Reverse Proxy & Networking
 
-- [ ] **[P0]** Configure `nginx/nginx.conf` with reverse proxy for `/api/`, static assets `/assets/`, and frontend SPA fallback routing.
-- [ ] **[P0]** Configure Nginx SSE directives (`proxy_buffering off`, `proxy_read_timeout 600s`).
-- [ ] **[P0]** Configure Nginx WebSocket upgrade headers for `/api/v1/ws/`.
-- [ ] **[P1]** Configure SSL/TLS termination with modern cipher suites.
+- [x] **[P0]** Configure `nginx/nginx.conf` with reverse proxy for `/api/`, static assets `/assets/`, and frontend SPA fallback routing.
+- [x] **[P0]** Configure Nginx SSE directives (`proxy_buffering off`, `proxy_read_timeout 600s`).
+- [x] **[P0]** Configure Nginx WebSocket upgrade headers for `/api/v1/ws/`.
+- [x] **[P1]** Configure SSL/TLS termination with modern cipher suites.
 
 ### 11.3 CI/CD Automation
 
-- [ ] **[P0]** Implement GitHub Actions workflow for linting, typing, and unit test execution on pull requests.
-- [ ] **[P1]** Implement Docker image build and registry push workflow upon merging to `main`.
-- [ ] **[P1]** Implement automated staging deployment via SSH webhook or runner.
+- [x] **[P0]** Implement GitHub Actions workflow for linting, typing, and unit test execution on pull requests.
+- [x] **[P1]** Implement Docker image build and registry push workflow upon merging to `main`.
+- [x] **[P1]** Implement automated staging deployment via SSH webhook or runner.
 
 ### 11.4 Operations & Observability
 
-- [ ] **[P1]** Enable Prometheus metrics endpoint in FastAPI using `prometheus-fastapi-instrumentator`.
-- [ ] **[P1]** Set up Celery Flower dashboard for background task visibility.
-- [ ] **[P1]** Implement automated Redis RDB backup script via cron.
-- [ ] **[P1]** Document system runbook covering service recovery, logs inspection, and credential rotation.
+- [x] **[P1]** Enable Prometheus metrics endpoint in FastAPI using `prometheus-fastapi-instrumentator`.
+- [x] **[P1]** Set up Celery Flower dashboard for background task visibility.
+- [x] **[P1]** Implement automated Redis RDB backup script via cron.
+- [x] **[P1]** Document system runbook covering service recovery, logs inspection, and credential rotation.
 
 ---
 
@@ -389,11 +389,11 @@ Each item is categorized by priority tag:
 
 | Sprint       | Timeline  | Focus Area                     | Deliverables & Milestones                                                           | Status |
 | ------------ | --------- | ------------------------------ | ----------------------------------------------------------------------------------- | ------ |
-| **Sprint 1** | Week 1–2  | Foundation & Core Backend      | Project bootstrap, FastAPI app, Agent 1 & Agent 3, Playwright capture basics        | `[ ]`  |
-| **Sprint 2** | Week 3–4  | Multi-Agent Machine & Frontend | Agent 4 & Agent 5, LangGraph graph, Monaco Editor, Zustand store, SSE hook          | `[ ]`  |
-| **Sprint 3** | Week 5–6  | Playwright Highlighting & HITL | Dynamic CSS highlight engine, chat WebSocket, fallback engine, manual upload        | `[ ]`  |
-| **Sprint 4** | Week 7–8  | Integration, Celery & Export   | Celery task queues, WeasyPrint PDF export, full pipeline integration, security pass | `[ ]`  |
-| **Sprint 5** | Week 9–10 | QA, Docker, Hardening & GA     | End-to-end testing, Docker Compose stack, Nginx TLS, load testing, v1.0.0 Release   | `[ ]`  |
+| **Sprint 1** | Week 1–2  | Foundation & Core Backend      | Project bootstrap, FastAPI app, Agent 1 & Agent 3, Playwright capture basics        | `[x]`  |
+| **Sprint 2** | Week 3–4  | Multi-Agent Machine & Frontend | Agent 4 & Agent 5, LangGraph graph, Monaco Editor, Zustand store, SSE hook          | `[x]`  |
+| **Sprint 3** | Week 5–6  | Playwright Highlighting & HITL | Dynamic CSS highlight engine, chat WebSocket, fallback engine, manual upload        | `[x]`  |
+| **Sprint 4** | Week 7–8  | Integration, Celery & Export   | Celery task queues, WeasyPrint PDF export, full pipeline integration, security pass | `[x]`  |
+| **Sprint 5** | Week 9–10 | QA, Docker, Hardening & GA     | End-to-end testing, Docker Compose stack, Nginx TLS, load testing, v1.0.0 Release   | `[x]`  |
 
 ---
 

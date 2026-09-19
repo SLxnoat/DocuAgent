@@ -1,183 +1,227 @@
 import * as React from "react";
-import { useManualStore } from "../store/useManualStore";
-import { LucideIcons, Camera, Upload, X } from "lucide-react";
+import { useState, useRef } from "react";
+import { useManualStore } from "@/store/useManualStore";
+import { triggerRecapture, uploadReplacementScreenshot } from "@/api/client";
+import { RefreshCw, Upload, Check, AlertCircle, Eye } from "lucide-react";
 
 interface ScreenshotImageProps {
-  src: string;
+  src?: string;
   alt?: string;
   title?: string;
+  className?: string;
 }
 
 export const ScreenshotImage: React.FC<ScreenshotImageProps> = ({
-  src,
+  src = "",
   alt = "",
   title = "",
+  className,
 }) => {
-  const setMarkdownContent = useManualStore(
-    (state) => state.setMarkdownContent,
-  );
-  const markdownContent = useManualStore((state) => state.markdownContent);
+  const { jobId, updateStepStatus } = useManualStore();
+  const [isRecapturing, setIsRecapturing] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
+  const [statusMessage, setStatusMessage] = useState<string | null>(null);
+  const [isError, setIsError] = useState(false);
+  const [showPreviewModal, setShowPreviewModal] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const [previewSrc, setPreviewSrc] = useState<string>(src);
-  const [isEditing, setIsEditing] = useState<boolean>(false);
-  const [webcamStream, setWebcamStream] = useState<MediaStream | null>(null);
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const [isRecapturing, setIsRecapturing] = useState<boolean>(false);
-  const [isUploading, setIsUploading] = useState<boolean>(false);
-
-  // Cleanup webcam stream on unmount or when stopping
-  React.useEffect(() => {
-    return () => {
-      if (webcamStream) {
-        webcamStream.getTracks().forEach((track) => track.stop());
-      }
-    };
-  }, [webcamStream]);
-
-  // Function to replace the image src in the markdown content
-  const updateMarkdownImage = async (newSrc: string) => {
-    // We replace the first occurrence of the original src with the new src
-    // This is a simple replacement; note that if the same src appears multiple times, we only replace the first.
-    // For a more robust solution, we might want to replace by the entire image markdown, but we don't have that here.
-    const newContent = markdownContent.replace(src, newSrc);
-    setMarkdownContent(newContent);
+  // Extract step index from image src or alt text (e.g., "step_002.png" -> 2, "Step 3" -> 3)
+  const extractStepIndex = (): number => {
+    const srcMatch = src.match(/step_?(\d+)/i);
+    if (srcMatch && srcMatch[1]) {
+      return parseInt(srcMatch[1], 10);
+    }
+    const altMatch = alt.match(/step\s*(\d+)/i);
+    if (altMatch && altMatch[1]) {
+      return parseInt(altMatch[1], 10);
+    }
+    return 1;
   };
 
-  const handleRecapture = async () => {
+  const stepIndex = extractStepIndex();
+
+  const handleRecapture = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!jobId) {
+      setStatusMessage("No active job to recapture");
+      setIsError(true);
+      return;
+    }
+
     setIsRecapturing(true);
+    setStatusMessage("Triggering Playwright recapture...");
+    setIsError(false);
+
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-      setWebcamStream(stream);
-      videoRef.current?.play();
-    } catch (err) {
-      console.error("Error accessing webcam:", err);
-      alert("Unable to access webcam. Please check your permissions.");
+      await triggerRecapture(jobId, stepIndex);
+      setStatusMessage("Recapture queued!");
+      updateStepStatus(stepIndex - 1, "pending");
+      setTimeout(() => setStatusMessage(null), 3500);
+    } catch (error: any) {
+      console.error("Recapture error:", error);
+      setStatusMessage(
+        error?.response?.data?.error?.message || "Recapture failed",
+      );
+      setIsError(true);
+      setTimeout(() => setStatusMessage(null), 4000);
+    } finally {
       setIsRecapturing(false);
     }
   };
 
-  const handleCapture = () => {
-    if (!videoRef.current) return;
-    const canvas = document.createElement("canvas");
-    const video = videoRef.current;
-    canvas.width = video.videoWidth;
-    canvas.height = video.videoHeight;
-    const ctx = canvas.getContext("2d");
-    if (ctx) {
-      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-      const dataUrl = canvas.toDataURL("image/png");
-      setPreviewSrc(dataUrl);
-      // Update the markdown content
-      updateMarkdownImage(dataUrl);
-    }
-    // Stop the webcam stream
-    if (webcamStream) {
-      webcamStream.getTracks().forEach((track) => track.stop());
-      setWebcamStream(null);
-    }
-    setIsRecapturing(false);
-    setIsEditing(false);
-  };
-
-  const handleUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (!file) return;
-    setIsUploading(true);
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      if (reader.result && typeof reader.result === "string") {
-        setPreviewSrc(reader.result);
-        // Update the markdown content
-        updateMarkdownImage(reader.result);
-      }
-      setIsUploading(false);
-      setIsEditing(false);
-      e.target.value = ""; // Reset the input
-    };
-    reader.readAsDataURL(file);
-  };
+    if (!file || !jobId) return;
 
-  const handleClose = () => {
-    // If we were recapturing, stop the webcam stream
-    if (webcamStream) {
-      webcamStream.getTracks().forEach((track) => track.stop());
-      setWebcamStream(null);
+    setIsUploading(true);
+    setStatusMessage("Uploading replacement...");
+    setIsError(false);
+
+    try {
+      await uploadReplacementScreenshot(jobId, stepIndex, file);
+      setStatusMessage("Screenshot replaced!");
+      updateStepStatus(stepIndex - 1, "captured");
+      setTimeout(() => setStatusMessage(null), 3000);
+    } catch (error: any) {
+      console.error("Upload screenshot error:", error);
+      setStatusMessage(
+        error?.response?.data?.error?.message || "Upload failed",
+      );
+      setIsError(true);
+      setTimeout(() => setStatusMessage(null), 4000);
+    } finally {
+      setIsUploading(false);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
     }
-    setIsRecapturing(false);
-    setIsUploading(false);
-    setIsEditing(false);
-    setPreviewSrc(src); // Reset preview to original src
   };
 
   return (
-    <div className="relative inline-block">
-      {/* The image */}
-      <img
-        src={previewSrc}
-        alt={alt}
-        title={title}
-        className="cursor-pointer max-w-full hover:opacity-80 transition-opacity"
-        onClick={() => setIsEditing(true)}
-      />
+    <div
+      className={`my-4 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/60 overflow-hidden shadow-xs transition-all group ${
+        className || ""
+      }`}
+    >
+      <div className="relative overflow-hidden bg-gray-900/5 dark:bg-gray-950/40">
+        {src ? (
+          <img
+            src={src}
+            alt={alt || `Step ${stepIndex} Screenshot`}
+            title={title || alt}
+            className="w-full max-h-[460px] object-contain mx-auto block cursor-pointer transition-transform duration-200 group-hover:scale-[1.01]"
+            onClick={() => setShowPreviewModal(true)}
+            loading="lazy"
+          />
+        ) : (
+          <div className="h-48 flex items-center justify-center text-gray-400 text-sm">
+            <span>No screenshot available</span>
+          </div>
+        )}
 
-      {/* Edit overlay */}
-      {isEditing && (
-        <div className="absolute inset-0 flex flex-col items-center justify-center bg-black bg-opacity-50">
-          <div className="bg-white p-6 rounded-lg shadow-lg w-80">
-            <h2 className="text-lg font-semibold mb-4">Edit Image</h2>
-            <div className="space-y-4">
+        {/* Hover Action Overlay */}
+        <div className="absolute top-2 right-2 flex items-center gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity duration-150 bg-black/70 backdrop-blur-sm p-1.5 rounded-lg">
+          <button
+            type="button"
+            onClick={() => setShowPreviewModal(true)}
+            className="p-1.5 text-white/90 hover:text-white rounded hover:bg-white/20 transition-colors"
+            title="View Full Size"
+          >
+            <Eye className="h-4 w-4" />
+          </button>
+
+          <button
+            type="button"
+            onClick={handleRecapture}
+            disabled={isRecapturing}
+            className="flex items-center gap-1 px-2 py-1 text-xs font-medium text-white/90 hover:text-white rounded hover:bg-white/20 transition-colors disabled:opacity-50"
+            title="Re-run browser automation for this step"
+          >
+            <RefreshCw
+              className={`h-3.5 w-3.5 ${isRecapturing ? "animate-spin" : ""}`}
+            />
+            <span>Recapture</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => fileInputRef.current?.click()}
+            disabled={isUploading}
+            className="flex items-center gap-1 px-2 py-1 text-xs font-medium text-white/90 hover:text-white rounded hover:bg-white/20 transition-colors disabled:opacity-50"
+            title="Upload custom replacement screenshot"
+          >
+            <Upload
+              className={`h-3.5 w-3.5 ${isUploading ? "animate-bounce" : ""}`}
+            />
+            <span>Replace</span>
+          </button>
+        </div>
+
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="image/png,image/jpeg,image/webp"
+          className="hidden"
+          onChange={handleFileChange}
+        />
+      </div>
+
+      {/* Footer info & status messages */}
+      <div className="px-3.5 py-2 flex items-center justify-between text-xs text-gray-600 dark:text-gray-400 border-t border-gray-200 dark:border-gray-700 bg-white/60 dark:bg-gray-850">
+        <span className="font-medium truncate max-w-[60%]">
+          {alt || `Step ${stepIndex} UI State`}
+        </span>
+
+        {statusMessage ? (
+          <span
+            className={`flex items-center gap-1 font-medium ${
+              isError
+                ? "text-red-600 dark:text-red-400"
+                : "text-blue-600 dark:text-blue-400"
+            }`}
+          >
+            {isError ? (
+              <AlertCircle className="h-3.5 w-3.5" />
+            ) : (
+              <Check className="h-3.5 w-3.5" />
+            )}
+            <span>{statusMessage}</span>
+          </span>
+        ) : (
+          <span className="text-gray-400 text-[11px]">
+            Click image to inspect
+          </span>
+        )}
+      </div>
+
+      {/* Full-size preview modal */}
+      {showPreviewModal && (
+        <div
+          className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 cursor-pointer"
+          onClick={() => setShowPreviewModal(false)}
+        >
+          <div
+            className="relative max-w-5xl max-h-[90vh] bg-white dark:bg-gray-900 rounded-xl overflow-hidden shadow-2xl p-2"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex justify-between items-center p-2 border-b border-gray-200 dark:border-gray-800">
+              <span className="text-sm font-semibold text-gray-800 dark:text-gray-200">
+                {alt || `Step ${stepIndex} Screenshot`}
+              </span>
               <button
-                onClick={handleRecapture}
-                disabled={isRecapturing}
-                className="w-full flex items-center justify-between px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+                onClick={() => setShowPreviewModal(false)}
+                className="text-gray-500 hover:text-gray-800 dark:hover:text-gray-200 text-sm font-bold px-2 py-1"
               >
-                <span>Recapture</span>
-                {isRecapturing && <span className="ml-2">...</span>}
-              </button>
-              <button
-                onClick={() => {
-                  setIsUploading(true);
-                  // Trigger the file input
-                  const input = document.createElement("input");
-                  input.type = "file";
-                  input.accept = "image/*";
-                  input.onchange = handleUpload;
-                  input.click();
-                }}
-                disabled={isUploading}
-                className="w-full flex items-center justify-between px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
-              >
-                <span>Upload</span>
-                {isUploading && <span className="ml-2">...</span>}
-              </button>
-              <button
-                onClick={handleClose}
-                className="w-full flex items-center justify-between px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600"
-              >
-                Cancel
-                <X className="ml-2 h-4 w-4" />
+                ✕ Close
               </button>
             </div>
-          </div>
-        </div>
-      )}
-
-      {/* Webcam preview when recapturing */}
-      {isRecapturing && webcamStream && (
-        <div className="absolute inset-0 bg-black bg-opacity-75 flex items-center justify-center z-20">
-          <div className="relative w-[640px] h-[480px]">
-            <video
-              ref={videoRef}
-              autoPlay
-              muted
-              className="w-full h-full object-contain"
-            />
-            <button
-              onClick={handleCapture}
-              className="absolute bottom-4 right-4 bg-white rounded-full p-2 hover:bg-gray-200"
-            >
-              <Camera className="h-5 w-5" />
-            </button>
+            <div className="p-2 overflow-auto max-h-[80vh]">
+              <img
+                src={src}
+                alt={alt}
+                className="w-full h-auto object-contain rounded"
+              />
+            </div>
           </div>
         </div>
       )}

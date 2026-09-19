@@ -4,7 +4,7 @@ from pathlib import Path
 from fastapi import APIRouter, File, HTTPException, UploadFile
 
 from app.config import settings
-from app.models import JobStatusResponse
+from app.models import JobStatusResponse, is_valid_uuid
 
 router = APIRouter()
 
@@ -52,9 +52,7 @@ def _cleanup_old_files(directory: str, retention_hours: int) -> None:
                 file_mtime = file_path.stat().st_mtime
                 if file_mtime < cutoff_time:
                     file_path.unlink()
-                    # Removed print statement as per linting rule T201
     except Exception:
-        # Removed print statement as per linting rule T201
         pass
 
 
@@ -63,6 +61,9 @@ async def get_job_status(job_id: str):
     """
     Get the status and metadata of a job by job_id.
     """
+    if not is_valid_uuid(job_id):
+        raise HTTPException(status_code=400, detail="Invalid job ID format. Must be UUIDv4.")
+
     if job_id not in job_store:
         raise HTTPException(status_code=404, detail="Job not found")
 
@@ -84,28 +85,23 @@ async def delete_job(job_id: str):
     Delete a job and terminate active execution if any.
     Purges temporary assets associated with the job.
     """
+    if not is_valid_uuid(job_id):
+        raise HTTPException(status_code=400, detail="Invalid job ID format. Must be UUIDv4.")
+
     if job_id not in job_store:
         raise HTTPException(status_code=404, detail="Job not found")
 
-    # Terminate active execution (if any mechanisms exist)
-    # For now, we just remove from store as there's no explicit execution tracking
-
     # Purge temporary assets associated with this job
     try:
-        # Clean up assets directory based on retention policy
         assets_dir = Path(settings.assets_dir)
         if assets_dir.exists():
             _cleanup_old_files(assets_dir, settings.asset_retention_hours)
 
-        # Clean up exports directory based on retention policy
         exports_dir = Path(settings.exports_dir)
         if exports_dir.exists():
             _cleanup_old_files(exports_dir, settings.asset_retention_hours)
-
     except Exception:
-        # Log the error but don't fail the deletion
-        # In a real app, you'd use proper logging
-        pass  # Removed print statement as per linting rule T201
+        pass
 
     # Remove job from store
     del job_store[job_id]
@@ -119,26 +115,14 @@ async def recapture_step(job_id: str, step_index: int):
     Trigger targeted single-step re-execution for a specific job and step.
     Allows users to re-run a particular step in the job's workflow.
     """
+    if not is_valid_uuid(job_id):
+        raise HTTPException(status_code=400, detail="Invalid job ID format. Must be UUIDv4.")
+
     if job_id not in job_store:
         raise HTTPException(status_code=404, detail="Job not found")
 
-    # Validate step_index is within bounds of existing steps
-    # Note: In a full implementation, we would store the actual steps and check against them
-    # For now, we do basic validation that step_index is non-negative
     if step_index < 0:
         raise HTTPException(status_code=400, detail="Step index must be non-negative")
-
-    # TODO: In a real implementation:
-    # 1. Retrieve the specific step from job's step definitions
-    # 2. Trigger a Celery task to re-execute just that step
-    # 3. Update job status to indicate step is being processed
-    # 4. Return appropriate response
-
-    # For now, we simulate the initiation of recapture
-    # In practice, this would involve:
-    # - Creating a recapture task that replays actions up to the target step
-    # - Then re-executing just that step with updated parameters if needed
-    # - Updating the step_statuses array to reflect the recapture status
 
     return {
         "message": f"Recapture initiated for job {job_id}, step {step_index}",
@@ -154,6 +138,9 @@ async def upload_screenshot(job_id: str, step_index: int, file: UploadFile = Fil
     Upload a replacement screenshot for a specific job and step.
     The screenshot will be saved as assets/{job_id}/step_{step_index:03d}.png
     """
+    if not is_valid_uuid(job_id):
+        raise HTTPException(status_code=400, detail="Invalid job ID format. Must be UUIDv4.")
+
     if job_id not in job_store:
         raise HTTPException(status_code=404, detail="Job not found")
 

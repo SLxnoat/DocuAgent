@@ -165,6 +165,13 @@ async def capture_screenshots_node(state: ManualState) -> ManualState:
                     if storage_data and context:
                         await inject_storage(context, storage_data)
 
+            # Zero-Retention: Wipe staging credentials immediately after browser authentication
+            current_state["credentials"] = {}
+            credentials = {}
+            username = None
+            password = None
+            storage_data = None
+
             # Process each structured step
             for step_index, step in enumerate(structured_steps):
                 try:
@@ -184,11 +191,17 @@ async def capture_screenshots_node(state: ManualState) -> ManualState:
                     # Clear highlights from previous step
                     await cleanup_highlights(page)
 
-                    # Extract step data from StepSchema
-                    action_type = getattr(step, "action_type", None)
-                    target_selector = getattr(step, "target_selector", None)
-                    input_value = getattr(step, "input_value", None)
-                    selector_hints = getattr(step, "selector_hints", [])
+                    # Extract step data from StepSchema or dict
+                    if isinstance(step, dict):
+                        action_type = step.get("action_type")
+                        target_selector = step.get("target_selector")
+                        input_value = step.get("input_value")
+                        selector_hints = step.get("selector_hints", [])
+                    else:
+                        action_type = getattr(step, "action_type", None)
+                        target_selector = getattr(step, "target_selector", None)
+                        input_value = getattr(step, "input_value", None)
+                        selector_hints = getattr(step, "selector_hints", [])
 
                     # Get step description for placeholder generation
                     step_description = f"Step {step_index}"

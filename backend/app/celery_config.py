@@ -3,9 +3,8 @@ Celery configuration for DocuAgent AI.
 Configures Celery app with Redis broker and result backend for task distribution.
 """
 
-from celery import Celery
-
 from app.config import settings
+from celery import Celery
 
 # Create Celery instance
 celery_app = Celery(

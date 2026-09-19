@@ -4,9 +4,8 @@ Maintenance tasks for DocuAgent AI Celery workers.
 
 from pathlib import Path
 
-from celery.utils.log import get_task_logger
-
 from app.celery import celery_app
+from celery.utils.log import get_task_logger
 
 logger = get_task_logger(__name__)
 
@@ -63,7 +62,7 @@ def cleanup_old_assets(self, max_age_hours: int = 24):
         space_freed_mb = space_freed / (1024 * 1024)
 
         logger.info(
-            f"Cleanup completed: {files_removed} files removed, " f"{space_freed_mb:.2f} MB freed"
+            f"Cleanup completed: {files_removed} files removed, {space_freed_mb:.2f} MB freed"
         )
 
         return {

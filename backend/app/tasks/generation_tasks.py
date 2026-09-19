@@ -60,19 +60,43 @@ def generate_manual(
         # Run async workflow within Celery worker process
         final_state = asyncio.run(_execute_docuagent_workflow(initial_state))
 
+        markdown_content = final_state.get("markdown_content", "")
+
+        # Persist results back into the shared job_store so the export
+        # endpoint can retrieve the markdown_content without a DB.
+        try:
+            from app.api.v1.endpoints.jobs import job_store
+
+            if job_id in job_store:
+                job_store[job_id]["markdown_content"] = markdown_content
+                job_store[job_id]["screenshot_assets"] = final_state.get("screenshot_assets", {})
+                job_store[job_id]["status"] = "completed"
+                job_store[job_id]["quality_approved"] = final_state.get("quality_approved", False)
+        except Exception as store_exc:
+            logger.warning("Could not update job_store after completion: %s", store_exc)
+
         logger.info(f"Manual generation completed for job {job_id}")
 
         return {
             "success": True,
             "job_id": job_id,
             "session_id": session_id,
-            "markdown_content": final_state.get("markdown_content", ""),
+            "markdown_content": markdown_content,
             "screenshot_assets": final_state.get("screenshot_assets", {}),
             "quality_approved": final_state.get("quality_approved", False),
         }
 
     except Exception as exc:
         logger.error(f"Manual generation failed for job {job_id}: {exc}")
+        # Mark job as failed in store
+        try:
+            from app.api.v1.endpoints.jobs import job_store
+
+            if job_id in job_store:
+                job_store[job_id]["status"] = "failed"
+                job_store[job_id]["error"] = str(exc)
+        except Exception:
+            pass
         raise self.retry(exc=exc) from exc
 
 

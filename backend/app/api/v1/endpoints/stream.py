@@ -9,11 +9,12 @@ import json
 import logging
 from collections.abc import AsyncGenerator
 
-from fastapi import APIRouter, Request
+from fastapi import APIRouter, HTTPException, Request
 from fastapi.responses import StreamingResponse
 from redis.asyncio import Redis
 
 from app.config import settings
+from app.models import is_valid_uuid
 from app.utils.sse_publisher import publish_sse_event
 
 logger = logging.getLogger(__name__)
@@ -113,8 +114,8 @@ async def stream_job_progress(request: Request, job_id: str):
     Returns:
         StreamingResponse: SSE stream of job progress events
     """
-    # TODO: Validate that the job_id exists (optional, but recommended)
-    # For now, we'll just start streaming and let the subscriber handle missing events
+    if not is_valid_uuid(job_id):
+        raise HTTPException(status_code=400, detail="Invalid job ID format. Must be UUIDv4.")
 
     return StreamingResponse(
         event_stream(request, job_id),

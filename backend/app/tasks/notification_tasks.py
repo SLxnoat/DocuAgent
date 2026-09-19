@@ -2,9 +2,8 @@
 Notification tasks for DocuAgent AI Celery workers.
 """
 
-from celery.utils.log import get_task_logger
-
 from app.celery import celery_app
+from celery.utils.log import get_task_logger
 
 logger = get_task_logger(__name__)
 

@@ -5,8 +5,8 @@ export function WorkspaceContainer(
   props: React.PropsWithChildren<{ className?: string }>,
 ) {
   return (
-    <main className={props.className}>
-      <ScrollArea className="h-full w-full p-6">{props.children}</ScrollArea>
+    <main className={`flex-1 flex flex-col min-h-0 ${props.className || ""}`}>
+      <ScrollArea className="h-full w-full">{props.children}</ScrollArea>
     </main>
   );
 }

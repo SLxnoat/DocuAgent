@@ -38,7 +38,7 @@ async def quality_review_node(state: ManualState) -> ManualState:
 
     # Call the LLM to get the quality feedback in JSON format
     try:
-        feedback_dict: dict[str, Any] = await ollama_generate_json_with_retry(
+        feedback_dict: dict[str, Any] = ollama_generate_json_with_retry(
             prompt=prompt,
             temperature=0.1,  # Low temperature for consistent JSON output
             max_retries=2,
@@ -61,18 +61,21 @@ async def quality_review_node(state: ManualState) -> ManualState:
     current_attempts = state.get("quality_review_attempts", 0)
     new_attempts = current_attempts + 1
 
+    # Calculate overall pass status
+    overall_pass = bool(feedback_dict.get("overall_pass", False))
+
     # Prepare the updated state
     updated_state = {
         **state,
         "quality_feedback": quality_feedback_str,
         "quality_review_attempts": new_attempts,
+        "quality_approved": overall_pass,
     }
 
     # Publish event: quality_approved if the review passes
     job_id = state.get("job_id")
     if job_id:
         try:
-            overall_pass = feedback_dict.get("overall_pass", False)
             if overall_pass:
                 await publish_sse_event(
                     job_id=job_id,

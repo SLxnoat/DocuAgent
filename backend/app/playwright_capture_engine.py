@@ -58,6 +58,23 @@ class PlaywrightCaptureEngine:
         # Set default timeout for selectors
         self.page.set_default_timeout(settings.playwright_selector_timeout_ms)
 
+        # Security Guardrail: Route interception to block internal/private hosts and redirects
+        async def _route_interceptor(route, request):
+            req_url = request.url
+            if req_url.startswith(("data:", "blob:", "about:")):
+                await route.continue_()
+                return
+
+            try:
+                from app.utils.url_validator import validate_target_url
+
+                validate_target_url(req_url)
+                await route.continue_()
+            except Exception:
+                await route.abort("blockedbyclient")
+
+        await self.context.route("**/*", _route_interceptor)
+
         return self
 
     async def __aexit__(self, exc_type, exc_val, exc_tb):

@@ -1,7 +1,17 @@
+import uuid
 from datetime import datetime
 from typing import Any
 
 from pydantic import BaseModel, Field, HttpUrl
+
+
+def is_valid_uuid(val: str) -> bool:
+    """Validate that a string conforms to standard UUID format."""
+    try:
+        uuid_obj = uuid.UUID(str(val))
+        return str(uuid_obj) == str(val).lower()
+    except (ValueError, AttributeError, TypeError):
+        return False
 
 
 class StepSchema(BaseModel):
@@ -32,7 +42,9 @@ class GenerateRequest(BaseModel):
     target_url: HttpUrl | None = Field(default=None, description="Target staging environment URL")
     url: HttpUrl | None = Field(default=None, description="Alias for target_url")
     credentials: dict[str, Any] | None = Field(
-        default=None, description="Optional login credentials (ephemeral)"
+        default=None,
+        description="Optional login credentials (ephemeral)",
+        exclude=True,  # Exclude from serialization and dict exports
     )
     options: dict[str, Any] | None = Field(default=None, description="Generation options")
 
@@ -43,6 +55,15 @@ class GenerateRequest(BaseModel):
         if self.url is not None:
             return str(self.url)
         raise ValueError("Either target_url or url must be provided")
+
+    def __repr__(self) -> str:
+        """Safe representation with redacted credentials."""
+        target = self.get_target_url() if (self.target_url or self.url) else None
+        has_creds = bool(self.credentials)
+        return (
+            f"GenerateRequest(script='{self.script[:30]}...', target_url='{target}', "
+            f"credentials={'[REDACTED]' if has_creds else 'None'})"
+        )
 
     class Config:
         from_attributes = True

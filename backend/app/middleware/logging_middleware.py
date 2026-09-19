@@ -50,7 +50,7 @@ class JSONLoggingMiddleware(BaseHTTPMiddleware):
             request_id: The unique request ID.
         """
         message = (
-            f"Request started: {request.method} {request.url.path}" f"?{request.url.query}"
+            f"Request started: {request.method} {request.url.path}?{request.url.query}"
             if request.url.query
             else ""
         )

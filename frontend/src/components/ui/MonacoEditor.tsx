@@ -1,94 +1,63 @@
 import * as React from "react";
-import { Monaco } from "@monaco-editor/react";
+import Editor, { type OnMount } from "@monaco-editor/react";
+import { useManualStore } from "@/store/useManualStore";
 
 interface MonacoEditorProps {
   value: string;
   onChange: (value: string) => void;
+  className?: string;
 }
+
+type EditorInstance = Parameters<OnMount>[0];
 
 export const MonacoEditor: React.FC<MonacoEditorProps> = ({
   value,
   onChange,
+  className,
 }) => {
-  const [editor, setEditor] = useState<Monaco | null>(null);
-  const [isSettingValue, setIsSettingValue] = useState<boolean>(false);
-  const [hasSetValue, setHasSetValue] = useState<boolean>(false);
+  const { darkMode } = useManualStore();
+  const editorRef = React.useRef<EditorInstance | null>(null);
 
-  // Use ref to store the previous selection to restore after setting value
-  const prevSelectionRef = useReact.Monaco.Selection | (null > null);
+  const handleEditorDidMount: OnMount = (editorInstance) => {
+    editorRef.current = editorInstance;
+  };
 
-  // When the editor instance is ready, set its value and handle changes
+  // Synchronize external value changes while preserving cursor position
   React.useEffect(() => {
-    if (!editor) return;
-
-    // Set the editor's value if it's not already set (or if it's changed externally)
-    if (!isSettingValue && editor.getValue() !== value) {
-      // Save current selection
-      const sel = editor.getSelection();
-      prevSelectionRef.current = sel;
-
-      setIsSettingValue(true);
-      // We'll use the editor's executeEdits to change the value
-      editor.executeEdits("", [
-        {
-          range: editor.getFullModelRange(),
-          text: value,
-          forceMoveMarkers: true,
-        },
-      ]);
-      setIsSettingValue(false);
+    if (editorRef.current) {
+      const currentValue = editorRef.current.getValue();
+      if (value !== currentValue) {
+        const position = editorRef.current.getPosition();
+        editorRef.current.setValue(value);
+        if (position) {
+          editorRef.current.setPosition(position);
+        }
+      }
     }
-
-    // If we haven't set the value at all (initial mount), set it now
-    if (!hasSetValue) {
-      setIsSettingValue(true);
-      editor.setValue(value);
-      setIsSettingValue(false);
-      setHasSetValue(true);
-    }
-  }, [editor, value, isSettingValue, hasSetValue]);
-
-  // Handle changes from the editor
-  const handleEditorChange = (value: string) => {
-    if (!isSettingValue) {
-      onChange(value);
-    }
-  };
-
-  // When the editor is loaded, we set up the editor
-  const onMonacoLoad = (monaco: Monaco) => {
-    setEditor(monaco);
-  };
+  }, [value]);
 
   return (
-    <div className="h-full w-full">
-      <Monaco
+    <div className={`h-full w-full overflow-hidden ${className || ""}`}>
+      <Editor
         height="100%"
         width="100%"
-        language="markdown"
-        theme="vs-dark"
+        defaultLanguage="markdown"
+        theme={darkMode ? "vs-dark" : "light"}
         value={value}
-        onChange={handleEditorChange}
-        onLoad={onMonacoLoad}
-        editorDidMount={editorDidMount}
-        editorWillUnmount={editorWillUnmount}
+        onChange={(val) => onChange(val ?? "")}
+        onMount={handleEditorDidMount}
         options={{
           wordWrap: "on",
           automaticLayout: true,
-          readOnly: false,
-          cursorBlinking: "solid",
+          minimap: { enabled: false },
+          fontSize: 13,
+          lineNumbers: "on",
+          scrollBeyondLastLine: false,
+          cursorBlinking: "smooth",
+          tabSize: 2,
+          renderWhitespace: "selection",
         }}
       />
     </div>
   );
-
-  function editorDidMount(editor: Monaco) {
-    // We already have the editor in state, but we can also set it here if needed
-    // We'll also set up a listener for external changes? Not needed.
-  }
-
-  function editorWillUnmount(editor: Monaco) {
-    setEditor(null);
-    setHasSetValue(false);
-  }
 };

@@ -62,10 +62,9 @@ async def compile_markdown_node(state: ManualState) -> ManualState:
 
     # Call the LLM to get the markdown document
     try:
-        markdown_content = await ollama_generate_text(
+        markdown_content = ollama_generate_text(
             prompt=prompt,
             temperature=0.3,  # Moderate temperature for balanced creativity and consistency
-            max_retries=2,
         )
     except Exception as e:
         # In case of failure, we provide a basic markdown structure

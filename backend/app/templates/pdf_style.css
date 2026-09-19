@@ -1,0 +1,289 @@
+/*
+ * DocuAgent AI — PDF Print Stylesheet
+ * Used by WeasyPrint for HTML-to-PDF conversion.
+ * Optimised for technical user manuals with screenshots.
+ */
+
+/* ─────────────────────────────────────────
+   Page setup
+───────────────────────────────────────── */
+@page {
+    size: A4;
+    margin: 22mm 18mm 22mm 18mm;
+
+    @top-center {
+        content: string(chapter-title);
+        font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+        font-size: 8pt;
+        color: #9ca3af;
+        letter-spacing: 0.03em;
+    }
+
+    @bottom-right {
+        content: "Page " counter(page) " of " counter(pages);
+        font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+        font-size: 8pt;
+        color: #9ca3af;
+    }
+
+    @bottom-left {
+        content: "DocuAgent AI — Dynamic User Manual";
+        font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+        font-size: 8pt;
+        color: #9ca3af;
+    }
+}
+
+/* First page: no running header */
+@page :first {
+    @top-center { content: none; }
+    @bottom-left { content: none; }
+    @bottom-right { content: none; }
+}
+
+/* ─────────────────────────────────────────
+   Base typography
+───────────────────────────────────────── */
+* {
+    box-sizing: border-box;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+}
+
+html, body {
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-size: 10.5pt;
+    line-height: 1.65;
+    color: #1f2937;
+    background: #ffffff;
+    margin: 0;
+    padding: 0;
+}
+
+/* ─────────────────────────────────────────
+   Headings
+───────────────────────────────────────── */
+h1 {
+    font-size: 22pt;
+    font-weight: 700;
+    color: #111827;
+    border-bottom: 3px solid #2563eb;
+    padding-bottom: 6pt;
+    margin: 0 0 18pt 0;
+    string-set: chapter-title content();
+    page-break-before: always;
+}
+
+h1:first-of-type {
+    page-break-before: avoid;
+}
+
+h2 {
+    font-size: 15pt;
+    font-weight: 700;
+    color: #1e3a5f;
+    border-bottom: 1px solid #e5e7eb;
+    padding-bottom: 3pt;
+    margin: 22pt 0 10pt 0;
+    page-break-after: avoid;
+}
+
+h3 {
+    font-size: 12pt;
+    font-weight: 700;
+    color: #374151;
+    margin: 16pt 0 6pt 0;
+    page-break-after: avoid;
+}
+
+h4, h5, h6 {
+    font-size: 10.5pt;
+    font-weight: 700;
+    color: #4b5563;
+    margin: 12pt 0 4pt 0;
+    page-break-after: avoid;
+}
+
+/* ─────────────────────────────────────────
+   Body text
+───────────────────────────────────────── */
+p {
+    margin: 0 0 9pt 0;
+    orphans: 3;
+    widows: 3;
+}
+
+a {
+    color: #2563eb;
+    text-decoration: none;
+}
+
+a[href]:after {
+    content: " (" attr(href) ")";
+    font-size: 8pt;
+    color: #6b7280;
+}
+
+/* ─────────────────────────────────────────
+   Lists
+───────────────────────────────────────── */
+ul, ol {
+    margin: 0 0 9pt 0;
+    padding-left: 20pt;
+}
+
+li {
+    margin-bottom: 3pt;
+    orphans: 2;
+    widows: 2;
+}
+
+li > ul, li > ol {
+    margin-top: 2pt;
+    margin-bottom: 2pt;
+}
+
+/* ─────────────────────────────────────────
+   Code blocks
+───────────────────────────────────────── */
+code {
+    font-family: "Courier New", Courier, monospace;
+    font-size: 9pt;
+    background-color: #f3f4f6;
+    color: #be185d;
+    padding: 1pt 3pt;
+    border-radius: 2pt;
+}
+
+pre {
+    font-family: "Courier New", Courier, monospace;
+    font-size: 8.5pt;
+    background-color: #f3f4f6;
+    color: #1f2937;
+    border: 1px solid #e5e7eb;
+    border-left: 4px solid #2563eb;
+    padding: 9pt 12pt;
+    margin: 10pt 0;
+    white-space: pre-wrap;
+    word-break: break-all;
+    page-break-inside: avoid;
+    border-radius: 3pt;
+}
+
+pre code {
+    background: none;
+    color: inherit;
+    padding: 0;
+    border-radius: 0;
+}
+
+/* ─────────────────────────────────────────
+   Tables
+───────────────────────────────────────── */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 10pt 0 16pt 0;
+    font-size: 9.5pt;
+    page-break-inside: avoid;
+}
+
+thead {
+    background-color: #1e40af;
+    color: #ffffff;
+    display: table-header-group; /* repeat on each printed page */
+}
+
+thead th {
+    padding: 6pt 9pt;
+    text-align: left;
+    font-weight: 600;
+    font-size: 9pt;
+    letter-spacing: 0.02em;
+}
+
+tbody tr:nth-child(even) {
+    background-color: #f9fafb;
+}
+
+tbody td {
+    padding: 5pt 9pt;
+    border-bottom: 1px solid #e5e7eb;
+    vertical-align: top;
+}
+
+/* ─────────────────────────────────────────
+   Blockquotes / Callouts
+───────────────────────────────────────── */
+blockquote {
+    margin: 10pt 0;
+    padding: 8pt 12pt;
+    border-left: 4px solid #6366f1;
+    background-color: #f5f3ff;
+    color: #3730a3;
+    border-radius: 0 4pt 4pt 0;
+    page-break-inside: avoid;
+}
+
+blockquote p {
+    margin: 0;
+}
+
+/* Tip / Note callout overrides based on emoji prefix */
+blockquote:has(p:first-child em:first-child) {
+    border-left-color: #0891b2;
+    background-color: #ecfeff;
+    color: #164e63;
+}
+
+/* ─────────────────────────────────────────
+   Images / Screenshots
+───────────────────────────────────────── */
+img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+    margin: 10pt auto;
+    border: 1px solid #e5e7eb;
+    border-radius: 4pt;
+    box-shadow: 0 2pt 8pt rgba(0, 0, 0, 0.08);
+    page-break-inside: avoid;
+    page-break-before: auto;
+    page-break-after: auto;
+}
+
+/* Screenshot figure block — prevent orphan caption */
+figure {
+    page-break-inside: avoid;
+    margin: 10pt 0;
+    text-align: center;
+}
+
+figcaption {
+    font-size: 8.5pt;
+    color: #6b7280;
+    font-style: italic;
+    margin-top: 4pt;
+}
+
+/* ─────────────────────────────────────────
+   Horizontal rule
+───────────────────────────────────────── */
+hr {
+    border: none;
+    border-top: 1px solid #e5e7eb;
+    margin: 18pt 0;
+}
+
+/* ─────────────────────────────────────────
+   Utility: avoid page breaks inside key
+   content containers
+───────────────────────────────────────── */
+.no-break {
+    page-break-inside: avoid;
+}
+
+/* Step cards (numbered sections wrapping h3 + content) */
+section {
+    page-break-inside: avoid;
+}

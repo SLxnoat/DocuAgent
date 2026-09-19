@@ -11,8 +11,8 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  lint:
-    name: ci/lint
+  lint-and-typecheck:
+    name: Lint & Type Check
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -31,39 +31,20 @@ jobs:
           cache: "npm"
           cache-dependency-path: "frontend/package-lock.json"
 
-      - name: Run Ruff Linter
+      - name: Run Ruff Linter & Formatter
         run: |
           pip install ruff
           ruff check .
-
-      - name: Run Ruff Formatter Check
-        run: |
           ruff format --check .
 
-  type-check:
-    name: ci/type-check
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Set up Python 3.11
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.11"
-
-      - name: Set up Node.js 20
-        uses: actions/setup-node@v4
-        with:
-          node-version: "20"
-
-      - name: Run Python Type Check (Mypy)
+      - name: Frontend Oxlint
+        working-directory: ./frontend
         run: |
-          pip install mypy
-          mypy backend --ignore-missing-imports || true
+          npm ci
+          npm run lint
 
   test-backend:
-    name: ci/test-backend
+    name: Backend Test Suite (Pytest)
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -73,14 +54,28 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
+          cache: "pip"
 
-      - name: Install backend dependencies & run tests
+      - name: Install system dependencies for WeasyPrint & Pandoc
         run: |
-          pip install pytest pytest-asyncio
-          pytest tests/ -v || true
+          sudo apt-get update
+          sudo apt-get install -y libpango-1.0-0 libpangoft2-1.0-0 libharfbuzz-subset0 libcairo2 pandoc
+
+      - name: Install Python dependencies
+        working-directory: ./backend
+        run: |
+          pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pytest pytest-asyncio pytest-mock pytest-cov
+          playwright install chromium
+
+      - name: Run Pytest Test Suite
+        working-directory: ./backend
+        run: |
+          pytest tests/ -v --no-cov
 
   test-frontend:
-    name: ci/test-frontend
+    name: Frontend Test Suite (Vitest & Build)
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -90,7 +85,17 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: "20"
+          cache: "npm"
+          cache-dependency-path: "frontend/package-lock.json"
 
-      - name: Run frontend check
-        run: |
-          echo "Frontend test verification ready."
+      - name: Install frontend dependencies
+        working-directory: ./frontend
+        run: npm ci
+
+      - name: Run Vitest Unit Tests
+        working-directory: ./frontend
+        run: npm test
+
+      - name: Build Production Frontend Bundle
+        working-directory: ./frontend
+        run: npm run build

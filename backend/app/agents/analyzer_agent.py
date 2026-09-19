@@ -116,9 +116,11 @@ async def analyze_script_node(state: ManualState) -> ManualState:
             max_retries=2,
         )
 
+        domain = "web application"
         if isinstance(response_json, list):
             step_items = response_json
         elif isinstance(response_json, dict):
+            domain = str(response_json.get("domain") or "web application")
             step_items = (
                 response_json.get("steps")
                 or response_json.get("actions")
@@ -130,7 +132,7 @@ async def analyze_script_node(state: ManualState) -> ManualState:
 
         for i, item in enumerate(step_items):
             if isinstance(item, dict):
-                parsed_steps.append(_parse_step_object(item, i))
+                parsed_steps.append(_parse_step_object(item, i, domain=domain))
 
     except Exception as exc:
         logger.warning(

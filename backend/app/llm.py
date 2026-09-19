@@ -270,7 +270,7 @@ def classify_domain(target_url: str, raw_input_script: str) -> str:
     text_to_analyze = f"{target_url} {raw_input_script}".lower()
 
     # Count matches for each domain
-    domain_scores = {domain: 0 for domain in KNOWN_DOMAINS}
+    domain_scores = dict.fromkeys(KNOWN_DOMAINS, 0)
 
     for domain, keywords in DOMAIN_KEYWORDS.items():
         for keyword in keywords:
