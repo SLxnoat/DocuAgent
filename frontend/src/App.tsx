@@ -1,67 +1,51 @@
-import { useEffect } from "react";
-import { useManualStore } from "./store/useManualStore";
-import { Sidebar } from "./components/sidebar";
-import { StatusHeader } from "./components/status-header";
-import { DashboardView } from "./components/views/DashboardView";
-import { StudioView } from "./components/views/StudioView";
-import { EditorView } from "./components/views/EditorView";
-import { PipelineMonitorView } from "./components/views/PipelineMonitorView";
-import { SettingsView } from "./components/views/SettingsView";
-import { Toast } from "./components/ui/Toast";
-import { useSSEStream } from "./hooks/useSSEStream";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { AppShell } from "@/components/layout/AppShell";
+import { StudioView } from "@/views/StudioView";
 
 export function App() {
-  const { darkMode, activeNavView, setActiveNavView, jobId } = useManualStore();
-
-  // Synchronize dark mode class on <html> document element
-  useEffect(() => {
-    if (darkMode) {
-      document.documentElement.classList.add("dark");
-    } else {
-      document.documentElement.classList.remove("dark");
-    }
-  }, [darkMode]);
-
-  // Connect SSE progress stream when jobId is active
-  useSSEStream(jobId);
-
-  // Global keyboard shortcuts (Ctrl/Cmd+K for Studio, Ctrl/Cmd+D for Dashboard)
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
-        e.preventDefault();
-        setActiveNavView("input");
-      } else if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "d") {
-        e.preventDefault();
-        setActiveNavView("dashboard");
-      }
-    };
-
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [setActiveNavView]);
-
   return (
-    <div className="flex flex-col h-screen w-screen overflow-hidden bg-gray-100 dark:bg-gray-950 text-gray-900 dark:text-gray-100 antialiased font-sans">
-      {/* Top Navigation & Status Context Header */}
-      <StatusHeader />
-
-      {/* Main App Layout: Collapsible Sidebar + Dynamic View Container */}
-      <div className="flex flex-1 min-h-0 overflow-hidden">
-        <Sidebar className="hidden md:flex" />
-
-        <main className="flex-1 flex flex-col min-w-0 min-h-0 overflow-hidden bg-white dark:bg-gray-900">
-          {activeNavView === "dashboard" && <DashboardView />}
-          {activeNavView === "input" && <StudioView />}
-          {activeNavView === "editor" && <EditorView />}
-          {activeNavView === "monitor" && <PipelineMonitorView />}
-          {activeNavView === "settings" && <SettingsView />}
-        </main>
-      </div>
-
-      {/* Global Interactive Toast Notification System */}
-      <Toast />
-    </div>
+    <BrowserRouter>
+      <AppShell>
+        <Routes>
+          <Route path="/" element={<StudioView />} />
+          {/* Fallback routes */}
+          <Route
+            path="/jobs"
+            element={
+              <div className="flex-1 flex flex-col items-center justify-center p-8 text-center text-muted-foreground text-sm">
+                <h2 className="text-lg font-semibold text-foreground mb-1">
+                  Job History
+                </h2>
+                <p>
+                  View previous manual generation runs and exported documents.
+                </p>
+                <span className="text-xs text-brand mt-2 font-mono">
+                  Status: Connected to Redis task backend
+                </span>
+              </div>
+            }
+          />
+          <Route
+            path="/settings"
+            element={
+              <div className="flex-1 flex flex-col items-center justify-center p-8 text-center text-muted-foreground text-sm">
+                <h2 className="text-lg font-semibold text-foreground mb-1">
+                  Settings & Integration
+                </h2>
+                <p>
+                  Configure Ollama inference endpoints and Playwright capture
+                  parameters.
+                </p>
+                <span className="text-xs text-brand mt-2 font-mono">
+                  Backend: FastAPI 1.0.0
+                </span>
+              </div>
+            }
+          />
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </AppShell>
+    </BrowserRouter>
   );
 }
 

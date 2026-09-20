@@ -109,6 +109,7 @@ Unable to generate system overview due to documentation generation failure.
                 job_id=job_id,
                 event_type="document_ready",
                 data={
+                    "markdown": markdown_content,
                     "markdown_length": len(markdown_content) if markdown_content else 0,
                 },
             )

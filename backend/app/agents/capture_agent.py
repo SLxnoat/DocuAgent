@@ -372,6 +372,18 @@ async def capture_screenshots_node(state: ManualState) -> ManualState:
                         },
                     )
 
+                    # Publish DOC-004 compliant capture_progress event
+                    is_placeholder = str(screenshot_path).startswith("PLACEHOLDER:")
+                    await publish_sse_event(
+                        job_id=job_id,
+                        event_type="capture_progress",
+                        data={
+                            "step_index": step_index + 1,
+                            "total_steps": len(structured_steps),
+                            "status": "fallback" if is_placeholder else "captured",
+                        },
+                    )
+
                 except Exception as step_error:
                     # Record step failure but continue with other steps
                     error_states = current_state["error_states"].copy()
@@ -464,8 +476,34 @@ async def capture_screenshots_node(state: ManualState) -> ManualState:
                             },
                         )
 
+                    # Publish DOC-004 compliant capture_progress event for step failure/fallback
+                    await publish_sse_event(
+                        job_id=job_id,
+                        event_type="capture_progress",
+                        data={
+                            "step_index": step_index + 1,
+                            "total_steps": len(structured_steps),
+                            "status": "fallback",
+                            "error": str(step_error),
+                        },
+                    )
+
             # Clear credentials after use for security
             current_state = clear_credentials(current_state)
+
+            # Count fallbacks and total captured
+            total_fallbacks = len(current_state.get("error_states", {}))
+            total_captured = len(current_state.get("screenshot_assets", {}))
+
+            # Publish DOC-004 compliant capture_complete event
+            await publish_sse_event(
+                job_id=job_id,
+                event_type="capture_complete",
+                data={
+                    "total_captured": total_captured,
+                    "total_fallbacks": total_fallbacks,
+                },
+            )
 
             # Publish job completed event
             await publish_sse_event(
@@ -494,6 +532,16 @@ async def capture_screenshots_node(state: ManualState) -> ManualState:
         except Exception as e:
             # If we have a browser error, clear credentials anyway for security
             error_state = clear_credentials(current_state)
+
+            # Publish DOC-004 compliant job_failed event
+            await publish_sse_event(
+                job_id=job_id,
+                event_type="job_failed",
+                data={
+                    "error": str(e),
+                    "step": "capture_agent",
+                },
+            )
 
             # Publish job failed event
             await publish_sse_event(

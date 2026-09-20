@@ -105,7 +105,18 @@ async def _click(page: Page, params: dict[str, Any]) -> None:
 
 async def _type(page: Page, params: dict[str, Any]) -> None:
     """
-    Type text into an element with automatic scroll-into-view and human-like delay to bypass UI input debounce.
+    Type text into an element using the modern Playwright Locator API.
+
+    Per DOC-005 Section 5, the ``type`` action uses:
+    - ``locator.fill()`` to atomically clear existing content and set the new value
+      (works for most standard HTML inputs and textareas).
+    - ``locator.press_sequentially()`` as a fallback for inputs that react to
+      individual keystrokes (e.g. autocomplete, masked inputs), simulating
+      human-like typing at a configurable delay.
+
+    ``page.type()`` (Playwright Page-level API) is **deprecated** in Playwright
+    ≥1.38 and ``element.clear()`` does not exist in the Playwright Python SDK
+    (it is a Selenium-only API). This implementation replaces both.
 
     Args:
         page: Playwright Page object
@@ -118,14 +129,26 @@ async def _type(page: Page, params: dict[str, Any]) -> None:
     if text is None:  # Allow empty string but not None
         raise ValueError("Type action requires 'text' parameter")
 
-    # Scroll the element into view, then wait for it to be attached and visible, then type with human-like delay
+    # Scroll the element into view before interacting
     await page.evaluate(
         f"document.querySelector('{selector}')?.scrollIntoView({{behavior: 'smooth', block: 'center', inline: 'nearest'}});"
     )
     await page.wait_for_selector(selector, state="visible", timeout=5000)
-    # Add random delay between 30-50ms per keystroke to mimic human typing
-    delay = random.uniform(30, 50)  # Delay in milliseconds
-    await page.type(selector, text, delay=delay)
+
+    locator = page.locator(selector).first
+
+    # Use fill() to atomically clear the existing value and set the new one.
+    # This is the recommended Playwright approach and works for the vast majority
+    # of standard <input> and <textarea> elements.
+    try:
+        await locator.fill(text)
+    except Exception:
+        # Fallback: for inputs that do not support fill() (e.g. contenteditable,
+        # custom components), use triple-click to select all and then type
+        # character-by-character with a human-like delay.
+        delay_ms = random.uniform(30, 50)
+        await locator.triple_click()
+        await locator.press_sequentially(text, delay=delay_ms)
 
 
 async def _scroll(page: Page, params: dict[str, Any]) -> None:

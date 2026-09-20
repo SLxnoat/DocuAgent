@@ -1,45 +1,34 @@
-# ==============================================================================
-# DocuAgent AI — Production Frontend Dockerfile
-# Multi-stage optimized build: Node 20 builder -> Nginx Alpine static server
-# ==============================================================================
-
-# Stage 1: Build static distribution
+# ── Stage 1: Build ──────────────────────────────────────────────────────────
 FROM node:20-alpine AS builder
-
 WORKDIR /app
 
-# Install dependencies using clean install
+# Install dependencies first (cached layer)
 COPY package*.json ./
-RUN npm ci
+RUN npm ci --ignore-scripts
 
-# Copy frontend source
+# Copy source files and build production bundle
 COPY . .
-
-# Build production assets
-ARG VITE_API_URL=/api/v1
-ARG VITE_WS_URL=/api/v1/ws
-ENV VITE_API_URL=$VITE_API_URL \
-    VITE_WS_URL=$VITE_WS_URL
+ARG VITE_API_BASE_URL=/api/v1
+ARG VITE_API_HOST=localhost
+ARG VITE_API_TOKEN=dev-secret-token
+ARG VITE_ENABLE_PDF_EXPORT=true
+ARG VITE_ENABLE_WEBSOCKET_CHAT=true
+ENV VITE_API_BASE_URL=$VITE_API_BASE_URL
+ENV VITE_API_HOST=$VITE_API_HOST
+ENV VITE_API_TOKEN=$VITE_API_TOKEN
+ENV VITE_ENABLE_PDF_EXPORT=$VITE_ENABLE_PDF_EXPORT
+ENV VITE_ENABLE_WEBSOCKET_CHAT=$VITE_ENABLE_WEBSOCKET_CHAT
 
 RUN npm run build
 
-# Stage 2: Serve using hardened Nginx
+# ── Stage 2: Serve via Nginx ────────────────────────────────────────────────
 FROM nginx:1.27-alpine AS production
-
-# Remove default configuration
-RUN rm -rf /etc/nginx/conf.d/*
-
-# Copy custom Nginx configuration
+COPY --from=builder /app/dist /usr/share/nginx/html
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 
-# Copy build artifacts from builder stage
-COPY --from=builder /app/dist /usr/share/nginx/html
-
-# Expose HTTP port
 EXPOSE 80
 
-# Health check
-HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-    CMD wget --no-verbose --tries=1 --spider http://localhost:80/ || exit 1
+HEALTHCHECK --interval=15s --timeout=5s --retries=3 \
+  CMD wget -qO- http://localhost:80/ || exit 1
 
 CMD ["nginx", "-g", "daemon off;"]

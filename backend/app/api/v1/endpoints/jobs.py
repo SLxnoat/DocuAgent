@@ -1,33 +1,24 @@
+import logging
 from datetime import datetime
 from pathlib import Path
 
 from fastapi import APIRouter, File, HTTPException, UploadFile
+from pydantic import BaseModel
 
 from app.config import settings
 from app.models import JobStatusResponse, is_valid_uuid
+from app.services.job_store import job_store
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter()
 
-# In-memory store for job statuses
-# In a real application, this would be replaced by a database or Redis
-job_store = {}
 
-
-def create_job_record(job_id: str, session_id: str) -> None:
+def create_job_record(job_id: str, session_id: str) -> dict:
     """
-    Create a new job record in the store with initial pending status.
+    Create a new job record in Redis/store with initial pending status.
     """
-    job_store[job_id] = {
-        "job_id": job_id,
-        "session_id": session_id,
-        "status": "pending",
-        "progress": 0,
-        "step_statuses": [],
-        "result_url": None,
-        "error": None,
-        "created_at": datetime.utcnow(),
-        "updated_at": datetime.utcnow(),
-    }
+    return job_store.create_job(job_id, session_id)
 
 
 def _cleanup_old_files(directory: str, retention_hours: int) -> None:
@@ -91,29 +82,51 @@ async def delete_job(job_id: str):
     if job_id not in job_store:
         raise HTTPException(status_code=404, detail="Job not found")
 
+    job_data = job_store.get(job_id)
+    if job_data and job_data.get("celery_task_id"):
+        try:
+            from app.celery import celery_app
+
+            celery_app.control.revoke(job_data["celery_task_id"], terminate=True)
+        except Exception:
+            pass
+
     # Purge temporary assets associated with this job
     try:
-        assets_dir = Path(settings.assets_dir)
+        assets_dir = Path(settings.assets_dir) / job_id
         if assets_dir.exists():
-            _cleanup_old_files(assets_dir, settings.asset_retention_hours)
+            import shutil
 
-        exports_dir = Path(settings.exports_dir)
+            shutil.rmtree(assets_dir, ignore_errors=True)
+
+        exports_dir = Path(settings.exports_dir) / job_id
         if exports_dir.exists():
-            _cleanup_old_files(exports_dir, settings.asset_retention_hours)
+            import shutil
+
+            shutil.rmtree(exports_dir, ignore_errors=True)
     except Exception:
         pass
 
     # Remove job from store
     del job_store[job_id]
 
-    return {"message": f"Job {job_id} has been deleted successfully"}
+    return {"message": f"Job {job_id} has been deleted successfully", "job_id": job_id}
 
 
-@router.post("/recapture/{job_id}/{step_index}")
-async def recapture_step(job_id: str, step_index: int):
+class RecaptureRequest(BaseModel):
+    selector_override: str | None = None
+    custom_screenshot_path: str | None = None
+
+
+@router.post("/recapture/{job_id}/{step_index}", status_code=202)
+async def recapture_step(
+    job_id: str,
+    step_index: int,
+    payload: RecaptureRequest | None = None,
+):
     """
     Trigger targeted single-step re-execution for a specific job and step.
-    Allows users to re-run a particular step in the job's workflow.
+    Implements DOC-004 Section 9 contract. Dispatches capture_tasks.recapture_step.
     """
     if not is_valid_uuid(job_id):
         raise HTTPException(status_code=400, detail="Invalid job ID format. Must be UUIDv4.")
@@ -124,11 +137,27 @@ async def recapture_step(job_id: str, step_index: int):
     if step_index < 0:
         raise HTTPException(status_code=400, detail="Step index must be non-negative")
 
+    override = payload.selector_override if payload else None
+    custom_path = payload.custom_screenshot_path if payload else None
+
+    # Dispatch Celery background task to recapture queue
+    try:
+        from app.tasks.capture_tasks import recapture_step as celery_recapture_step
+
+        celery_recapture_step.delay(
+            job_id=job_id,
+            step_index=step_index,
+            selector_override=override,
+            custom_screenshot_path=custom_path,
+        )
+    except Exception as exc:
+        logger.warning("Could not dispatch Celery recapture task: %s", exc)
+
     return {
-        "message": f"Recapture initiated for job {job_id}, step {step_index}",
         "job_id": job_id,
         "step_index": step_index,
-        "status": "recapture_pending",
+        "status": "recapture_queued",
+        "stream_url": f"/api/v1/stream/{job_id}",
     }
 
 
@@ -169,7 +198,7 @@ async def upload_screenshot(job_id: str, step_index: int, file: UploadFile = Fil
         await file.close()
 
     # Update job's updated_at timestamp
-    job_store[job_id]["updated_at"] = datetime.utcnow()
+    job_store.update_job(job_id, {"updated_at": datetime.utcnow()})
 
     # TODO: In a full implementation, we might want to:
     # 1. Validate that step_index is within the actual number of steps for this job

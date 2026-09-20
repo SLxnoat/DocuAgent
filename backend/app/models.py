@@ -89,8 +89,40 @@ class JobStatusResponse(BaseModel):
         from_attributes = True
 
 
+class ChangeSummaryItem(BaseModel):
+    section: str
+    change_type: str
+    description: str
+
+    class Config:
+        from_attributes = True
+
+
+class ChatContext(BaseModel):
+    current_markdown: str | None = None
+
+    class Config:
+        from_attributes = True
+
+
+class ChatRequest(BaseModel):
+    message: str = Field(..., min_length=1, description="Natural language refinement request")
+    context: ChatContext | None = Field(
+        default=None, description="Optional current document context"
+    )
+
+    class Config:
+        from_attributes = True
+
+
 class ChatResponse(BaseModel):
-    message: ChatMessage
+    session_id: str
+    response_message: str
+    updated_markdown: str
+    changes_summary: list[ChangeSummaryItem] = Field(default_factory=list)
+    recapture_triggered: bool = False
+    recapture_step_index: int | None = None
+    timestamp: datetime = Field(default_factory=datetime.utcnow)
 
     class Config:
         from_attributes = True

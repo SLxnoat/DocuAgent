@@ -54,18 +54,16 @@ async def capture_viewport_screenshot(
     except Exception as e:
         # Record failure diagnostics in state if provided
         if state is not None:
-            error_states = state.get("error_states", {}).copy()
-            error_states[str(step_index)] = {
+            if "error_states" not in state or state["error_states"] is None:
+                state["error_states"] = {}
+            state["error_states"][str(step_index)] = {
                 "error": str(e),
                 "error_type": type(e).__name__,
                 "step_index": step_index,
                 "job_id": job_id,
-                "timestamp": str(Path(__file__)),  # Simple timestamp placeholder
+                "timestamp": str(Path(__file__)),
                 "screenshot_type": "viewport",
             }
-            # Note: In a real implementation, we would return the updated state
-            # For now, we're just recording it in the passed state object
-            # The caller would need to handle the state update
 
         # Re-raise the exception to maintain existing behavior
         raise
@@ -147,13 +145,14 @@ async def capture_screenshot_with_fallback(
     except Exception as e:
         # If viewport capture also fails, record the error and generate a text placeholder
         if state is not None:
-            error_states = state.get("error_states", {}).copy()
-            error_states[str(step_index)] = {
+            if "error_states" not in state or state["error_states"] is None:
+                state["error_states"] = {}
+            state["error_states"][str(step_index)] = {
                 "error": str(e),
                 "error_type": type(e).__name__,
                 "step_index": step_index,
                 "job_id": job_id,
-                "timestamp": str(Path(__file__)),  # Simple timestamp placeholder
+                "timestamp": str(Path(__file__)),
                 "screenshot_type": "viewport_fallback",
                 "selectors_attempted": selectors_to_try,
                 "last_exception": str(last_exception) if last_exception else None,

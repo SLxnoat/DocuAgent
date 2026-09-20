@@ -78,3 +78,20 @@ def mock_llm_response():
         return mock
 
     return _create_mock
+
+
+TEST_API_TOKEN = "test-api-token-value"
+AUTH_HEADERS = {"Authorization": f"Bearer {TEST_API_TOKEN}"}
+
+
+@pytest.fixture
+def authed_client():
+    """
+    Return a FastAPI TestClient pre-configured with the test Bearer token header.
+    Use this fixture in tests that hit authenticated API routes.
+    """
+    from fastapi.testclient import TestClient
+
+    from app.main import app
+
+    return TestClient(app, headers=AUTH_HEADERS)

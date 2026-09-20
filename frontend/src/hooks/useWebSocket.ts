@@ -1,158 +1,154 @@
-import { useEffect, useRef, useCallback, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { v4 as uuidv4 } from "uuid";
+import { sendChatMessage } from "@/api/client";
 import { useManualStore } from "@/store/useManualStore";
-import { API_BASE_URL } from "@/api/client";
+import type { WSServerMessage } from "@/types";
 
-export const useWebSocket = (sessionId: string | null) => {
-  const { addChatMessage, setMarkdownContent, setChatLoading, setTyping } =
-    useManualStore();
+const API_HOST = import.meta.env.VITE_API_HOST ?? "localhost:8000";
+const WS_ENABLED = import.meta.env.VITE_ENABLE_WEBSOCKET_CHAT !== "false";
+
+export function useWebSocket(sessionId: string | null) {
   const wsRef = useRef<WebSocket | null>(null);
+  const heartRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const [isConnected, setIsConnected] = useState(false);
-  const reconnectTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(
-    null,
-  );
+  const store = useManualStore();
 
   useEffect(() => {
-    if (!sessionId) {
-      return;
-    }
+    if (!sessionId || !WS_ENABLED) return;
 
-    let isMounted = true;
+    const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
+    const host = API_HOST.includes(":")
+      ? API_HOST
+      : `${window.location.hostname}:8000`;
+    const url = `${protocol}//${host}/api/v1/ws/chat/${sessionId}`;
+    const ws = new WebSocket(url);
+    wsRef.current = ws;
 
-    const connectWebSocket = () => {
-      try {
-        // Derive WS endpoint from API_BASE_URL
-        const wsBase = API_BASE_URL.replace(/^http/, "ws");
-        const token =
-          localStorage.getItem("api_token") ||
-          import.meta.env.VITE_API_TOKEN ||
-          "";
-        const url = `${wsBase}/ws/chat/${sessionId}${
-          token ? `?token=${encodeURIComponent(token)}` : ""
-        }`;
-
-        const ws = new WebSocket(url);
-        wsRef.current = ws;
-
-        ws.onopen = () => {
-          if (!isMounted) return;
-          console.log(`[WebSocket] Connected for session ${sessionId}`);
-          setIsConnected(true);
-        };
-
-        ws.onmessage = (event) => {
-          if (!isMounted) return;
-          try {
-            const data = JSON.parse(event.data);
-
-            switch (data.type) {
-              case "agent_response":
-                if (data.content) {
-                  addChatMessage("assistant", data.content);
-                }
-                if (data.updated_markdown) {
-                  setMarkdownContent(data.updated_markdown);
-                }
-                setChatLoading(false);
-                setTyping(false);
-                break;
-
-              case "chat_message":
-                if (data.role && data.content) {
-                  addChatMessage(data.role, data.content);
-                }
-                setChatLoading(false);
-                setTyping(false);
-                break;
-
-              case "typing_start":
-                setTyping(true);
-                break;
-
-              case "typing_stop":
-                setTyping(false);
-                break;
-
-              case "pong":
-                // Heartbeat reply
-                break;
-
-              case "error":
-                console.error("[WebSocket] Server error event:", data.message);
-                setChatLoading(false);
-                setTyping(false);
-                break;
-
-              default:
-                console.debug("[WebSocket] Unhandled message:", data);
-            }
-          } catch (error) {
-            console.error("[WebSocket] Parse error:", error, event.data);
-          }
-        };
-
-        ws.onclose = () => {
-          if (!isMounted) return;
-          setIsConnected(false);
-          console.log(
-            "[WebSocket] Disconnected, attempting reconnect in 3s...",
+    ws.onopen = () => {
+      setIsConnected(true);
+      heartRef.current = setInterval(() => {
+        if (ws.readyState === WebSocket.OPEN) {
+          ws.send(
+            JSON.stringify({
+              type: "ping",
+              timestamp: new Date().toISOString(),
+            }),
           );
-          reconnectTimeoutRef.current = setTimeout(() => {
-            if (isMounted) {
-              connectWebSocket();
-            }
-          }, 3000);
-        };
+        }
+      }, 20_000);
+    };
 
-        ws.onerror = (error) => {
-          console.warn("[WebSocket] Error occurred:", error);
-          ws.close();
-        };
-      } catch (err) {
-        console.error("[WebSocket] Failed to establish connection:", err);
+    ws.onclose = () => {
+      setIsConnected(false);
+      if (heartRef.current) {
+        clearInterval(heartRef.current);
+        heartRef.current = null;
       }
     };
 
-    connectWebSocket();
-
-    // Send keepalive ping every 25 seconds
-    const pingInterval = setInterval(() => {
-      if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
-        wsRef.current.send(JSON.stringify({ type: "ping" }));
-      }
-    }, 25000);
-
-    return () => {
-      isMounted = false;
-      clearInterval(pingInterval);
-      if (reconnectTimeoutRef.current) {
-        clearTimeout(reconnectTimeoutRef.current);
-      }
-      if (wsRef.current) {
-        wsRef.current.close();
-      }
+    ws.onerror = () => {
       setIsConnected(false);
     };
-  }, [
-    sessionId,
-    addChatMessage,
-    setMarkdownContent,
-    setChatLoading,
-    setTyping,
-  ]);
 
-  const sendMessage = useCallback((content: string) => {
-    if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
-      wsRef.current.send(
-        JSON.stringify({
-          type: "user_message",
-          content,
-          timestamp: new Date().toISOString(),
-        }),
-      );
-      return true;
-    }
-    return false;
-  }, []);
+    ws.onmessage = ({ data }: MessageEvent) => {
+      let msg: WSServerMessage;
+      try {
+        msg = JSON.parse(data);
+      } catch {
+        return;
+      }
+
+      switch (msg.type) {
+        case "typing_start":
+          store.setChatLoading(true);
+          break;
+
+        case "typing_stop":
+          store.setChatLoading(false);
+          break;
+
+        case "agent_response":
+          if (msg.updated_markdown) {
+            store.setMarkdownContent(msg.updated_markdown);
+          }
+          if (msg.content) {
+            store.updateLastAssistantMessage(msg.content);
+          }
+          store.setChatLoading(false);
+          break;
+
+        case "error":
+          store.setChatLoading(false);
+          if (msg.message) {
+            store.updateLastAssistantMessage(`⚠️ Error: ${msg.message}`);
+          }
+          break;
+      }
+    };
+
+    return () => {
+      ws.close();
+      if (heartRef.current) {
+        clearInterval(heartRef.current);
+        heartRef.current = null;
+      }
+    };
+  }, [sessionId]);
+
+  const sendMessage = useCallback(
+    async (content: string) => {
+      if (!sessionId || !content.trim()) return;
+
+      // Add user message to chat
+      store.addChatMessage({
+        id: uuidv4(),
+        role: "user",
+        content,
+        timestamp: new Date().toISOString(),
+      });
+
+      // Add loading placeholder for assistant response
+      store.addChatMessage({
+        id: uuidv4(),
+        role: "assistant",
+        content: "",
+        timestamp: new Date().toISOString(),
+        isLoading: true,
+      });
+
+      const ws = wsRef.current;
+      if (ws && ws.readyState === WebSocket.OPEN) {
+        ws.send(
+          JSON.stringify({
+            type: "user_message",
+            content,
+            timestamp: new Date().toISOString(),
+          }),
+        );
+      } else {
+        // Fallback: REST endpoint
+        store.setChatLoading(true);
+        try {
+          const { data } = await sendChatMessage(
+            sessionId,
+            content,
+            store.markdownContent,
+          );
+          if (data.updated_markdown) {
+            store.setMarkdownContent(data.updated_markdown);
+          }
+          store.updateLastAssistantMessage(data.response_message);
+        } catch (err) {
+          const msg =
+            err instanceof Error ? err.message : "Chat request failed";
+          store.updateLastAssistantMessage(`⚠️ Error: ${msg}`);
+        } finally {
+          store.setChatLoading(false);
+        }
+      }
+    },
+    [sessionId, store],
+  );
 
   return { sendMessage, isConnected };
-};
+}

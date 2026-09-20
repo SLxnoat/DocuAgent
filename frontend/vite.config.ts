@@ -1,16 +1,37 @@
-import react from "@vitejs/plugin-react";
-import { defineConfig } from "vite";
 import path from "path";
-import { fileURLToPath } from "url";
+import { defineConfig } from "vite";
+import react from "@vitejs/plugin-react";
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-
-// https://vite.dev/config/
 export default defineConfig({
   plugins: [react()],
   resolve: {
-    alias: {
-      "@": path.resolve(__dirname, "./src"),
+    alias: { "@": path.resolve(__dirname, "./src") },
+  },
+  server: {
+    port: 5173,
+    proxy: {
+      "/api": { target: "http://localhost:8000", changeOrigin: true },
+      "/assets": { target: "http://localhost:8000", changeOrigin: true },
+    },
+  },
+  build: { outDir: "dist", sourcemap: true },
+  test: {
+    globals: true,
+    environment: "jsdom",
+    setupFiles: ["./src/test/setup.ts"],
+    coverage: {
+      provider: "v8",
+      reporter: ["text", "lcov"],
+      exclude: [
+        "node_modules/**",
+        "src/test/**",
+        "**/*.d.ts",
+        "postcss.config.js",
+        "tailwind.config.ts",
+        "src/types/**",
+        "src/main.tsx",
+        "dist/**",
+      ],
     },
   },
 });

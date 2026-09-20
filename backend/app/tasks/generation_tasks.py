@@ -62,16 +62,21 @@ def generate_manual(
 
         markdown_content = final_state.get("markdown_content", "")
 
-        # Persist results back into the shared job_store so the export
-        # endpoint can retrieve the markdown_content without a DB.
+        # Persist results back into the distributed Redis job_store so the export
+        # endpoint can retrieve the markdown_content across containers/processes.
         try:
             from app.api.v1.endpoints.jobs import job_store
 
-            if job_id in job_store:
-                job_store[job_id]["markdown_content"] = markdown_content
-                job_store[job_id]["screenshot_assets"] = final_state.get("screenshot_assets", {})
-                job_store[job_id]["status"] = "completed"
-                job_store[job_id]["quality_approved"] = final_state.get("quality_approved", False)
+            job_store.update_job(
+                job_id,
+                {
+                    "markdown_content": markdown_content,
+                    "screenshot_assets": final_state.get("screenshot_assets", {}),
+                    "status": "completed",
+                    "quality_approved": final_state.get("quality_approved", False),
+                    "progress": 100,
+                },
+            )
         except Exception as store_exc:
             logger.warning("Could not update job_store after completion: %s", store_exc)
 
@@ -92,9 +97,13 @@ def generate_manual(
         try:
             from app.api.v1.endpoints.jobs import job_store
 
-            if job_id in job_store:
-                job_store[job_id]["status"] = "failed"
-                job_store[job_id]["error"] = str(exc)
+            job_store.update_job(
+                job_id,
+                {
+                    "status": "failed",
+                    "error": str(exc),
+                },
+            )
         except Exception:
             pass
         raise self.retry(exc=exc) from exc

@@ -100,7 +100,9 @@ async def analyze_script_node(state: ManualState) -> ManualState:
                 job_id=job_id,
                 event_type="script_analyzed",
                 data={
+                    "step_count": len(current_state["structured_steps"]),
                     "total_steps": len(current_state["structured_steps"]),
+                    "domain": "web application",
                     "structured_steps": current_state["structured_steps"],
                 },
             )
@@ -160,7 +162,9 @@ async def analyze_script_node(state: ManualState) -> ManualState:
             job_id=job_id,
             event_type="script_analyzed",
             data={
+                "step_count": len(structured_steps),
                 "total_steps": len(structured_steps),
+                "domain": domain,
                 "structured_steps": structured_steps,
             },
         )

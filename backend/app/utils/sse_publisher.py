@@ -62,11 +62,15 @@ async def publish_sse_event(
     try:
         redis_client = await get_redis_client()
 
-        # Create the event payload
+        # Create the event payload compliant with DOC-004 SSE Event Reference
+        now_ts = str(__import__("datetime").datetime.now().isoformat())
+        payload_data = dict(data) if isinstance(data, dict) else {}
         event = {
+            "type": event_type,
             "event_type": event_type,
-            "data": data,
-            "timestamp": str(__import__("datetime").datetime.now().isoformat()),
+            **payload_data,
+            "data": payload_data,
+            "timestamp": payload_data.get("timestamp") or now_ts,
         }
 
         # Publish to the job-specific SSE channel

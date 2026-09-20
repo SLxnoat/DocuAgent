@@ -1,17 +1,29 @@
 """
-WebSocket endpoint for bidirectional chat with Agent 5 (Chat Refiner Agent).
+WebSocket Endpoint for Conversational Document Refinement (Agent 5)
+===================================================================
+wss://{host}/api/v1/ws/chat/{session_id}?token={api_token}
+
+Implements bi-directional streaming communication between user and Agent 5:
+  • Client → Server: "user_message", "ping"
+  • Server → Client: "typing_start", "agent_response", "typing_stop", "pong", "error"
 """
+
+from __future__ import annotations
 
 import asyncio
 import contextlib
 import json
 import logging
+from datetime import datetime
 
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect
 
-from app.chat_refiner import chat_refiner_node
+from app.api.v1.endpoints.chat import _refine_markdown_content
+from app.api.v1.endpoints.jobs import job_store
+from app.chat_refiner import classify_chat_edit, extract_recapture_step_index
 from app.langgraph_config import get_checkpointer
-from app.state import ManualState
+from app.models import ChangeSummaryItem, is_valid_uuid
+from app.utils.sse_publisher import publish_sse_event
 
 logger = logging.getLogger(__name__)
 
@@ -21,177 +33,210 @@ router = APIRouter()
 @router.websocket("/ws/chat/{session_id}")
 async def websocket_chat_endpoint(websocket: WebSocket, session_id: str):
     """
-    WebSocket endpoint for chat interactions with Agent 5.
-
-    Args:
-        websocket: The WebSocket connection.
-        session_id: The session ID used to identify the state.
+    Bi-directional WebSocket endpoint for conversational refinement with Agent 5.
+    Conforms strictly to DOC-004 Section 11 specifications.
     """
     await websocket.accept()
-    logger.info(f"WebSocket connection opened for session_id: {session_id}")
+    logger.info("WebSocket connection established for session_id: %s", session_id)
 
-    # Get the checkpointer
     checkpointer = get_checkpointer()
 
     try:
-        # Try to load the state for this session_id (as thread_id)
-        # We assume the state has been saved by the LangGraph workflow
-        # up to the point of the chat_refiner_node (i.e., after quality_review_node).
-        state_dict = None
-        try:
-            # The checkpointer.get_tuple returns a tuple (checkpoint, metadata, parent_checkpoint, etc.)
-            # We are interested in the checkpoint (which is the state).
-            # Note: The checkpointer might not have the state if the workflow hasn't reached this point.
-            # We'll try to get the state and if it doesn't exist, we'll wait a bit and try again?
-            # For simplicity, we'll try once and if not found, we'll return an error.
-            state_tuple = checkpointer.get_tuple({"configurable": {"thread_id": session_id}})
-            if state_tuple is not None:
-                state_dict = state_tuple.checkpoint  # This is the state dict
-                logger.info(f"Loaded state for session_id: {session_id}")
-            else:
-                logger.warning(f"No state found for session_id: {session_id} in checkpointer")
-                await websocket.send_json(
-                    {
-                        "type": "error",
-                        "message": "State not found. Please ensure the workflow has been started and paused at the chat refinement stage.",
-                    }
-                )
-                await websocket.close()
-                return
-        except Exception as e:
-            logger.error(f"Error loading state for session_id {session_id}: {e}")
+        # Validate session ID format
+        if not is_valid_uuid(session_id):
             await websocket.send_json(
                 {
                     "type": "error",
-                    "message": f"Failed to load state: {e!s}",
+                    "message": f"Invalid session ID format '{session_id}'. Must be UUIDv4.",
                 }
             )
-            await websocket.close()
+            await websocket.close(code=1008, reason="Invalid session ID")
             return
 
-        # Convert the dict to a ManualState (TypedDict) - we'll treat it as a dict for simplicity
-        # Since ManualState is a TypedDict, we can use the dict directly as long as it has the required fields.
-        state: ManualState = state_dict  # type: ignore
-
-        # Main loop: receive messages, process them, and send back updates
+        # Continuous message processing loop
         while True:
-            # Wait for a message from the client with a timeout to allow for keep-alive pings
             try:
-                # We'll wait for a message for 15 seconds (same as the heartbeat interval in SSE)
-                # If we don't get a message in 15 seconds, we'll send a ping to keep the connection alive.
-                data = await asyncio.wait_for(websocket.receive_text(), timeout=15.0)
+                # Wait for client message with 25s timeout
+                raw_data = await asyncio.wait_for(websocket.receive_text(), timeout=25.0)
             except TimeoutError:
-                # No message received in 15 seconds, send a ping to keep the connection alive
+                # Keepalive timeout: perform WebSocket protocol ping/pong
                 try:
-                    await websocket.ping()
-                    # Wait for a pong (we don't need to do anything with the pong, just waiting for it confirms the connection is alive)
-                    # We'll wait for a pong for 5 seconds
-                    pong_waiter = await websocket.pong()
-                    await asyncio.wait_for(pong_waiter, timeout=5.0)
-                    logger.debug(f"Ping/pong successful for session_id: {session_id}")
-                    continue  # Go back to waiting for a message
-                except TimeoutError:
-                    logger.warning(
-                        f"Ping/pong timeout for session_id: {session_id}. Closing connection."
+                    await websocket.send_json({"type": "ping"})
+                    continue
+                except Exception:
+                    logger.info(
+                        "WebSocket keepalive ping failed for session %s. Closing.", session_id
                     )
-                    await websocket.close(code=1001, reason="Keep-alive timeout")
-                    return
-                except Exception as e:
-                    logger.error(f"Error during ping/pong for session_id {session_id}: {e}")
-                    await websocket.close(code=1011, reason="Internal error")
-                    return
+                    break
             except WebSocketDisconnect:
-                logger.info(f"WebSocket connection closed for session_id: {session_id}")
+                logger.info("WebSocket client disconnected for session_id: %s", session_id)
                 break
 
-            # If we got here, we have a message
+            # Parse incoming JSON payload
             try:
-                message = json.loads(data)
-                if message.get("type") == "chat_message":
-                    content = message.get("content", "")
-                    if not content:
-                        await websocket.send_json(
-                            {"type": "error", "message": "Empty message received"}
-                        )
-                        continue
-
-                    logger.info(
-                        f"Received chat message for session_id {session_id}: {content[:100]}"
-                    )
-
-                    # Add the message to the chat history
-                    # We need to append a ChatMessage with role="user" and the content, and a timestamp.
-                    # We'll create a simple dict for the ChatMessage (since we don't have the ChatMessage class imported here? We do have it in state.py, but we can import it).
-                    # However, to avoid circular imports, we'll create a dict that matches the ChatMessage structure.
-                    # The ChatMessage is defined in models.py, but we can avoid importing it by using a dict.
-                    # The state expects a list of ChatMessage, but we can store dicts and hope that the TypedDict is not enforced at runtime.
-                    # Alternatively, we can import ChatMessage from models.
-                    # Let's import it to be safe.
-                    from datetime import datetime
-
-                    from app.models import ChatMessage
-
-                    chat_message = ChatMessage(
-                        role="user",
-                        content=content,
-                        timestamp=datetime.now(),
-                    )
-                    # Get the current chat history and append the new message
-                    chat_history = state.get("chat_history", [])
-                    chat_history.append(chat_message)
-                    state["chat_history"] = chat_history
-
-                    # Process the message with the chat_refiner_node
-                    updated_state = chat_refiner_node(state)
-
-                    # Save the updated state back to the checkpointer
-                    checkpointer.put(
-                        {"configurable": {"thread_id": session_id}},
-                        updated_state,
-                        {},  # metadata
-                        "1",  # version
-                    )
-
-                    # Prepare a response to send back to the client
-                    response = {}
-
-                    # If the markdown content has changed, send it back
-                    if updated_state.get("markdown_content") != state.get("markdown_content"):
-                        response["type"] = "markdown_update"
-                        response["markdown"] = updated_state["markdown_content"]
-
-                    # If a recapture step index is set, send a recapture request
-                    recapture_step_index = updated_state.get("recapture_step_index")
-                    if recapture_step_index is not None and recapture_step_index != state.get(
-                        "recapture_step_index"
-                    ):
-                        response["type"] = "recapture_request"
-                        response["step_index"] = recapture_step_index
-
-                    # If we have a response, send it back
-                    if response:
-                        await websocket.send_json(response)
-
-                    # Update the state for the next iteration
-                    state = updated_state
-
-                else:
-                    await websocket.send_json(
-                        {"type": "error", "message": f"Unknown message type: {message.get('type')}"}
-                    )
-
+                message = json.loads(raw_data)
             except json.JSONDecodeError:
-                await websocket.send_json({"type": "error", "message": "Invalid JSON received"})
-            except Exception as e:
-                logger.error(f"Error processing message for session_id {session_id}: {e}")
-                await websocket.send_json({"type": "error", "message": f"Internal error: {e!s}"})
+                await websocket.send_json({"type": "error", "message": "Invalid JSON format"})
+                continue
+
+            msg_type = message.get("type", "")
+
+            # ── 1. Keepalive Ping / Pong ──────────────────────────────────────
+            if msg_type == "ping":
+                await websocket.send_json(
+                    {"type": "pong", "timestamp": datetime.utcnow().isoformat()}
+                )
+                continue
+            elif msg_type == "pong":
+                continue
+
+            # ── 2. User Chat Message ──────────────────────────────────────────
+            elif msg_type in ("user_message", "chat_message"):
+                content = message.get("content", "").strip()
+                if not content:
+                    await websocket.send_json(
+                        {"type": "error", "message": "Message content cannot be empty"}
+                    )
+                    continue
+
+                # Notify client that agent has started processing
+                await websocket.send_json({"type": "typing_start"})
+
+                try:
+                    # Retrieve existing job state from Redis job_store or checkpointer
+                    job_record = job_store.get_job_by_session_id(session_id)
+                    job_id = job_record.get("job_id", "") if job_record else ""
+
+                    current_markdown = ""
+                    if job_record and job_record.get("markdown_content"):
+                        current_markdown = job_record["markdown_content"]
+                    elif message.get("context", {}).get("current_markdown"):
+                        current_markdown = message["context"]["current_markdown"]
+
+                    # Determine intent
+                    edit_type = classify_chat_edit(content)
+
+                    # Case A: Screenshot Recapture
+                    if edit_type == "recapture_trigger":
+                        step_idx = extract_recapture_step_index(content)
+                        recapture_step = step_idx if step_idx is not None else 0
+                        step_display = recapture_step + 1
+
+                        reply_text = (
+                            f"I've initiated a screenshot re-capture for Step {step_display}."
+                        )
+                        summaries = [
+                            ChangeSummaryItem(
+                                section=f"Step {step_display}",
+                                change_type="recapture_trigger",
+                                description=f"Initiated re-capture for step {step_display}",
+                            )
+                        ]
+
+                        if job_id:
+                            job_store.update_job(
+                                job_id,
+                                {
+                                    "recapture_step_index": recapture_step,
+                                    "status": "awaiting_input",
+                                },
+                            )
+
+                        # Send DOC-004 compliant agent_response
+                        await websocket.send_json(
+                            {
+                                "type": "agent_response",
+                                "content": reply_text,
+                                "updated_markdown": current_markdown,
+                                "changes_summary": [s.model_dump() for s in summaries],
+                                "recapture_triggered": True,
+                                "recapture_step_index": recapture_step,
+                                "timestamp": datetime.utcnow().isoformat(),
+                            }
+                        )
+
+                    # Case B: Document Refinement
+                    else:
+                        updated_md, reply_text, summaries = _refine_markdown_content(
+                            current_markdown=current_markdown,
+                            user_message=content,
+                            edit_type=edit_type,
+                        )
+
+                        # Persist to Redis job_store
+                        if job_id:
+                            job_store.update_job(
+                                job_id,
+                                {
+                                    "markdown_content": updated_md,
+                                    "status": "awaiting_input",
+                                },
+                            )
+
+                            # Also sync to LangGraph checkpointer if active
+                            with contextlib.suppress(Exception):
+                                checkpointer.put(
+                                    {"configurable": {"thread_id": session_id}},
+                                    {"markdown_content": updated_md},
+                                    {},
+                                    "1",
+                                )
+
+                            # Broadcast SSE event for synchronized multi-tab updates
+                            try:
+                                await publish_sse_event(
+                                    job_id=job_id,
+                                    event_type="document_updated",
+                                    data={
+                                        "markdown": updated_md,
+                                        "changes_summary": [s.model_dump() for s in summaries],
+                                        "response_message": reply_text,
+                                    },
+                                )
+                            except Exception as exc:
+                                logger.warning("SSE publish failed during WS refinement: %s", exc)
+
+                        # Send DOC-004 compliant agent_response
+                        await websocket.send_json(
+                            {
+                                "type": "agent_response",
+                                "content": reply_text,
+                                "updated_markdown": updated_md,
+                                "changes_summary": [s.model_dump() for s in summaries],
+                                "recapture_triggered": False,
+                                "recapture_step_index": None,
+                                "timestamp": datetime.utcnow().isoformat(),
+                            }
+                        )
+
+                except Exception as proc_exc:
+                    logger.exception(
+                        "Error processing chat refinement for session %s: %s", session_id, proc_exc
+                    )
+                    await websocket.send_json(
+                        {
+                            "type": "error",
+                            "message": f"Refinement processing failed: {proc_exc!s}",
+                        }
+                    )
+                finally:
+                    # Signal typing completion
+                    await websocket.send_json({"type": "typing_stop"})
+
+            # ── 3. Unsupported Message Type ───────────────────────────────────
+            else:
+                await websocket.send_json(
+                    {
+                        "type": "error",
+                        "message": f"Unsupported message type '{msg_type}'. Expected 'user_message' or 'ping'.",
+                    }
+                )
 
     except WebSocketDisconnect:
-        logger.info(f"WebSocket connection closed for session_id: {session_id}")
-    except Exception as e:
-        logger.error(f"WebSocket error for session_id {session_id}: {e}")
+        logger.info("WebSocket connection closed cleanly for session_id: %s", session_id)
+    except Exception as exc:
+        logger.error("Unhandled WebSocket exception for session_id %s: %s", session_id, exc)
         with contextlib.suppress(Exception):
-            await websocket.send_json({"type": "error", "message": f"WebSocket error: {e!s}"})
-    finally:
-        # Clean up: we don't close the checkpointer here because it's shared
-        pass
+            await websocket.send_json(
+                {"type": "error", "message": f"Internal server error: {exc!s}"}
+            )

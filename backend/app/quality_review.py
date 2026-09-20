@@ -24,6 +24,21 @@ async def quality_review_node(state: ManualState) -> ManualState:
     Returns:
         Updated ManualState with quality_feedback set and quality_review_attempts incremented.
     """
+    job_id = state.get("job_id")
+    if job_id:
+        try:
+            await publish_sse_event(
+                job_id=job_id,
+                event_type="quality_review_started",
+                data={},
+            )
+        except Exception as e:
+            import logging
+
+            logging.getLogger(__name__).warning(
+                "Failed to publish quality_review_started event: %s", e
+            )
+
     # Determine the domain context from target_url and raw_input_script
     domain_context = classify_domain(state["target_url"], state["raw_input_script"])
 
@@ -85,8 +100,14 @@ async def quality_review_node(state: ManualState) -> ManualState:
                     },
                 )
             else:
-                # We can publish a "quality_review_failed" event if needed, but not in the checklist
-                pass
+                await publish_sse_event(
+                    job_id=job_id,
+                    event_type="quality_loop",
+                    data={
+                        "retry_count": new_attempts,
+                        "feedback": feedback_dict,
+                    },
+                )
         except Exception as e:
             # Don't let publishing errors break the node
             import logging

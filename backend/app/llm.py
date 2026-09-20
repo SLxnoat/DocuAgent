@@ -1,13 +1,14 @@
 """
 LLM configuration and utility functions for DocuAgent AI.
 Provides configured clients for Ollama LLM inference with JSON support.
+Supports both asynchronous (httpx.AsyncClient) and synchronous (httpx.Client) execution.
 """
 
 import json
 import re
 from typing import Any
 
-import requests
+import httpx
 
 from app.config import settings
 
@@ -22,36 +23,29 @@ def get_ollama_primary_url() -> str:
     return f"{settings.ollama_base_url}/api/generate"
 
 
-def ollama_generate_json(
+# ------------------------------------------------------------------------------
+# Asynchronous LLM Inference (httpx.AsyncClient)
+# ------------------------------------------------------------------------------
+
+
+async def async_ollama_generate_json(
     prompt: str,
     model: str | None = None,
     temperature: float = 0.1,
     max_tokens: int | None = None,
+    client: httpx.AsyncClient | None = None,
 ) -> dict[str, Any]:
     """
-    Generate a JSON response from Ollama LLM.
-
-    Args:
-        prompt: The input prompt for the LLM
-        model: The model to use (defaults to analyzer model for JSON tasks)
-        temperature: Sampling temperature (lower for more deterministic JSON)
-        max_tokens: Maximum tokens to generate
-
-    Returns:
-        Parsed JSON dictionary from the LLM response
-
-    Raises:
-        requests.RequestException: If the API call fails
-        ValueError: If the response is not valid JSON
+    Asynchronously generate a JSON response from Ollama LLM using httpx.AsyncClient.
+    Prevents blocking the asyncio event loop during multi-agent LangGraph execution.
     """
-    # Use analyzer model (Qwen 2.5 72B) for JSON/structured reasoning tasks by default
     if model is None:
         model = settings.ollama_analyzer_model
 
-    payload = {
+    payload: dict[str, Any] = {
         "model": model,
         "prompt": prompt,
-        "format": "json",  # Ollama-specific parameter to enforce JSON output
+        "format": "json",
         "stream": False,
         "options": {
             "temperature": temperature,
@@ -60,13 +54,132 @@ def ollama_generate_json(
     if max_tokens is not None:
         payload["options"]["num_predict"] = max_tokens
 
-    response = requests.post(
-        get_ollama_analyzer_url(), json=payload, timeout=settings.ollama_timeout_seconds
-    )
-    response.raise_for_status()
+    async def _send(c: httpx.AsyncClient) -> dict[str, Any]:
+        resp = await c.post(
+            get_ollama_analyzer_url(),
+            json=payload,
+            timeout=settings.ollama_timeout_seconds,
+        )
+        resp.raise_for_status()
+        data = resp.json()
+        try:
+            return json.loads(data["response"])
+        except (json.JSONDecodeError, KeyError) as e:
+            raise ValueError(f"Failed to parse JSON from LLM response: {e}") from e
+
+    if client is not None:
+        return await _send(client)
+    async with httpx.AsyncClient() as new_client:
+        return await _send(new_client)
+
+
+async def async_ollama_generate_json_with_retry(
+    prompt: str,
+    model: str | None = None,
+    temperature: float = 0.1,
+    max_tokens: int | None = None,
+    max_retries: int = 2,
+    client: httpx.AsyncClient | None = None,
+) -> dict[str, Any]:
+    """
+    Asynchronously generate a JSON response with automatic retry on malformed JSON.
+    """
+    last_exception = None
+    current_temperature = temperature
+    for attempt in range(max_retries + 1):
+        try:
+            return await async_ollama_generate_json(
+                prompt=prompt,
+                model=model,
+                temperature=current_temperature,
+                max_tokens=max_tokens,
+                client=client,
+            )
+        except ValueError as e:
+            last_exception = e
+            if attempt < max_retries:
+                current_temperature = max(0.0, current_temperature - 0.1)
+                continue
+            raise last_exception from None
+        except Exception as e:
+            raise e
+    raise last_exception  # pragma: no cover
+
+
+async def async_ollama_generate_text(
+    prompt: str,
+    model: str | None = None,
+    temperature: float = 0.7,
+    max_tokens: int | None = None,
+    client: httpx.AsyncClient | None = None,
+) -> str:
+    """
+    Asynchronously generate a text response from Ollama LLM using httpx.AsyncClient.
+    """
+    if model is None:
+        model = settings.ollama_primary_model
+
+    payload: dict[str, Any] = {
+        "model": model,
+        "prompt": prompt,
+        "stream": False,
+        "options": {
+            "temperature": temperature,
+        },
+    }
+    if max_tokens is not None:
+        payload["options"]["num_predict"] = max_tokens
+
+    async def _send(c: httpx.AsyncClient) -> str:
+        resp = await c.post(
+            get_ollama_primary_url(),
+            json=payload,
+            timeout=settings.ollama_timeout_seconds,
+        )
+        resp.raise_for_status()
+        data = resp.json()
+        return data.get("response", "")
+
+    if client is not None:
+        return await _send(client)
+    async with httpx.AsyncClient() as new_client:
+        return await _send(new_client)
+
+
+# ------------------------------------------------------------------------------
+# Synchronous LLM Inference (httpx.Client)
+# ------------------------------------------------------------------------------
+
+
+def ollama_generate_json(
+    prompt: str,
+    model: str | None = None,
+    temperature: float = 0.1,
+    max_tokens: int | None = None,
+) -> dict[str, Any]:
+    """
+    Generate a JSON response from Ollama LLM synchronously using httpx.Client.
+    """
+    if model is None:
+        model = settings.ollama_analyzer_model
+
+    payload: dict[str, Any] = {
+        "model": model,
+        "prompt": prompt,
+        "format": "json",
+        "stream": False,
+        "options": {
+            "temperature": temperature,
+        },
+    }
+    if max_tokens is not None:
+        payload["options"]["num_predict"] = max_tokens
+
+    with httpx.Client(timeout=settings.ollama_timeout_seconds) as client:
+        response = client.post(get_ollama_analyzer_url(), json=payload)
+        response.raise_for_status()
 
     result = response.json()
-    # Ollama returns the response in the "response" field when format=json
     try:
         return json.loads(result["response"])
     except (json.JSONDecodeError, KeyError) as e:
@@ -82,20 +195,6 @@ def ollama_generate_json_with_retry(
 ) -> dict[str, Any]:
     """
     Generate a JSON response from Ollama LLM with automatic retry on malformed JSON.
-
-    Args:
-        prompt: The input prompt for the LLM
-        model: The model to use (defaults to analyzer model for JSON tasks)
-        temperature: Sampling temperature (lower for more deterministic JSON)
-        max_tokens: Maximum tokens to generate
-        max_retries: Number of retry attempts (default 2, meaning 3 total attempts)
-
-    Returns:
-        Parsed JSON dictionary from the LLM response
-
-    Raises:
-        requests.RequestException: If the API call fails
-        ValueError: If the response is not valid JSON after all retries
     """
     last_exception = None
     current_temperature = temperature
@@ -107,23 +206,15 @@ def ollama_generate_json_with_retry(
                 temperature=current_temperature,
                 max_tokens=max_tokens,
             )
-        except ValueError as e:  # JSON parsing error
+        except ValueError as e:
             last_exception = e
             if attempt < max_retries:
-                # On retry, we try to make the output more deterministic
-                # by lowering the temperature and emphasizing JSON format in the prompt
                 current_temperature = max(0.0, current_temperature - 0.1)
-                # Optionally, we could modify the prompt here to add more emphasis on JSON-only output
-                # For now, we rely on lowering temperature to get more consistent output
                 continue
-            else:
-                # If we've exhausted retries, raise the last exception
-                raise last_exception from None
+            raise last_exception from None
         except Exception as e:
-            # For non-JSON errors (e.g., network issues), we don't retry
             raise e
-    # This point should not be reached because of the return in the loop and raise after
-    raise last_exception
+    raise last_exception  # pragma: no cover
 
 
 def ollama_generate_text(
@@ -133,25 +224,12 @@ def ollama_generate_text(
     max_tokens: int | None = None,
 ) -> str:
     """
-    Generate a text response from Ollama LLM (non-JSON).
-
-    Args:
-        prompt: The input prompt for the LLM
-        model: The model to use (defaults to primary model for text generation)
-        temperature: Sampling temperature
-        max_tokens: Maximum tokens to generate
-
-    Returns:
-        Text response from the LLM
-
-    Raises:
-        requests.RequestException: If the API call fails
+    Generate a text response from Ollama LLM (non-JSON) synchronously using httpx.Client.
     """
-    # Use primary model (Llama 3.3 70B) for general text generation by default
     if model is None:
         model = settings.ollama_primary_model
 
-    payload = {
+    payload: dict[str, Any] = {
         "model": model,
         "prompt": prompt,
         "stream": False,
@@ -162,10 +240,9 @@ def ollama_generate_text(
     if max_tokens is not None:
         payload["options"]["num_predict"] = max_tokens
 
-    response = requests.post(
-        get_ollama_primary_url(), json=payload, timeout=settings.ollama_timeout_seconds
-    )
-    response.raise_for_status()
+    with httpx.Client(timeout=settings.ollama_timeout_seconds) as client:
+        response = client.post(get_ollama_primary_url(), json=payload)
+        response.raise_for_status()
 
     result = response.json()
     return result.get("response", "")

@@ -3,118 +3,95 @@ import { useManualStore } from "../useManualStore";
 
 describe("useManualStore", () => {
   beforeEach(() => {
-    // Reset store state before each test
     useManualStore.getState().reset();
   });
 
-  it("should have correct default initial state", () => {
+  it("initializes with default values", () => {
     const state = useManualStore.getState();
     expect(state.jobId).toBeNull();
     expect(state.sessionId).toBeNull();
-    expect(state.jobStatus).toBeNull();
+    expect(state.jobStatus).toBe("idle");
     expect(state.markdownContent).toBe("");
+    expect(state.stepCount).toBe(0);
     expect(state.stepStatuses).toEqual([]);
-    expect(state.stepErrors).toEqual({});
     expect(state.chatHistory).toEqual([]);
-    expect(state.darkMode).toBe(false);
-    expect(state.viewLayout).toBe("split");
+    expect(state.isChatLoading).toBe(false);
+    expect(state.isChatVisible).toBe(false);
   });
 
-  it("should update jobId, sessionId, and jobStatus", () => {
-    const store = useManualStore.getState();
-    store.setJobId("job-abc-123");
-    store.setSessionId("sess-xyz-789");
-    store.setJobStatus("analyzing");
+  it("sets job and session IDs", () => {
+    useManualStore.getState().setJobId("job-1");
+    useManualStore.getState().setSessionId("sess-1");
 
-    const updated = useManualStore.getState();
-    expect(updated.jobId).toBe("job-abc-123");
-    expect(updated.sessionId).toBe("sess-xyz-789");
-    expect(updated.jobStatus).toBe("analyzing");
-  });
-
-  it("should update markdownContent", () => {
-    const store = useManualStore.getState();
-    const content = "# Sample Guide\n\nStep 1: Open app.";
-    store.setMarkdownContent(content);
-
-    expect(useManualStore.getState().markdownContent).toBe(content);
-  });
-
-  it("should manage step statuses and step errors", () => {
-    const store = useManualStore.getState();
-
-    // Update step 0 to captured
-    store.updateStepStatus(0, "captured");
-    expect(useManualStore.getState().stepStatuses[0]).toBe("captured");
-
-    // Update step 1 to error with error message
-    store.updateStepStatus(1, "error", "Selector button#submit not found");
     const state = useManualStore.getState();
-    expect(state.stepStatuses[1]).toBe("error");
-    expect(state.stepErrors[1]).toBe("Selector button#submit not found");
-
-    // Reset step statuses
-    store.resetStepStatuses();
-    const afterReset = useManualStore.getState();
-    expect(afterReset.stepStatuses).toEqual([]);
-    expect(afterReset.stepErrors).toEqual({});
+    expect(state.jobId).toBe("job-1");
+    expect(state.sessionId).toBe("sess-1");
   });
 
-  it("should append chat messages to history", () => {
-    const store = useManualStore.getState();
-    store.addChatMessage("user", "Can you make step 2 clearer?");
-    store.addChatMessage(
-      "assistant",
-      "Sure, I have updated step 2 with more detail.",
-    );
+  it("updates job status and markdown content", () => {
+    useManualStore.getState().setJobStatus("compiling");
+    useManualStore.getState().setMarkdownContent("# Header");
 
-    const history = useManualStore.getState().chatHistory;
-    expect(history.length).toBe(2);
-    expect(history[0].role).toBe("user");
-    expect(history[0].content).toBe("Can you make step 2 clearer?");
-    expect(history[1].role).toBe("assistant");
-    expect(history[1].content).toBe(
-      "Sure, I have updated step 2 with more detail.",
-    );
-    expect(history[0].timestamp).toBeDefined();
+    const state = useManualStore.getState();
+    expect(state.jobStatus).toBe("compiling");
+    expect(state.markdownContent).toBe("# Header");
   });
 
-  it("should toggle dark mode", () => {
-    const store = useManualStore.getState();
-    expect(store.darkMode).toBe(false);
+  it("updates step statuses sorting by stepIndex", () => {
+    useManualStore
+      .getState()
+      .updateStepStatus({ stepIndex: 2, status: "pending" });
+    useManualStore
+      .getState()
+      .updateStepStatus({ stepIndex: 1, status: "captured" });
+    useManualStore
+      .getState()
+      .updateStepStatus({ stepIndex: 2, status: "captured" });
 
-    store.toggleDarkMode();
-    expect(useManualStore.getState().darkMode).toBe(true);
-
-    store.toggleDarkMode();
-    expect(useManualStore.getState().darkMode).toBe(false);
+    const state = useManualStore.getState();
+    expect(state.stepStatuses).toHaveLength(2);
+    expect(state.stepStatuses[0]).toEqual({ stepIndex: 1, status: "captured" });
+    expect(state.stepStatuses[1]).toEqual({ stepIndex: 2, status: "captured" });
   });
 
-  it("should switch view layout", () => {
-    const store = useManualStore.getState();
-    store.setViewLayout("editor");
-    expect(useManualStore.getState().viewLayout).toBe("editor");
+  it("handles chat messages and updates last assistant message", () => {
+    useManualStore.getState().addChatMessage({
+      id: "1",
+      role: "user",
+      content: "Hello",
+      timestamp: "2026-09-20T10:00:00Z",
+    });
+    useManualStore.getState().addChatMessage({
+      id: "2",
+      role: "assistant",
+      content: "",
+      timestamp: "2026-09-20T10:00:01Z",
+      isLoading: true,
+    });
 
-    store.setViewLayout("preview");
-    expect(useManualStore.getState().viewLayout).toBe("preview");
+    useManualStore.getState().updateLastAssistantMessage("Hi there!");
 
-    store.setViewLayout("split");
-    expect(useManualStore.getState().viewLayout).toBe("split");
+    const state = useManualStore.getState();
+    expect(state.chatHistory).toHaveLength(2);
+    expect(state.chatHistory[1].content).toBe("Hi there!");
+    expect(state.chatHistory[1].isLoading).toBe(false);
   });
 
-  it("should reset all fields to initial defaults", () => {
-    const store = useManualStore.getState();
-    store.setJobId("job-temp");
-    store.setMarkdownContent("# Test");
-    store.setJobStatus("completed");
-    store.addChatMessage("user", "Hello");
+  it("toggles chat visibility and loading state", () => {
+    useManualStore.getState().setChatVisible(true);
+    useManualStore.getState().setChatLoading(true);
 
-    store.reset();
+    expect(useManualStore.getState().isChatVisible).toBe(true);
+    expect(useManualStore.getState().isChatLoading).toBe(true);
+  });
 
-    const resetState = useManualStore.getState();
-    expect(resetState.jobId).toBeNull();
-    expect(resetState.markdownContent).toBe("");
-    expect(resetState.jobStatus).toBeNull();
-    expect(resetState.chatHistory).toEqual([]);
+  it("resets store to initial state", () => {
+    useManualStore.getState().setJobId("job-999");
+    useManualStore.getState().setJobStatus("completed");
+    useManualStore.getState().reset();
+
+    const state = useManualStore.getState();
+    expect(state.jobId).toBeNull();
+    expect(state.jobStatus).toBe("idle");
   });
 });
