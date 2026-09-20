@@ -4,7 +4,7 @@
 
 /**
  * Extracts all screenshot image URLs and step indices from Markdown text.
- * Pattern matches: ![Step 1: Description](/assets/job_123/step_001.png)
+ * Pattern matches: ![Step 1: Description](/media/job_123/step_001.png)
  */
 export function extractScreenshotReferences(markdown: string): Array<{
   alt: string;
@@ -29,16 +29,16 @@ export function extractScreenshotReferences(markdown: string): Array<{
 }
 
 /**
- * Normalizes image paths in Markdown so that relative or bare /assets/ paths
+ * Normalizes image paths in Markdown so that relative or bare /media/ paths
  * resolve correctly against the API or assets root.
  */
 export function normalizeImagePaths(markdown: string, apiBase: string): string {
-  // If image points to /assets/..., ensure it points to the proxy or host
+  // If image points to /media/..., ensure it points to the proxy or host
   return markdown.replace(
-    /!\[([^\]]*)\]\(\/assets\/([^)]+)\)/g,
+    /!\[([^\]]*)\]\(\/media\/([^)]+)\)/g,
     (_match, alt, path) => {
       const baseUrl = apiBase.replace(/\/api\/v1\/?$/, "");
-      return `![${alt}](${baseUrl}/assets/${path})`;
+      return `![${alt}](${baseUrl}/media/${path})`;
     },
   );
 }

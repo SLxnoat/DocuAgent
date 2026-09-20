@@ -1,9 +1,9 @@
 # ==============================================================================
 # DocuAgent AI — Production Celery Worker Dockerfile
-# Executes long-running multi-agent state machines, screenshot captures, and document export
+# Executes multi-agent state machines, screenshot captures, and document export
 # ==============================================================================
 
-FROM python:3.11-slim AS runtime
+FROM python:3.11-slim-bookworm AS runtime
 
 # System environment variables
 ENV PYTHONDONTWRITEBYTECODE=1 \
@@ -13,13 +13,11 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 
 WORKDIR /app
 
-# Install native compilation and PDF/document rendering libraries
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    build-essential \
-    gcc \
+# Configure apt retries and install only runtime PDF/document rendering libraries
+RUN echo 'Acquire::Retries "3";' > /etc/apt/apt.conf.d/80-retries && \
+    apt-get update && apt-get install -y --no-install-recommends \
     curl \
     ca-certificates \
-    libffi-dev \
     shared-mime-info \
     libpango-1.0-0 \
     libpangoft2-1.0-0 \

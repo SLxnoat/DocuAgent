@@ -39,7 +39,7 @@ app.add_middleware(
     exempt_prefixes=[
         "/api/v1/stream/",  # EventSource — cannot send headers
         "/api/v1/ws/",  # WebSocket upgrade — cannot send headers
-        "/assets/",  # Static files — no sensitive data
+        "/media/",  # Static screenshot files — no sensitive data
     ],
 )
 
@@ -61,7 +61,7 @@ async def security_headers_middleware(request: Request, call_next) -> Response: 
     response.headers["Permissions-Policy"] = "geolocation=(), camera=(), microphone=()"
 
     # Path-specific Cache Control
-    if request.url.path.startswith("/assets/"):
+    if request.url.path.startswith("/media/"):
         response.headers["Cache-Control"] = "public, max-age=3600, immutable"
     elif request.url.path.startswith("/api/"):
         response.headers["Cache-Control"] = "no-store, no-cache, must-revalidate, private"
@@ -82,7 +82,7 @@ app.include_router(export_router, prefix="/api/v1")
 # Ensure and mount static assets directory
 assets_path = Path(settings.assets_dir).resolve()
 assets_path.mkdir(parents=True, exist_ok=True)
-app.mount("/assets", StaticFiles(directory=str(assets_path)), name="assets")
+app.mount("/media", StaticFiles(directory=str(assets_path)), name="media")
 
 # Prometheus Metrics Instrumentation
 try:
