@@ -23,30 +23,30 @@
         <div class='clearfix'>
 
             <div class='fl pad1y space-right2'>
-                <span class="strong">85.96% </span>
+                <span class="strong">84.74% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>49/57</span>
+                <span class='fraction'>50/59</span>
             </div>
 
 
             <div class='fl pad1y space-right2'>
-                <span class="strong">77.77% </span>
+                <span class="strong">66.66% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>7/9</span>
+                <span class='fraction'>8/12</span>
             </div>
 
 
             <div class='fl pad1y space-right2'>
-                <span class="strong">87.5% </span>
+                <span class="strong">88.88% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>7/8</span>
+                <span class='fraction'>8/9</span>
             </div>
 
 
             <div class='fl pad1y space-right2'>
-                <span class="strong">85.96% </span>
+                <span class="strong">84.74% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>49/57</span>
+                <span class='fraction'>50/59</span>
             </div>
 
 
@@ -140,7 +140,15 @@
 <a name='L75'></a><a href='#L75'>75</a>
 <a name='L76'></a><a href='#L76'>76</a>
 <a name='L77'></a><a href='#L77'>77</a>
-<a name='L78'></a><a href='#L78'>78</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">1x</span>
+<a name='L78'></a><a href='#L78'>78</a>
+<a name='L79'></a><a href='#L79'>79</a>
+<a name='L80'></a><a href='#L80'>80</a>
+<a name='L81'></a><a href='#L81'>81</a>
+<a name='L82'></a><a href='#L82'>82</a>
+<a name='L83'></a><a href='#L83'>83</a>
+<a name='L84'></a><a href='#L84'>84</a>
+<a name='L85'></a><a href='#L85'>85</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -164,6 +172,9 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -184,19 +195,11 @@
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -207,6 +210,13 @@
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
@@ -217,19 +227,24 @@
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import axios from 'axios';
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import axios from "axios";
 import type {
   GenerateRequest,
   GenerateResponse,
   ChatResponse,
-} from '@/types';
+  AvailableModelsResponse,
+} from "@/types";
 &nbsp;
 export const apiClient = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:8000/api/v1',
+  baseURL: import.meta.env.<span class="branch-0 cbranch-no" title="branch not covered" >VITE_API_BASE_URL ?? "http://localhost:8000/api/v1",</span>
   timeout: 30_000,
   headers: {
-    'Content-Type': 'application/json',
-    Authorization: `Bearer ${import.meta.env.VITE_API_TOKEN ?? ''}`,
+    "Content-Type": "application/json",
+    Authorization: `Bearer ${import.meta.env.<span class="branch-0 cbranch-no" title="branch not covered" >VITE_API_TOKEN ?? ""}</span>`,
   },
 });
 &nbsp;
@@ -240,60 +255,66 @@ apiClient.interceptors.response.use(
 <span class="cstat-no" title="statement not covered" >    const backendMsg = err.response?.data?.error?.message;</span>
 <span class="cstat-no" title="statement not covered" >    const errorCode = err.response?.data?.error?.code;</span>
 <span class="cstat-no" title="statement not covered" >    const finalMsg = backendMsg ?? err.message;</span>
-<span class="cstat-no" title="statement not covered" >    const error = new Error(finalMsg) as Error &amp; { code?: string; status?: number };</span>
+<span class="cstat-no" title="statement not covered" >    const error = new Error(finalMsg) as Error &amp; {</span>
+      code?: string;
+      status?: number;
+    };
 <span class="cstat-no" title="statement not covered" >    error.code = errorCode;</span>
 <span class="cstat-no" title="statement not covered" >    error.status = err.response?.status;</span>
 <span class="cstat-no" title="statement not covered" >    return Promise.reject(error);</span>
-<span class="cstat-no" title="statement not covered" >  }</span>
+<span class="cstat-no" title="statement not covered" >  },</span>
 );
 &nbsp;
 // ── Typed API functions ───────────────────────────────────────────────────────
 &nbsp;
 export const generateManual = (data: GenerateRequest) =&gt;
-  apiClient.post&lt;GenerateResponse&gt;('/generate', data);
+  apiClient.post&lt;GenerateResponse&gt;("/generate", data);
 &nbsp;
 export const sendChatMessage = (
   sessionId: string,
   message: string,
-  currentMarkdown?: string
+  currentMarkdown?: string,
 ) =&gt;
   apiClient.post&lt;ChatResponse&gt;(`/chat/${sessionId}`, {
     message,
-    context: currentMarkdown ? { current_markdown: currentMarkdown <span class="branch-0 cbranch-no" title="branch not covered" >} : undefined,</span>
+    context: currentMarkdown
+      ? { current_markdown: currentMarkdown <span class="branch-0 cbranch-no" title="branch not covered" >}</span>
+<span class="cstat-no" title="statement not covered" >      : undefined,</span>
   });
 &nbsp;
 export const triggerRecapture = (
   jobId: string,
   stepIndex: number,
-  selectorOverride?: string
+  selectorOverride?: string,
 ) =&gt;
   apiClient.post(`/recapture/${jobId}/${stepIndex}`, {
     selector_override: <span class="branch-0 cbranch-no" title="branch not covered" >selectorOverride ?? null,</span>
   });
 &nbsp;
-export const getJobStatus = (jobId: string) =&gt;
-  apiClient.get(`/jobs/${jobId}`);
+export const getJobStatus = (jobId: string) =&gt; apiClient.get(`/jobs/${jobId}`);
 &nbsp;
-export const deleteJob = (jobId: string) =&gt;
-  apiClient.delete(`/jobs/${jobId}`);
+export const deleteJob = (jobId: string) =&gt; apiClient.delete(`/jobs/${jobId}`);
 &nbsp;
 export const downloadExport = (
   jobId: string,
-  format: 'markdown' | 'html' | 'pdf'
+  format: "markdown" | "html" | "pdf",
 ) =&gt;
-  apiClient.get(`/export/${jobId}?format=${format}`, { responseType: 'blob' });
+  apiClient.get(`/export/${jobId}?format=${format}`, { responseType: "blob" });
 &nbsp;
 export const uploadReplacementScreenshot = (
   jobId: string,
   stepIndex: number,
-  file: File
+  file: File,
 ) =&gt; {
   const form = new FormData();
-  form.append('file', file);
+  form.append("file", file);
   return apiClient.post(`/jobs/${jobId}/assets/${stepIndex}`, form, {
-    headers: { 'Content-Type': 'multipart/form-data' },
+    headers: { "Content-Type": "multipart/form-data" },
   });
 };
+&nbsp;
+export const getAvailableModels = () =&gt;
+  apiClient.get&lt;AvailableModelsResponse&gt;("/models");
 &nbsp;</pre></td></tr></table></pre>
 
                 <div class='push'></div><!-- for sticky footer -->
@@ -301,7 +322,7 @@ export const uploadReplacementScreenshot = (
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-09-20T14:21:38.310Z
+                at 2026-09-20T15:22:02.504Z
             </div>
         <script src="../../../prettify.js"></script>
         <script>

@@ -25,7 +25,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>54/54</span>
+                <span class='fraction'>56/56</span>
             </div>
 
 
@@ -46,7 +46,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>54/54</span>
+                <span class='fraction'>56/56</span>
             </div>
 
 
@@ -132,7 +132,9 @@
 <a name='L67'></a><a href='#L67'>67</a>
 <a name='L68'></a><a href='#L68'>68</a>
 <a name='L69'></a><a href='#L69'>69</a>
-<a name='L70'></a><a href='#L70'>70</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">1x</span>
+<a name='L70'></a><a href='#L70'>70</a>
+<a name='L71'></a><a href='#L71'>71</a>
+<a name='L72'></a><a href='#L72'>72</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
@@ -151,6 +153,8 @@
 <span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
@@ -201,12 +205,12 @@
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { renderHook } from '@testing-library/react';
-import { useSSEStream } from '../useSSEStream';
-import { useManualStore } from '@/store/useManualStore';
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { describe, it, expect, vi, beforeEach } from "vitest";
+import { renderHook } from "@testing-library/react";
+import { useSSEStream } from "../useSSEStream";
+import { useManualStore } from "@/store/useManualStore";
 &nbsp;
-describe('useSSEStream', () =&gt; {
+describe("useSSEStream", () =&gt; {
   let mockEventSourceInstance: any;
 &nbsp;
   beforeEach(() =&gt; {
@@ -219,53 +223,55 @@ describe('useSSEStream', () =&gt; {
       readyState: 1,
     };
 &nbsp;
-    (global as any).EventSource = vi.fn().mockImplementation(() =&gt; mockEventSourceInstance);
+    (globalThis as any).EventSource = vi
+      .fn()
+      .mockImplementation(() =&gt; mockEventSourceInstance);
   });
 &nbsp;
-  it('subscribes to stream URL and updates status on events', () =&gt; {
-    renderHook(() =&gt; useSSEStream('job-999'));
+  it("subscribes to stream URL and updates status on events", () =&gt; {
+    renderHook(() =&gt; useSSEStream("job-999"));
 &nbsp;
-    expect(global.EventSource).toHaveBeenCalledWith(
-      expect.stringContaining('/stream/job-999')
+    expect(globalThis.EventSource).toHaveBeenCalledWith(
+      expect.stringContaining("/stream/job-999"),
     );
 &nbsp;
     // Simulate pipeline_started event
     mockEventSourceInstance.onmessage({
-      data: JSON.stringify({ type: 'pipeline_started', job_id: 'job-999' }),
+      data: JSON.stringify({ type: "pipeline_started", job_id: "job-999" }),
     });
-    expect(useManualStore.getState().jobStatus).toBe('analyzing');
+    expect(useManualStore.getState().jobStatus).toBe("analyzing");
 &nbsp;
     // Simulate script_analyzed event
     mockEventSourceInstance.onmessage({
-      data: JSON.stringify({ type: 'script_analyzed', step_count: 4 }),
+      data: JSON.stringify({ type: "script_analyzed", step_count: 4 }),
     });
-    expect(useManualStore.getState().jobStatus).toBe('capturing');
+    expect(useManualStore.getState().jobStatus).toBe("capturing");
     expect(useManualStore.getState().stepCount).toBe(4);
 &nbsp;
     // Simulate capture_progress event
     mockEventSourceInstance.onmessage({
       data: JSON.stringify({
-        type: 'capture_progress',
+        type: "capture_progress",
         step_index: 1,
-        status: 'captured',
+        status: "captured",
       }),
     });
     expect(useManualStore.getState().stepStatuses).toHaveLength(1);
-    expect(useManualStore.getState().stepStatuses[0].status).toBe('captured');
+    expect(useManualStore.getState().stepStatuses[0].status).toBe("captured");
 &nbsp;
     // Simulate document_ready event
     mockEventSourceInstance.onmessage({
       data: JSON.stringify({
-        type: 'document_ready',
-        markdown: '# Ready Manual',
+        type: "document_ready",
+        markdown: "# Ready Manual",
       }),
     });
-    expect(useManualStore.getState().jobStatus).toBe('awaiting_input');
-    expect(useManualStore.getState().markdownContent).toBe('# Ready Manual');
+    expect(useManualStore.getState().jobStatus).toBe("awaiting_input");
+    expect(useManualStore.getState().markdownContent).toBe("# Ready Manual");
   });
 &nbsp;
-  it('closes EventSource on unmount', () =&gt; {
-    const { unmount } = renderHook(() =&gt; useSSEStream('job-999'));
+  it("closes EventSource on unmount", () =&gt; {
+    const { unmount } = renderHook(() =&gt; useSSEStream("job-999"));
     unmount();
     expect(mockEventSourceInstance.close).toHaveBeenCalled();
   });
@@ -277,7 +283,7 @@ describe('useSSEStream', () =&gt; {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-09-20T14:21:38.310Z
+                at 2026-09-20T15:22:02.504Z
             </div>
         <script src="../../../../prettify.js"></script>
         <script>

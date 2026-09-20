@@ -23,16 +23,16 @@
         <div class='clearfix'>
 
             <div class='fl pad1y space-right2'>
-                <span class="strong">79.1% </span>
+                <span class="strong">79.41% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>53/67</span>
+                <span class='fraction'>54/68</span>
             </div>
 
 
             <div class='fl pad1y space-right2'>
-                <span class="strong">55.55% </span>
+                <span class="strong">52.63% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>10/18</span>
+                <span class='fraction'>10/19</span>
             </div>
 
 
@@ -44,9 +44,9 @@
 
 
             <div class='fl pad1y space-right2'>
-                <span class="strong">79.1% </span>
+                <span class="strong">79.41% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>53/67</span>
+                <span class='fraction'>54/68</span>
             </div>
 
 
@@ -150,10 +150,12 @@
 <a name='L85'></a><a href='#L85'>85</a>
 <a name='L86'></a><a href='#L86'>86</a>
 <a name='L87'></a><a href='#L87'>87</a>
-<a name='L88'></a><a href='#L88'>88</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">1x</span>
+<a name='L88'></a><a href='#L88'>88</a>
+<a name='L89'></a><a href='#L89'>89</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
@@ -237,11 +239,12 @@
 <span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-yes">8x</span>
 <span class="cline-any cline-yes">8x</span>
-<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { useEffect, useRef } from 'react';
-import { useManualStore } from '@/store/useManualStore';
-import type { SSEEvent } from '@/types';
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { useEffect, useRef } from "react";
+import { useManualStore } from "@/store/useManualStore";
+import type { SSEEvent } from "@/types";
 &nbsp;
-const API_BASE = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:8000/api/v1';
+const API_BASE =
+  import.meta.env.<span class="branch-0 cbranch-no" title="branch not covered" >VITE_API_BASE_URL ?? "http://localhost:8000/api/v1";</span>
 &nbsp;
 export function useSSEStream(jobId: string | null) {
   const store = useManualStore();
@@ -265,56 +268,56 @@ export function useSSEStream(jobId: string | null) {
 <span class="cstat-no" title="statement not covered" >      }</span>
 &nbsp;
       switch (event.type) {
-        case 'pipeline_started':
-          store.setJobStatus('analyzing');
+        case "pipeline_started":
+          store.setJobStatus("analyzing");
           break;
 &nbsp;
-        case 'script_analyzed':
-          store.setJobStatus('capturing');
+        case "script_analyzed":
+          store.setJobStatus("capturing");
           if (event.step_count) store.setStepCount(event.step_count);
           break;
 &nbsp;
-        case 'capture_progress':
+        case "capture_progress":
           if (event.step_index != null) {
             store.updateStepStatus({
               stepIndex: event.step_index,
-              status: event.status === 'captured' ? <span class="branch-0 cbranch-no" title="branch not covered" >'captured' : 'fallback',</span>
+              status: event.status === "captured" ? <span class="branch-0 cbranch-no" title="branch not covered" >"captured" : "fallback",</span>
               error: event.error,
             });
           }
           break;
 &nbsp;
-<span class="branch-0 cbranch-no" title="branch not covered" >        case 'capture_complete':</span>
+<span class="branch-0 cbranch-no" title="branch not covered" >        case "capture_complete":</span>
 <span class="cstat-no" title="statement not covered" >          break;</span>
 &nbsp;
-<span class="branch-0 cbranch-no" title="branch not covered" >        case 'draft_compiled':</span>
-<span class="cstat-no" title="statement not covered" >          store.setJobStatus('compiling');</span>
+<span class="branch-0 cbranch-no" title="branch not covered" >        case "draft_compiled":</span>
+<span class="cstat-no" title="statement not covered" >          store.setJobStatus("compiling");</span>
 <span class="cstat-no" title="statement not covered" >          break;</span>
 &nbsp;
-<span class="branch-0 cbranch-no" title="branch not covered" >        case 'quality_review_started':</span>
-<span class="cstat-no" title="statement not covered" >          store.setJobStatus('reviewing');</span>
+<span class="branch-0 cbranch-no" title="branch not covered" >        case "quality_review_started":</span>
+<span class="cstat-no" title="statement not covered" >          store.setJobStatus("reviewing");</span>
 <span class="cstat-no" title="statement not covered" >          break;</span>
 &nbsp;
-<span class="branch-0 cbranch-no" title="branch not covered" >        case 'quality_approved':</span>
+<span class="branch-0 cbranch-no" title="branch not covered" >        case "quality_approved":</span>
 <span class="cstat-no" title="statement not covered" >          break;</span>
 &nbsp;
-        case 'document_ready':
-        case 'document_updated':
+        case "document_ready":
+        case "document_updated":
           if (event.markdown) {
             store.setMarkdownContent(event.markdown);
           }
-          store.setJobStatus('awaiting_input');
+          store.setJobStatus("awaiting_input");
           break;
 &nbsp;
-<span class="branch-0 cbranch-no" title="branch not covered" >        case 'job_failed':</span>
-<span class="cstat-no" title="statement not covered" >          store.setJobStatus('failed');</span>
+<span class="branch-0 cbranch-no" title="branch not covered" >        case "job_failed":</span>
+<span class="cstat-no" title="statement not covered" >          store.setJobStatus("failed");</span>
 <span class="cstat-no" title="statement not covered" >          break;</span>
       }
     };
 &nbsp;
     es.onerror = <span class="fstat-no" title="function not covered" >() =&gt; {</span>
 <span class="cstat-no" title="statement not covered" >      if (es.readyState === EventSource.CLOSED) {</span>
-<span class="cstat-no" title="statement not covered" >        store.setJobStatus('failed');</span>
+<span class="cstat-no" title="statement not covered" >        store.setJobStatus("failed");</span>
 <span class="cstat-no" title="statement not covered" >      }</span>
 <span class="cstat-no" title="statement not covered" >    };</span>
 &nbsp;
@@ -331,7 +334,7 @@ export function useSSEStream(jobId: string | null) {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-09-20T14:21:38.310Z
+                at 2026-09-20T15:22:02.504Z
             </div>
         <script src="../../../prettify.js"></script>
         <script>

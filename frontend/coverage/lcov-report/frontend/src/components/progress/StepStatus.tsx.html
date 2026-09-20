@@ -23,9 +23,9 @@
         <div class='clearfix'>
 
             <div class='fl pad1y space-right2'>
-                <span class="strong">90.56% </span>
+                <span class="strong">91.07% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>48/53</span>
+                <span class='fraction'>51/56</span>
             </div>
 
 
@@ -44,9 +44,9 @@
 
 
             <div class='fl pad1y space-right2'>
-                <span class="strong">90.56% </span>
+                <span class="strong">91.07% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>48/53</span>
+                <span class='fraction'>51/56</span>
             </div>
 
 
@@ -137,7 +137,11 @@
 <a name='L72'></a><a href='#L72'>72</a>
 <a name='L73'></a><a href='#L73'>73</a>
 <a name='L74'></a><a href='#L74'>74</a>
-<a name='L75'></a><a href='#L75'>75</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">1x</span>
+<a name='L75'></a><a href='#L75'>75</a>
+<a name='L76'></a><a href='#L76'>76</a>
+<a name='L77'></a><a href='#L77'>77</a>
+<a name='L78'></a><a href='#L78'>78</a>
+<a name='L79'></a><a href='#L79'>79</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -191,6 +195,8 @@
 <span class="cline-any cline-yes">6x</span>
 <span class="cline-any cline-yes">6x</span>
 <span class="cline-any cline-yes">6x</span>
+<span class="cline-any cline-yes">6x</span>
+<span class="cline-any cline-yes">6x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">6x</span>
@@ -201,6 +207,8 @@
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
@@ -211,15 +219,15 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">5x</span>
 <span class="cline-any cline-yes">5x</span>
-<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { CheckCircle2, Clock, AlertTriangle, XCircle } from 'lucide-react';
-import { Badge } from '@/components/ui/badge';
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { CheckCircle2, Clock, AlertTriangle, XCircle } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from '@/components/ui/tooltip';
-import type { CaptureStatus } from '@/types';
+} from "@/components/ui/tooltip";
+import type { CaptureStatus } from "@/types";
 &nbsp;
 interface StepStatusProps {
   stepIndex: number;
@@ -230,30 +238,30 @@ interface StepStatusProps {
 export function StepStatus({ stepIndex, status, error }: StepStatusProps) {
   const getBadgeConfig = () =&gt; {
     switch (status) {
-      case 'captured':
+      case "captured":
         return {
-          variant: 'success' as const,
+          variant: "success" as const,
           icon: CheckCircle2,
-          label: 'Captured',
+          label: "Captured",
         };
-      case 'fallback':
+      case "fallback":
         return {
-          variant: 'warning' as const,
+          variant: "warning" as const,
           icon: AlertTriangle,
-          label: 'Fallback',
+          label: "Fallback",
         };
-<span class="branch-0 cbranch-no" title="branch not covered" >      case 'error':</span>
+<span class="branch-0 cbranch-no" title="branch not covered" >      case "error":</span>
 <span class="cstat-no" title="statement not covered" >        return {</span>
-<span class="cstat-no" title="statement not covered" >          variant: 'destructive' as const,</span>
+<span class="cstat-no" title="statement not covered" >          variant: "destructive" as const,</span>
 <span class="cstat-no" title="statement not covered" >          icon: XCircle,</span>
-<span class="cstat-no" title="statement not covered" >          label: 'Failed',</span>
+<span class="cstat-no" title="statement not covered" >          label: "Failed",</span>
 <span class="cstat-no" title="statement not covered" >        };</span>
-      case 'pending':
+      case "pending":
       default:
         return {
-          variant: 'secondary' as const,
+          variant: "secondary" as const,
           icon: Clock,
-          label: 'Pending',
+          label: "Pending",
         };
     }
   };
@@ -263,7 +271,9 @@ export function StepStatus({ stepIndex, status, error }: StepStatusProps) {
   const badgeElement = (
     &lt;Badge variant={variant} className="gap-1.5 py-1 px-2.5 font-mono text-xs"&gt;
       &lt;Icon className="h-3.5 w-3.5 shrink-0" /&gt;
-      &lt;span&gt;Step {stepIndex}: {label}&lt;/span&gt;
+      &lt;span&gt;
+        Step {stepIndex}: {label}
+      &lt;/span&gt;
     &lt;/Badge&gt;
   );
 &nbsp;
@@ -275,7 +285,9 @@ export function StepStatus({ stepIndex, status, error }: StepStatusProps) {
             &lt;div className="cursor-help inline-block"&gt;{badgeElement}&lt;/div&gt;
           &lt;/TooltipTrigger&gt;
           &lt;TooltipContent className="max-w-xs text-xs"&gt;
-            &lt;p className="font-semibold text-destructive-foreground"&gt;Warning / Error&lt;/p&gt;
+            &lt;p className="font-semibold text-destructive-foreground"&gt;
+              Warning / Error
+            &lt;/p&gt;
             &lt;p&gt;{error}&lt;/p&gt;
           &lt;/TooltipContent&gt;
         &lt;/Tooltip&gt;
@@ -292,7 +304,7 @@ export function StepStatus({ stepIndex, status, error }: StepStatusProps) {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-09-20T14:21:38.310Z
+                at 2026-09-20T15:22:02.504Z
             </div>
         <script src="../../../../prettify.js"></script>
         <script>

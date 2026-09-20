@@ -25,7 +25,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>68/68</span>
+                <span class='fraction'>71/71</span>
             </div>
 
 
@@ -46,7 +46,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>68/68</span>
+                <span class='fraction'>71/71</span>
             </div>
 
 
@@ -148,7 +148,10 @@
 <a name='L83'></a><a href='#L83'>83</a>
 <a name='L84'></a><a href='#L84'>84</a>
 <a name='L85'></a><a href='#L85'>85</a>
-<a name='L86'></a><a href='#L86'>86</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">1x</span>
+<a name='L86'></a><a href='#L86'>86</a>
+<a name='L87'></a><a href='#L87'>87</a>
+<a name='L88'></a><a href='#L88'>88</a>
+<a name='L89'></a><a href='#L89'>89</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
@@ -233,76 +236,79 @@
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { renderHook, act } from '@testing-library/react';
-import { useGenerate } from '../useGenerate';
-import { useExport } from '../useExport';
-import { useManualStore } from '@/store/useManualStore';
-import * as apiClient from '@/api/client';
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { describe, it, expect, vi, beforeEach } from "vitest";
+import { renderHook, act } from "@testing-library/react";
+import { useGenerate } from "../useGenerate";
+import { useExport } from "../useExport";
+import { useManualStore } from "@/store/useManualStore";
+import * as apiClient from "@/api/client";
 &nbsp;
-describe('useGenerate', () =&gt; {
+describe("useGenerate", () =&gt; {
   beforeEach(() =&gt; {
     useManualStore.getState().reset();
     vi.clearAllMocks();
   });
 &nbsp;
-  it('submits generation request and updates store on success', async () =&gt; {
-    vi.spyOn(apiClient, 'generateManual').mockResolvedValueOnce({
-      data: { job_id: 'job-abc', session_id: 'sess-xyz' },
+  it("submits generation request and updates store on success", async () =&gt; {
+    vi.spyOn(apiClient, "generateManual").mockResolvedValueOnce({
+      data: { job_id: "job-abc", session_id: "sess-xyz" },
     } as any);
 &nbsp;
     const { result } = renderHook(() =&gt; useGenerate());
 &nbsp;
     await act(async () =&gt; {
       await result.current.submit({
-        script: 'Test workflow script for manual',
-        target_url: 'https://staging.app',
+        script: "Test workflow script for manual",
+        target_url: "https://staging.app",
       });
     });
 &nbsp;
     const state = useManualStore.getState();
-    expect(state.jobId).toBe('job-abc');
-    expect(state.sessionId).toBe('sess-xyz');
-    expect(state.jobStatus).toBe('queued');
+    expect(state.jobId).toBe("job-abc");
+    expect(state.sessionId).toBe("sess-xyz");
+    expect(state.jobStatus).toBe("queued");
     expect(result.current.isLoading).toBe(false);
     expect(result.current.error).toBeNull();
   });
 &nbsp;
-  it('handles submission failure gracefully', async () =&gt; {
-    vi.spyOn(apiClient, 'generateManual').mockRejectedValueOnce(
-      new Error('Validation failed')
+  it("handles submission failure gracefully", async () =&gt; {
+    vi.spyOn(apiClient, "generateManual").mockRejectedValueOnce(
+      new Error("Validation failed"),
     );
 &nbsp;
     const { result } = renderHook(() =&gt; useGenerate());
 &nbsp;
     await act(async () =&gt; {
       await result.current.submit({
-        script: 'Short',
-        target_url: 'invalid',
+        script: "Short",
+        target_url: "invalid",
       });
     });
 &nbsp;
     const state = useManualStore.getState();
-    expect(state.jobStatus).toBe('failed');
-    expect(result.current.error).toBe('Validation failed');
+    expect(state.jobStatus).toBe("failed");
+    expect(result.current.error).toBe("Validation failed");
   });
 });
 &nbsp;
-describe('useExport', () =&gt; {
+describe("useExport", () =&gt; {
   beforeEach(() =&gt; {
     useManualStore.getState().reset();
     vi.clearAllMocks();
   });
 &nbsp;
-  it('downloads export file when jobId is set', async () =&gt; {
-    useManualStore.getState().setJobId('job-123');
+  it("downloads export file when jobId is set", async () =&gt; {
+    useManualStore.getState().setJobId("job-123");
 &nbsp;
-    vi.spyOn(apiClient, 'downloadExport').mockResolvedValueOnce({
-      data: new Blob(['# Markdown Manual']),
+    vi.spyOn(apiClient, "downloadExport").mockResolvedValueOnce({
+      data: new Blob(["# Markdown Manual"]),
     } as any);
 &nbsp;
     // Mock URL.createObjectURL and URL.revokeObjectURL
-    const createObjectURL = vi.fn().mockReturnValue('blob:test');
+    const createObjectURL = vi.fn().mockReturnValue("blob:test");
     const revokeObjectURL = vi.fn();
     window.URL.createObjectURL = createObjectURL;
     window.URL.revokeObjectURL = revokeObjectURL;
@@ -310,10 +316,13 @@ describe('useExport', () =&gt; {
     const { result } = renderHook(() =&gt; useExport());
 &nbsp;
     await act(async () =&gt; {
-      await result.current.handleExport('markdown');
+      await result.current.handleExport("markdown");
     });
 &nbsp;
-    expect(apiClient.downloadExport).toHaveBeenCalledWith('job-123', 'markdown');
+    expect(apiClient.downloadExport).toHaveBeenCalledWith(
+      "job-123",
+      "markdown",
+    );
     expect(createObjectURL).toHaveBeenCalled();
     expect(revokeObjectURL).toHaveBeenCalled();
   });
@@ -325,7 +334,7 @@ describe('useExport', () =&gt; {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-09-20T14:21:38.310Z
+                at 2026-09-20T15:22:02.504Z
             </div>
         <script src="../../../../prettify.js"></script>
         <script>

@@ -23,9 +23,9 @@
         <div class='clearfix'>
 
             <div class='fl pad1y space-right2'>
-                <span class="strong">93.75% </span>
+                <span class="strong">94.11% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>45/48</span>
+                <span class='fraction'>48/51</span>
             </div>
 
 
@@ -44,9 +44,9 @@
 
 
             <div class='fl pad1y space-right2'>
-                <span class="strong">93.75% </span>
+                <span class="strong">94.11% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>45/48</span>
+                <span class='fraction'>48/51</span>
             </div>
 
 
@@ -130,7 +130,11 @@
 <a name='L65'></a><a href='#L65'>65</a>
 <a name='L66'></a><a href='#L66'>66</a>
 <a name='L67'></a><a href='#L67'>67</a>
-<a name='L68'></a><a href='#L68'>68</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">1x</span>
+<a name='L68'></a><a href='#L68'>68</a>
+<a name='L69'></a><a href='#L69'>69</a>
+<a name='L70'></a><a href='#L70'>70</a>
+<a name='L71'></a><a href='#L71'>71</a>
+<a name='L72'></a><a href='#L72'>72</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -140,11 +144,6 @@
 <span class="cline-any cline-yes">4x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">4x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">4x</span>
-<span class="cline-any cline-yes">4x</span>
-<span class="cline-any cline-yes">4x</span>
-<span class="cline-any cline-yes">4x</span>
 <span class="cline-any cline-yes">4x</span>
 <span class="cline-any cline-yes">4x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -153,17 +152,11 @@
 <span class="cline-any cline-yes">4x</span>
 <span class="cline-any cline-yes">4x</span>
 <span class="cline-any cline-yes">4x</span>
-<span class="cline-any cline-yes">4x</span>
-<span class="cline-any cline-yes">4x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">4x</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">4x</span>
 <span class="cline-any cline-yes">4x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">4x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">4x</span>
 <span class="cline-any cline-yes">4x</span>
 <span class="cline-any cline-yes">4x</span>
@@ -193,26 +186,45 @@
 <span class="cline-any cline-yes">4x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-yes">4x</span>
 <span class="cline-any cline-yes">4x</span>
 <span class="cline-any cline-yes">4x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">4x</span>
-<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { Download, FileText, Code2, FileCheck, Loader2 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { useExport } from '@/hooks/useExport';
-import { useManualStore } from '@/store/useManualStore';
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { Download, FileText, Code2, FileCheck, Loader2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { useExport } from "@/hooks/useExport";
+import { useManualStore } from "@/store/useManualStore";
 &nbsp;
 export function ExportBar() {
   const { jobStatus } = useManualStore();
   const { handleExport, isExporting } = useExport();
 &nbsp;
-  const isExportReady = ['awaiting_input', 'refining', 'completed'].includes(jobStatus);
+  const isExportReady = ["awaiting_input", "refining", "completed"].includes(
+    jobStatus,
+  );
 &nbsp;
   return (
     &lt;div className="flex items-center justify-between px-4 py-2.5 border rounded-lg bg-card shadow-sm select-none"&gt;
       &lt;div className="flex items-center gap-2 text-xs font-semibold text-muted-foreground"&gt;
         &lt;Download className="h-4 w-4 text-brand" /&gt;
-        &lt;span className="uppercase tracking-wider"&gt;Export Publication Formats:&lt;/span&gt;
+        &lt;span className="uppercase tracking-wider"&gt;
+          Export Publication Formats:
+        &lt;/span&gt;
       &lt;/div&gt;
 &nbsp;
       &lt;div className="flex items-center gap-2"&gt;
@@ -220,10 +232,10 @@ export function ExportBar() {
           size="sm"
           variant="outline"
           className="h-8 gap-1.5 text-xs font-medium"
-          onClick={<span class="fstat-no" title="function not covered" >() =&gt; handleExport('markdown')}</span>
+          onClick={<span class="fstat-no" title="function not covered" >() =&gt; handleExport("markdown")}</span>
           disabled={!isExportReady || isExporting !== null}
         &gt;
-          {isExporting === <span class="branch-0 cbranch-no" title="branch not covered" >'markdown' ? (</span>
+          {isExporting === <span class="branch-0 cbranch-no" title="branch not covered" >"markdown" ? (</span>
 <span class="cstat-no" title="statement not covered" >            &lt;Loader2 className="h-3.5 w-3.5 animate-spin" /&gt;</span>
           ) : (
             &lt;FileText className="h-3.5 w-3.5 text-blue-500" /&gt;
@@ -235,10 +247,10 @@ export function ExportBar() {
           size="sm"
           variant="outline"
           className="h-8 gap-1.5 text-xs font-medium"
-          onClick={<span class="fstat-no" title="function not covered" >() =&gt; handleExport('html')}</span>
+          onClick={<span class="fstat-no" title="function not covered" >() =&gt; handleExport("html")}</span>
           disabled={!isExportReady || isExporting !== null}
         &gt;
-          {isExporting === <span class="branch-0 cbranch-no" title="branch not covered" >'html' ? (</span>
+          {isExporting === <span class="branch-0 cbranch-no" title="branch not covered" >"html" ? (</span>
 <span class="cstat-no" title="statement not covered" >            &lt;Loader2 className="h-3.5 w-3.5 animate-spin" /&gt;</span>
           ) : (
             &lt;Code2 className="h-3.5 w-3.5 text-orange-500" /&gt;
@@ -250,10 +262,10 @@ export function ExportBar() {
           size="sm"
           variant="outline"
           className="h-8 gap-1.5 text-xs font-medium"
-          onClick={<span class="fstat-no" title="function not covered" >() =&gt; handleExport('pdf')}</span>
+          onClick={<span class="fstat-no" title="function not covered" >() =&gt; handleExport("pdf")}</span>
           disabled={!isExportReady || isExporting !== null}
         &gt;
-          {isExporting === <span class="branch-0 cbranch-no" title="branch not covered" >'pdf' ? (</span>
+          {isExporting === <span class="branch-0 cbranch-no" title="branch not covered" >"pdf" ? (</span>
 <span class="cstat-no" title="statement not covered" >            &lt;Loader2 className="h-3.5 w-3.5 animate-spin" /&gt;</span>
           ) : (
             &lt;FileCheck className="h-3.5 w-3.5 text-emerald-500" /&gt;
@@ -271,7 +283,7 @@ export function ExportBar() {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-09-20T14:21:38.310Z
+                at 2026-09-20T15:22:02.504Z
             </div>
         <script src="../../../../prettify.js"></script>
         <script>

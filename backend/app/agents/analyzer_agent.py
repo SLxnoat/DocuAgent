@@ -111,9 +111,11 @@ async def analyze_script_node(state: ManualState) -> ManualState:
     prompt = SCRIPT_ANALYSIS_PROMPT.format(raw_input_script=raw_script)
 
     parsed_steps: list[dict[str, Any]] = []
+    selected_model = current_state.get("options", {}).get("model")
     try:
         response_json = ollama_generate_json_with_retry(
             prompt=prompt,
+            model=selected_model,
             temperature=0.1,
             max_retries=2,
         )

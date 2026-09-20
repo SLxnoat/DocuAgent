@@ -38,7 +38,15 @@ export interface GenerateRequest {
     output_formats?: ("markdown" | "html" | "pdf")[];
     domain_hint?: string;
     language?: string;
+    model?: string;
   };
+}
+
+export interface AvailableModelsResponse {
+  models: string[];
+  default_primary: string;
+  default_analyzer: string;
+  is_live: boolean;
 }
 
 export interface GenerateResponse {

@@ -25,7 +25,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>34/34</span>
+                <span class='fraction'>36/36</span>
             </div>
 
 
@@ -46,7 +46,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>34/34</span>
+                <span class='fraction'>36/36</span>
             </div>
 
 
@@ -118,7 +118,13 @@
 <a name='L53'></a><a href='#L53'>53</a>
 <a name='L54'></a><a href='#L54'>54</a>
 <a name='L55'></a><a href='#L55'>55</a>
-<a name='L56'></a><a href='#L56'>56</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">1x</span>
+<a name='L56'></a><a href='#L56'>56</a>
+<a name='L57'></a><a href='#L57'>57</a>
+<a name='L58'></a><a href='#L58'>58</a>
+<a name='L59'></a><a href='#L59'>59</a>
+<a name='L60'></a><a href='#L60'>60</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -161,71 +167,77 @@
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, fireEvent } from '@testing-library/react';
-import { StudioView } from '../StudioView';
-import { useManualStore } from '@/store/useManualStore';
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { describe, it, expect, vi, beforeEach } from "vitest";
+import { render, screen, fireEvent } from "@testing-library/react";
+import { StudioView } from "../StudioView";
+import { useManualStore } from "@/store/useManualStore";
 &nbsp;
 // Mock Monaco Editor wrapper so it doesn't try to load monaco in jsdom
-vi.mock('@/components/editor/EditorPane', () =&gt; ({
+vi.mock("@/components/editor/EditorPane", () =&gt; ({
   EditorPane: () =&gt; &lt;div data-testid="mock-editor-pane"&gt;Mock Editor Pane&lt;/div&gt;,
 }));
 &nbsp;
-vi.mock('@/components/editor/PreviewPane', () =&gt; ({
-  PreviewPane: () =&gt; &lt;div data-testid="mock-preview-pane"&gt;Mock Preview Pane&lt;/div&gt;,
+vi.mock("@/components/editor/PreviewPane", () =&gt; ({
+  PreviewPane: () =&gt; (
+    &lt;div data-testid="mock-preview-pane"&gt;Mock Preview Pane&lt;/div&gt;
+  ),
 }));
 &nbsp;
-describe('StudioView', () =&gt; {
+describe("StudioView", () =&gt; {
   beforeEach(() =&gt; {
     useManualStore.getState().reset();
   });
 &nbsp;
-  it('renders script input form initially when status is idle', () =&gt; {
+  it("renders script input form initially when status is idle", () =&gt; {
     render(&lt;StudioView /&gt;);
-    expect(screen.getByText('Generate User Manual')).toBeInTheDocument();
+    expect(screen.getByText("Generate User Manual")).toBeInTheDocument();
   });
 &nbsp;
-  it('renders progress panel when job is generating', () =&gt; {
-    useManualStore.getState().setJobStatus('capturing');
-    useManualStore.getState().setJobId('job-1234');
+  it("renders progress panel when job is generating", () =&gt; {
+    useManualStore.getState().setJobStatus("capturing");
+    useManualStore.getState().setJobId("job-1234");
     render(&lt;StudioView /&gt;);
 &nbsp;
     expect(screen.getByText(/Generating User Manual/i)).toBeInTheDocument();
   });
 &nbsp;
-  it('renders editor and export bar when document is ready', () =&gt; {
-    useManualStore.getState().setJobStatus('awaiting_input');
-    useManualStore.getState().setSessionId('sess-1234');
-    useManualStore.getState().setMarkdownContent('# My Manual');
+  it("renders editor and export bar when document is ready", () =&gt; {
+    useManualStore.getState().setJobStatus("awaiting_input");
+    useManualStore.getState().setSessionId("sess-1234");
+    useManualStore.getState().setMarkdownContent("# My Manual");
     render(&lt;StudioView /&gt;);
 &nbsp;
-    expect(screen.getByTestId('mock-editor-pane')).toBeInTheDocument();
-    expect(screen.getByTestId('mock-preview-pane')).toBeInTheDocument();
-    expect(screen.getByText(/Interactive Studio Workspace/i)).toBeInTheDocument();
+    expect(screen.getByTestId("mock-editor-pane")).toBeInTheDocument();
+    expect(screen.getByTestId("mock-preview-pane")).toBeInTheDocument();
+    expect(
+      screen.getByText(/Interactive Studio Workspace/i),
+    ).toBeInTheDocument();
     expect(screen.getByText(/Export Publication Formats/i)).toBeInTheDocument();
   });
 &nbsp;
-  it('allows resetting back to new manual form', () =&gt; {
-    useManualStore.getState().setJobStatus('awaiting_input');
+  it("allows resetting back to new manual form", () =&gt; {
+    useManualStore.getState().setJobStatus("awaiting_input");
     render(&lt;StudioView /&gt;);
 &nbsp;
-    const newBtn = screen.getByRole('button', { name: /new manual/i });
+    const newBtn = screen.getByRole("button", { name: /new manual/i });
     fireEvent.click(newBtn);
 &nbsp;
-    expect(useManualStore.getState().jobStatus).toBe('idle');
-    expect(screen.getByText('Generate User Manual')).toBeInTheDocument();
+    expect(useManualStore.getState().jobStatus).toBe("idle");
+    expect(screen.getByText("Generate User Manual")).toBeInTheDocument();
   });
 });
 &nbsp;</pre></td></tr></table></pre>
@@ -235,7 +247,7 @@ describe('StudioView', () =&gt; {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-09-20T14:21:38.310Z
+                at 2026-09-20T15:22:02.504Z
             </div>
         <script src="../../../../prettify.js"></script>
         <script>

@@ -1,4 +1,5 @@
-import { PlusCircle, RotateCcw } from "lucide-react";
+import { useEffect } from "react";
+import { PlusCircle, RotateCcw, Cpu } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ScriptInputForm } from "@/components/input/ScriptInputForm";
 import { ProgressPanel } from "@/components/progress/ProgressPanel";
@@ -11,10 +12,34 @@ import { useGenerate } from "@/hooks/useGenerate";
 import { useSSEStream } from "@/hooks/useSSEStream";
 import { useWebSocket } from "@/hooks/useWebSocket";
 import { useManualStore } from "@/store/useManualStore";
+import { getAvailableModels } from "@/api/client";
 
 export function StudioView() {
-  const { jobId, sessionId, jobStatus, reset } = useManualStore();
+  const {
+    jobId,
+    sessionId,
+    jobStatus,
+    reset,
+    selectedModel,
+    setSelectedModel,
+    setAvailableModels,
+  } = useManualStore();
   const { submit, isLoading, error } = useGenerate();
+
+  useEffect(() => {
+    getAvailableModels()
+      .then((res) => {
+        if (res.data?.models?.length) {
+          setAvailableModels(res.data.models);
+          if (res.data.default_primary && selectedModel === "llama3.3:70b") {
+            setSelectedModel(res.data.default_primary);
+          }
+        }
+      })
+      .catch(() => {
+        // Fall back gracefully to preset models
+      });
+  }, [setAvailableModels, setSelectedModel, selectedModel]);
 
   // Active SSE stream for real-time pipeline events
   useSSEStream(jobId);
@@ -46,6 +71,9 @@ export function StudioView() {
             </span>
             <span className="text-xs px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-500 font-medium">
               Human-in-the-Loop Active
+            </span>
+            <span className="text-xs px-2.5 py-0.5 rounded-full bg-brand/15 text-brand font-mono font-medium flex items-center gap-1">
+              <Cpu className="h-3 w-3" /> {selectedModel}
             </span>
           </div>
 

@@ -23,9 +23,9 @@
         <div class='clearfix'>
 
             <div class='fl pad1y space-right2'>
-                <span class="strong">93.75% </span>
+                <span class="strong">91.66% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>30/32</span>
+                <span class='fraction'>33/36</span>
             </div>
 
 
@@ -44,9 +44,9 @@
 
 
             <div class='fl pad1y space-right2'>
-                <span class="strong">93.75% </span>
+                <span class="strong">91.66% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>30/32</span>
+                <span class='fraction'>33/36</span>
             </div>
 
 
@@ -111,7 +111,11 @@
 <a name='L46'></a><a href='#L46'>46</a>
 <a name='L47'></a><a href='#L47'>47</a>
 <a name='L48'></a><a href='#L48'>48</a>
-<a name='L49'></a><a href='#L49'>49</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">1x</span>
+<a name='L49'></a><a href='#L49'>49</a>
+<a name='L50'></a><a href='#L50'>50</a>
+<a name='L51'></a><a href='#L51'>51</a>
+<a name='L52'></a><a href='#L52'>52</a>
+<a name='L53'></a><a href='#L53'>53</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -124,6 +128,8 @@
 <span class="cline-any cline-yes">4x</span>
 <span class="cline-any cline-yes">4x</span>
 <span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">4x</span>
 <span class="cline-any cline-yes">4x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">2x</span>
@@ -149,6 +155,8 @@
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -159,49 +167,53 @@
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
-import type { Theme } from '@/types';
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { create } from "zustand";
+import { persist } from "zustand/middleware";
+import type { Theme } from "@/types";
 &nbsp;
 interface ThemeStore {
   theme: Theme;
-  resolvedTheme: 'light' | 'dark';
+  resolvedTheme: "light" | "dark";
   setTheme: (t: Theme) =&gt; void;
 }
 &nbsp;
-function getSystemTheme(): 'light' | 'dark' {
-  if (typeof window === 'undefined') <span class="branch-0 cbranch-no" title="branch not covered" >return 'light';</span>
-  return window.matchMedia('(prefers-color-scheme: dark)').<span class="branch-0 cbranch-no" title="branch not covered" >matches ? 'dark' : '</span>light';
+function getSystemTheme(): "light" | "dark" {
+  if (typeof window === "undefined") <span class="branch-0 cbranch-no" title="branch not covered" >return "light";</span>
+  return window.matchMedia("(prefers-color-scheme: dark)").<span class="branch-0 cbranch-no" title="branch not covered" >matches</span>
+<span class="cstat-no" title="statement not covered" >    ? "dark"</span>
+    : "light";
 }
 &nbsp;
-function applyTheme(resolved: 'light' | 'dark') {
-  if (typeof document === 'undefined') <span class="branch-0 cbranch-no" title="branch not covered" >return;</span>
+function applyTheme(resolved: "light" | "dark") {
+  if (typeof document === "undefined") <span class="branch-0 cbranch-no" title="branch not covered" >return;</span>
   const root = document.documentElement;
-  root.classList.toggle('dark', resolved === 'dark');
+  root.classList.toggle("dark", resolved === "dark");
 }
 &nbsp;
 export const useThemeStore = create&lt;ThemeStore&gt;()(
   persist(
     (set) =&gt; ({
-      theme: 'system' as Theme,
+      theme: "system" as Theme,
       resolvedTheme: getSystemTheme(),
 &nbsp;
       setTheme: (t) =&gt; {
-        const resolved = t === 'system' ? getSystemTheme(<span class="branch-0 cbranch-no" title="branch not covered" >) : t;</span>
+        const resolved = t === "system" ? getSystemTheme(<span class="branch-0 cbranch-no" title="branch not covered" >) : t;</span>
         applyTheme(resolved);
         set({ theme: t, resolvedTheme: resolved });
       },
     }),
-    { name: 'docuagent-theme' },
+    { name: "docuagent-theme" },
   ),
 );
 &nbsp;
 // Listen for OS theme changes when in 'system' mode
-if (typeof window !== 'undefined') {
-  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () =&gt; {
-<span class="cstat-no" title="statement not covered" >    const { theme, setTheme } = useThemeStore.getState();</span>
-<span class="cstat-no" title="statement not covered" >    if (theme === 'system') setTheme('system');</span>
-  });
+if (typeof window !== "undefined") {
+  window
+    .matchMedia("(prefers-color-scheme: dark)")
+    .addEventListener("change", () =&gt; {
+<span class="cstat-no" title="statement not covered" >      const { theme, setTheme } = useThemeStore.getState();</span>
+<span class="cstat-no" title="statement not covered" >      if (theme === "system") setTheme("system");</span>
+    });
 &nbsp;
   // Apply theme on initial load
   const { theme, setTheme } = useThemeStore.getState();
@@ -214,7 +226,7 @@ if (typeof window !== 'undefined') {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-09-20T14:21:38.310Z
+                at 2026-09-20T15:22:02.504Z
             </div>
         <script src="../../../prettify.js"></script>
         <script>

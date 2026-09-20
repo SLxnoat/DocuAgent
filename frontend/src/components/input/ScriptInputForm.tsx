@@ -22,6 +22,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { OptionsPanel } from "./OptionsPanel";
+import { useManualStore } from "@/store/useManualStore";
 import type { GenerateRequest } from "@/types";
 
 interface ScriptInputFormProps {
@@ -47,6 +48,7 @@ export function ScriptInputForm({
   >(["markdown", "pdf"]);
   const [language, setLanguage] = useState("en");
   const [domainHint, setDomainHint] = useState("");
+  const { selectedModel, setSelectedModel, availableModels } = useManualStore();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -59,6 +61,7 @@ export function ScriptInputForm({
         output_formats: outputFormats,
         language,
         domain_hint: domainHint.trim() || undefined,
+        model: selectedModel,
       },
     };
 
@@ -213,6 +216,9 @@ export function ScriptInputForm({
             onChangeLanguage={setLanguage}
             domainHint={domainHint}
             onChangeDomainHint={setDomainHint}
+            selectedModel={selectedModel}
+            onChangeModel={setSelectedModel}
+            availableModels={availableModels}
           />
         </CardContent>
 

@@ -8,6 +8,7 @@ from app.api.v1.endpoints.export import router as export_router
 from app.api.v1.endpoints.generate import router as generate_router
 from app.api.v1.endpoints.health import router as health_router
 from app.api.v1.endpoints.jobs import router as jobs_router
+from app.api.v1.endpoints.models import router as models_router
 from app.api.v1.endpoints.stream import router as stream_router
 from app.api.v1.endpoints.websocket import router as websocket_router
 from app.config import settings
@@ -72,6 +73,7 @@ async def security_headers_middleware(request: Request, call_next) -> Response: 
 app.include_router(health_router)
 app.include_router(generate_router, prefix="/api/v1")
 app.include_router(jobs_router, prefix="/api/v1")
+app.include_router(models_router, prefix="/api/v1")
 app.include_router(stream_router, prefix="/api/v1")
 app.include_router(websocket_router, prefix="/api/v1")
 app.include_router(chat_router, prefix="/api/v1")

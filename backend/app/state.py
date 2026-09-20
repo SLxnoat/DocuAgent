@@ -27,6 +27,7 @@ class ManualState(TypedDict):
     quality_feedback: str | None  # Structured feedback from quality review (Agent 4)
     quality_review_attempts: int  # Number of times quality review has been looped
     recapture_step_index: int | None  # Step index to recapture (set by Agent 5)
+    options: dict[str, Any]  # Generation options including user-selected model
 
 
 def clear_credentials(state: ManualState) -> ManualState:

@@ -23,16 +23,16 @@
         <div class='clearfix'>
 
             <div class='fl pad1y space-right2'>
-                <span class="strong">24.79% </span>
+                <span class="strong">24.03% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>30/121</span>
+                <span class='fraction'>31/129</span>
             </div>
 
 
             <div class='fl pad1y space-right2'>
-                <span class="strong">72.72% </span>
+                <span class="strong">66.66% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>8/11</span>
+                <span class='fraction'>8/12</span>
             </div>
 
 
@@ -44,9 +44,9 @@
 
 
             <div class='fl pad1y space-right2'>
-                <span class="strong">24.79% </span>
+                <span class="strong">24.03% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>30/121</span>
+                <span class='fraction'>31/129</span>
             </div>
 
 
@@ -209,7 +209,15 @@
 <a name='L144'></a><a href='#L144'>144</a>
 <a name='L145'></a><a href='#L145'>145</a>
 <a name='L146'></a><a href='#L146'>146</a>
-<a name='L147'></a><a href='#L147'>147</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">1x</span>
+<a name='L147'></a><a href='#L147'>147</a>
+<a name='L148'></a><a href='#L148'>148</a>
+<a name='L149'></a><a href='#L149'>149</a>
+<a name='L150'></a><a href='#L150'>150</a>
+<a name='L151'></a><a href='#L151'>151</a>
+<a name='L152'></a><a href='#L152'>152</a>
+<a name='L153'></a><a href='#L153'>153</a>
+<a name='L154'></a><a href='#L154'>154</a>
+<a name='L155'></a><a href='#L155'>155</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -229,11 +237,18 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">4x</span>
 <span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-yes">4x</span>
 <span class="cline-any cline-yes">4x</span>
 <span class="cline-any cline-yes">4x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -350,19 +365,20 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-yes">5x</span>
 <span class="cline-any cline-yes">5x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">5x</span>
 <span class="cline-any cline-yes">5x</span>
-<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { useCallback, useEffect, useRef, useState } from 'react';
-import { v4 as uuidv4 } from 'uuid';
-import { sendChatMessage } from '@/api/client';
-import { useManualStore } from '@/store/useManualStore';
-import type { WSServerMessage } from '@/types';
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { useCallback, useEffect, useRef, useState } from "react";
+import { v4 as uuidv4 } from "uuid";
+import { sendChatMessage } from "@/api/client";
+import { useManualStore } from "@/store/useManualStore";
+import type { WSServerMessage } from "@/types";
 &nbsp;
-const API_HOST = import.meta.env.VITE_API_HOST ?? 'localhost:8000';
-const WS_ENABLED = import.meta.env.VITE_ENABLE_WEBSOCKET_CHAT !== 'false';
+const API_HOST = import.meta.env.<span class="branch-0 cbranch-no" title="branch not covered" >VITE_API_HOST ?? "localhost:8000";</span>
+const WS_ENABLED = import.meta.env.VITE_ENABLE_WEBSOCKET_CHAT !== "false";
 &nbsp;
 export function useWebSocket(sessionId: string | null) {
   const wsRef = useRef&lt;WebSocket | null&gt;(null);
@@ -373,8 +389,10 @@ export function useWebSocket(sessionId: string | null) {
   useEffect(() =&gt; {
     if (!sessionId || !WS_ENABLED) return;
 &nbsp;
-    const protocol = window.location.protocol === <span class="branch-0 cbranch-no" title="branch not covered" >'https:' ? 'wss:' : '</span>ws:';
-    const host = API_HOST.includes(':') ? <span class="branch-0 cbranch-no" title="branch not covered" >API_HOST : `${window.location.hostname}:8000`;</span>
+    const protocol = window.location.protocol === <span class="branch-0 cbranch-no" title="branch not covered" >"https:" ? "wss:" : "</span>ws:";
+    const host = API_HOST.includes(":")
+      ? <span class="branch-0 cbranch-no" title="branch not covered" >API_HOST</span>
+<span class="cstat-no" title="statement not covered" >      : `${window.location.hostname}:8000`;</span>
     const url = `${protocol}//${host}/api/v1/ws/chat/${sessionId}`;
     const ws = new WebSocket(url);
     wsRef.current = ws;
@@ -383,7 +401,12 @@ export function useWebSocket(sessionId: string | null) {
 <span class="cstat-no" title="statement not covered" >      setIsConnected(true);</span>
 <span class="cstat-no" title="statement not covered" >      heartRef.current = setInterval(() =&gt; {</span>
 <span class="cstat-no" title="statement not covered" >        if (ws.readyState === WebSocket.OPEN) {</span>
-<span class="cstat-no" title="statement not covered" >          ws.send(JSON.stringify({ type: 'ping', timestamp: new Date().toISOString() }));</span>
+<span class="cstat-no" title="statement not covered" >          ws.send(</span>
+<span class="cstat-no" title="statement not covered" >            JSON.stringify({</span>
+<span class="cstat-no" title="statement not covered" >              type: "ping",</span>
+<span class="cstat-no" title="statement not covered" >              timestamp: new Date().toISOString(),</span>
+<span class="cstat-no" title="statement not covered" >            }),</span>
+<span class="cstat-no" title="statement not covered" >          );</span>
 <span class="cstat-no" title="statement not covered" >        }</span>
 <span class="cstat-no" title="statement not covered" >      }, 20_000);</span>
 <span class="cstat-no" title="statement not covered" >    };</span>
@@ -409,15 +432,15 @@ export function useWebSocket(sessionId: string | null) {
 <span class="cstat-no" title="statement not covered" >      }</span>
 &nbsp;
 <span class="cstat-no" title="statement not covered" >      switch (msg.type) {</span>
-<span class="cstat-no" title="statement not covered" >        case 'typing_start':</span>
+<span class="cstat-no" title="statement not covered" >        case "typing_start":</span>
 <span class="cstat-no" title="statement not covered" >          store.setChatLoading(true);</span>
 <span class="cstat-no" title="statement not covered" >          break;</span>
 &nbsp;
-<span class="cstat-no" title="statement not covered" >        case 'typing_stop':</span>
+<span class="cstat-no" title="statement not covered" >        case "typing_stop":</span>
 <span class="cstat-no" title="statement not covered" >          store.setChatLoading(false);</span>
 <span class="cstat-no" title="statement not covered" >          break;</span>
 &nbsp;
-<span class="cstat-no" title="statement not covered" >        case 'agent_response':</span>
+<span class="cstat-no" title="statement not covered" >        case "agent_response":</span>
 <span class="cstat-no" title="statement not covered" >          if (msg.updated_markdown) {</span>
 <span class="cstat-no" title="statement not covered" >            store.setMarkdownContent(msg.updated_markdown);</span>
 <span class="cstat-no" title="statement not covered" >          }</span>
@@ -427,7 +450,7 @@ export function useWebSocket(sessionId: string | null) {
 <span class="cstat-no" title="statement not covered" >          store.setChatLoading(false);</span>
 <span class="cstat-no" title="statement not covered" >          break;</span>
 &nbsp;
-<span class="cstat-no" title="statement not covered" >        case 'error':</span>
+<span class="cstat-no" title="statement not covered" >        case "error":</span>
 <span class="cstat-no" title="statement not covered" >          store.setChatLoading(false);</span>
 <span class="cstat-no" title="statement not covered" >          if (msg.message) {</span>
 <span class="cstat-no" title="statement not covered" >            store.updateLastAssistantMessage(`⚠️ Error: ${msg.message}`);</span>
@@ -452,7 +475,7 @@ export function useWebSocket(sessionId: string | null) {
       // Add user message to chat
 <span class="cstat-no" title="statement not covered" >      store.addChatMessage({</span>
 <span class="cstat-no" title="statement not covered" >        id: uuidv4(),</span>
-<span class="cstat-no" title="statement not covered" >        role: 'user',</span>
+<span class="cstat-no" title="statement not covered" >        role: "user",</span>
 <span class="cstat-no" title="statement not covered" >        content,</span>
 <span class="cstat-no" title="statement not covered" >        timestamp: new Date().toISOString(),</span>
 <span class="cstat-no" title="statement not covered" >      });</span>
@@ -460,8 +483,8 @@ export function useWebSocket(sessionId: string | null) {
       // Add loading placeholder for assistant response
 <span class="cstat-no" title="statement not covered" >      store.addChatMessage({</span>
 <span class="cstat-no" title="statement not covered" >        id: uuidv4(),</span>
-<span class="cstat-no" title="statement not covered" >        role: 'assistant',</span>
-<span class="cstat-no" title="statement not covered" >        content: '',</span>
+<span class="cstat-no" title="statement not covered" >        role: "assistant",</span>
+<span class="cstat-no" title="statement not covered" >        content: "",</span>
 <span class="cstat-no" title="statement not covered" >        timestamp: new Date().toISOString(),</span>
 <span class="cstat-no" title="statement not covered" >        isLoading: true,</span>
 <span class="cstat-no" title="statement not covered" >      });</span>
@@ -470,10 +493,10 @@ export function useWebSocket(sessionId: string | null) {
 <span class="cstat-no" title="statement not covered" >      if (ws &amp;&amp; ws.readyState === WebSocket.OPEN) {</span>
 <span class="cstat-no" title="statement not covered" >        ws.send(</span>
 <span class="cstat-no" title="statement not covered" >          JSON.stringify({</span>
-<span class="cstat-no" title="statement not covered" >            type: 'user_message',</span>
+<span class="cstat-no" title="statement not covered" >            type: "user_message",</span>
 <span class="cstat-no" title="statement not covered" >            content,</span>
 <span class="cstat-no" title="statement not covered" >            timestamp: new Date().toISOString(),</span>
-<span class="cstat-no" title="statement not covered" >          })</span>
+<span class="cstat-no" title="statement not covered" >          }),</span>
 <span class="cstat-no" title="statement not covered" >        );</span>
 <span class="cstat-no" title="statement not covered" >      } else {</span>
         // Fallback: REST endpoint
@@ -482,21 +505,22 @@ export function useWebSocket(sessionId: string | null) {
 <span class="cstat-no" title="statement not covered" >          const { data } = await sendChatMessage(</span>
 <span class="cstat-no" title="statement not covered" >            sessionId,</span>
 <span class="cstat-no" title="statement not covered" >            content,</span>
-<span class="cstat-no" title="statement not covered" >            store.markdownContent</span>
+<span class="cstat-no" title="statement not covered" >            store.markdownContent,</span>
 <span class="cstat-no" title="statement not covered" >          );</span>
 <span class="cstat-no" title="statement not covered" >          if (data.updated_markdown) {</span>
 <span class="cstat-no" title="statement not covered" >            store.setMarkdownContent(data.updated_markdown);</span>
 <span class="cstat-no" title="statement not covered" >          }</span>
 <span class="cstat-no" title="statement not covered" >          store.updateLastAssistantMessage(data.response_message);</span>
 <span class="cstat-no" title="statement not covered" >        } catch (err) {</span>
-<span class="cstat-no" title="statement not covered" >          const msg = err instanceof Error ? err.message : 'Chat request failed';</span>
+<span class="cstat-no" title="statement not covered" >          const msg =</span>
+<span class="cstat-no" title="statement not covered" >            err instanceof Error ? err.message : "Chat request failed";</span>
 <span class="cstat-no" title="statement not covered" >          store.updateLastAssistantMessage(`⚠️ Error: ${msg}`);</span>
 <span class="cstat-no" title="statement not covered" >        } finally {</span>
 <span class="cstat-no" title="statement not covered" >          store.setChatLoading(false);</span>
 <span class="cstat-no" title="statement not covered" >        }</span>
 <span class="cstat-no" title="statement not covered" >      }</span>
 <span class="cstat-no" title="statement not covered" >    },</span>
-    [sessionId, store]
+    [sessionId, store],
   );
 &nbsp;
   return { sendMessage, isConnected };
@@ -508,7 +532,7 @@ export function useWebSocket(sessionId: string | null) {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-09-20T14:21:38.310Z
+                at 2026-09-20T15:22:02.504Z
             </div>
         <script src="../../../prettify.js"></script>
         <script>

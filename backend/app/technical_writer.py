@@ -61,9 +61,11 @@ async def compile_markdown_node(state: ManualState) -> ManualState:
     )
 
     # Call the LLM to get the markdown document
+    selected_model = state.get("options", {}).get("model")
     try:
         markdown_content = ollama_generate_text(
             prompt=prompt,
+            model=selected_model,
             temperature=0.3,  # Moderate temperature for balanced creativity and consistency
         )
     except Exception as e:

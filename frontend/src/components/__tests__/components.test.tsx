@@ -82,12 +82,15 @@ describe("OptionsPanel", () => {
         onChangeLanguage={onChangeLanguage}
         domainHint=""
         onChangeDomainHint={onChangeDomainHint}
+        selectedModel="llama3.3:70b"
+        onChangeModel={vi.fn()}
       />,
     );
 
     expect(screen.getByText("Markdown")).toBeInTheDocument();
     expect(screen.getByText("HTML")).toBeInTheDocument();
     expect(screen.getByText("PDF")).toBeInTheDocument();
+    expect(screen.getByText(/AI Model/i)).toBeInTheDocument();
 
     const htmlCheckbox = screen.getByRole("checkbox", { name: /html/i });
     fireEvent.click(htmlCheckbox);
@@ -140,6 +143,7 @@ describe("ScriptInputForm", () => {
         output_formats: ["markdown", "pdf"],
         language: "en",
         domain_hint: undefined,
+        model: "llama3.3:70b",
       },
     });
   });

@@ -1,5 +1,10 @@
 import axios from "axios";
-import type { GenerateRequest, GenerateResponse, ChatResponse } from "@/types";
+import type {
+  GenerateRequest,
+  GenerateResponse,
+  ChatResponse,
+  AvailableModelsResponse,
+} from "@/types";
 
 export const apiClient = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL ?? "http://localhost:8000/api/v1",
@@ -74,3 +79,6 @@ export const uploadReplacementScreenshot = (
     headers: { "Content-Type": "multipart/form-data" },
   });
 };
+
+export const getAvailableModels = () =>
+  apiClient.get<AvailableModelsResponse>("/models");

@@ -20,7 +20,13 @@ interface ManualStore {
   isChatLoading: boolean;
   isChatVisible: boolean;
 
+  // ── AI Model ──────────────────────────────────────────────────────────────
+  selectedModel: string;
+  availableModels: string[];
+
   // ── Actions ────────────────────────────────────────────────────────────────
+  setSelectedModel: (model: string) => void;
+  setAvailableModels: (models: string[]) => void;
   setJobId: (id: string) => void;
   setSessionId: (id: string) => void;
   setJobStatus: (status: JobStatus) => void;
@@ -44,6 +50,16 @@ const initialState = {
   chatHistory: [] as ChatMessage[],
   isChatLoading: false,
   isChatVisible: false,
+  selectedModel: "llama3.3:70b",
+  availableModels: [
+    "llama3.3:70b",
+    "llama3.1:8b",
+    "qwen2.5:72b",
+    "qwen2.5:32b",
+    "qwen2.5:7b",
+    "mistral-large",
+    "deepseek-r1:70b",
+  ],
 };
 
 export const useManualStore = create<ManualStore>()(
@@ -51,6 +67,10 @@ export const useManualStore = create<ManualStore>()(
     (set) => ({
       ...initialState,
 
+      setSelectedModel: (model) =>
+        set({ selectedModel: model }, false, "setSelectedModel"),
+      setAvailableModels: (models) =>
+        set({ availableModels: models }, false, "setAvailableModels"),
       setJobId: (id) => set({ jobId: id }, false, "setJobId"),
       setSessionId: (id) => set({ sessionId: id }, false, "setSessionId"),
       setJobStatus: (status) =>

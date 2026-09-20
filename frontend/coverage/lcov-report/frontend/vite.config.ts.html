@@ -137,39 +137,39 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js"><span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" ><span class="branch-0 cbranch-no" title="branch not covered" >import path from 'path';</span></span></span>
-<span class="cstat-no" title="statement not covered" >import { defineConfig } from 'vite';</span>
-<span class="cstat-no" title="statement not covered" >import react from '@vitejs/plugin-react';</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js"><span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" ><span class="branch-0 cbranch-no" title="branch not covered" >import path from "path";</span></span></span>
+<span class="cstat-no" title="statement not covered" >import { defineConfig } from "vite";</span>
+<span class="cstat-no" title="statement not covered" >import react from "@vitejs/plugin-react";</span>
 <span class="cstat-no" title="statement not covered" ></span>
 <span class="cstat-no" title="statement not covered" >export default defineConfig({</span>
 <span class="cstat-no" title="statement not covered" >  plugins: [react()],</span>
 <span class="cstat-no" title="statement not covered" >  resolve: {</span>
-<span class="cstat-no" title="statement not covered" >    alias: { '@': path.resolve(__dirname, './src') },</span>
+<span class="cstat-no" title="statement not covered" >    alias: { "@": path.resolve(__dirname, "./src") },</span>
 <span class="cstat-no" title="statement not covered" >  },</span>
 <span class="cstat-no" title="statement not covered" >  server: {</span>
 <span class="cstat-no" title="statement not covered" >    port: 5173,</span>
 <span class="cstat-no" title="statement not covered" >    proxy: {</span>
-<span class="cstat-no" title="statement not covered" >      '/api': { target: 'http://localhost:8000', changeOrigin: true },</span>
-<span class="cstat-no" title="statement not covered" >      '/assets': { target: 'http://localhost:8000', changeOrigin: true },</span>
+<span class="cstat-no" title="statement not covered" >      "/api": { target: "http://localhost:8000", changeOrigin: true },</span>
+<span class="cstat-no" title="statement not covered" >      "/assets": { target: "http://localhost:8000", changeOrigin: true },</span>
 <span class="cstat-no" title="statement not covered" >    },</span>
 <span class="cstat-no" title="statement not covered" >  },</span>
-<span class="cstat-no" title="statement not covered" >  build: { outDir: 'dist', sourcemap: true },</span>
+<span class="cstat-no" title="statement not covered" >  build: { outDir: "dist", sourcemap: true },</span>
 <span class="cstat-no" title="statement not covered" >  test: {</span>
 <span class="cstat-no" title="statement not covered" >    globals: true,</span>
-<span class="cstat-no" title="statement not covered" >    environment: 'jsdom',</span>
-<span class="cstat-no" title="statement not covered" >    setupFiles: ['./src/test/setup.ts'],</span>
+<span class="cstat-no" title="statement not covered" >    environment: "jsdom",</span>
+<span class="cstat-no" title="statement not covered" >    setupFiles: ["./src/test/setup.ts"],</span>
 <span class="cstat-no" title="statement not covered" >    coverage: {</span>
-<span class="cstat-no" title="statement not covered" >      provider: 'v8',</span>
-<span class="cstat-no" title="statement not covered" >      reporter: ['text', 'lcov'],</span>
+<span class="cstat-no" title="statement not covered" >      provider: "v8",</span>
+<span class="cstat-no" title="statement not covered" >      reporter: ["text", "lcov"],</span>
 <span class="cstat-no" title="statement not covered" >      exclude: [</span>
-<span class="cstat-no" title="statement not covered" >        'node_modules/**',</span>
-<span class="cstat-no" title="statement not covered" >        'src/test/**',</span>
-<span class="cstat-no" title="statement not covered" >        '**/*.d.ts',</span>
-<span class="cstat-no" title="statement not covered" >        'postcss.config.js',</span>
-<span class="cstat-no" title="statement not covered" >        'tailwind.config.ts',</span>
-<span class="cstat-no" title="statement not covered" >        'src/types/**',</span>
-<span class="cstat-no" title="statement not covered" >        'src/main.tsx',</span>
-<span class="cstat-no" title="statement not covered" >        'dist/**',</span>
+<span class="cstat-no" title="statement not covered" >        "node_modules/**",</span>
+<span class="cstat-no" title="statement not covered" >        "src/test/**",</span>
+<span class="cstat-no" title="statement not covered" >        "**/*.d.ts",</span>
+<span class="cstat-no" title="statement not covered" >        "postcss.config.js",</span>
+<span class="cstat-no" title="statement not covered" >        "tailwind.config.ts",</span>
+<span class="cstat-no" title="statement not covered" >        "src/types/**",</span>
+<span class="cstat-no" title="statement not covered" >        "src/main.tsx",</span>
+<span class="cstat-no" title="statement not covered" >        "dist/**",</span>
 <span class="cstat-no" title="statement not covered" >      ],</span>
 <span class="cstat-no" title="statement not covered" >    },</span>
 <span class="cstat-no" title="statement not covered" >  },</span>
@@ -181,7 +181,7 @@
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-09-20T14:21:38.310Z
+                at 2026-09-20T15:22:02.504Z
             </div>
         <script src="../prettify.js"></script>
         <script>

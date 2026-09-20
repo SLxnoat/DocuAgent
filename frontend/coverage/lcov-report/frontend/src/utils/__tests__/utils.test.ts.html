@@ -25,7 +25,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>49/49</span>
+                <span class='fraction'>53/53</span>
             </div>
 
 
@@ -46,7 +46,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>49/49</span>
+                <span class='fraction'>53/53</span>
             </div>
 
 
@@ -127,7 +127,17 @@
 <a name='L62'></a><a href='#L62'>62</a>
 <a name='L63'></a><a href='#L63'>63</a>
 <a name='L64'></a><a href='#L64'>64</a>
-<a name='L65'></a><a href='#L65'>65</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">1x</span>
+<a name='L65'></a><a href='#L65'>65</a>
+<a name='L66'></a><a href='#L66'>66</a>
+<a name='L67'></a><a href='#L67'>67</a>
+<a name='L68'></a><a href='#L68'>68</a>
+<a name='L69'></a><a href='#L69'>69</a>
+<a name='L70'></a><a href='#L70'>70</a>
+<a name='L71'></a><a href='#L71'>71</a>
+<a name='L72'></a><a href='#L72'>72</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -168,18 +178,10 @@
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
@@ -189,14 +191,29 @@
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { describe, it, expect } from 'vitest';
-import { extractScreenshotReferences, normalizeImagePaths } from '../markdownUtils';
-import { formatTimestamp, formatFileSize, truncateText } from '../formatUtils';
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { describe, it, expect } from "vitest";
+import {
+  extractScreenshotReferences,
+  normalizeImagePaths,
+} from "../markdownUtils";
+import { formatTimestamp, formatFileSize, truncateText } from "../formatUtils";
 &nbsp;
-describe('markdownUtils', () =&gt; {
-  it('extracts screenshot references with step index', () =&gt; {
+describe("markdownUtils", () =&gt; {
+  it("extracts screenshot references with step index", () =&gt; {
     const md = `
 # Manual
 Here is step 1:
@@ -210,49 +227,53 @@ And generic image:
     const refs = extractScreenshotReferences(md);
     expect(refs).toHaveLength(3);
     expect(refs[0]).toEqual({
-      alt: 'Step 1: Dashboard',
-      src: '/assets/job_abc/step_001.png',
+      alt: "Step 1: Dashboard",
+      src: "/assets/job_abc/step_001.png",
       stepIndex: 1,
     });
     expect(refs[1]).toEqual({
-      alt: 'Step 2: Settings',
-      src: '/assets/job_abc/step_002.png',
+      alt: "Step 2: Settings",
+      src: "/assets/job_abc/step_002.png",
       stepIndex: 2,
     });
     expect(refs[2]).toEqual({
-      alt: 'Logo',
-      src: 'https://example.com/logo.png',
+      alt: "Logo",
+      src: "https://example.com/logo.png",
       stepIndex: null,
     });
   });
 &nbsp;
-  it('normalizes relative /assets/ paths with API base', () =&gt; {
-    const md = '![Step 1](/assets/job_1/step_001.png)';
-    const normalized = normalizeImagePaths(md, 'http://localhost:8000/api/v1');
-    expect(normalized).toBe('![Step 1](http://localhost:8000/assets/job_1/step_001.png)');
+  it("normalizes relative /assets/ paths with API base", () =&gt; {
+    const md = "![Step 1](/assets/job_1/step_001.png)";
+    const normalized = normalizeImagePaths(md, "http://localhost:8000/api/v1");
+    expect(normalized).toBe(
+      "![Step 1](http://localhost:8000/assets/job_1/step_001.png)",
+    );
   });
 });
 &nbsp;
-describe('formatUtils', () =&gt; {
-  it('formats valid ISO timestamp', () =&gt; {
-    const formatted = formatTimestamp('2026-09-20T10:30:00Z');
+describe("formatUtils", () =&gt; {
+  it("formats valid ISO timestamp", () =&gt; {
+    const formatted = formatTimestamp("2026-09-20T10:30:00Z");
     expect(formatted).toBeTruthy();
-    expect(typeof formatted).toBe('string');
+    expect(typeof formatted).toBe("string");
   });
 &nbsp;
-  it('handles invalid timestamp gracefully', () =&gt; {
-    expect(formatTimestamp('invalid-date')).toBe('');
+  it("handles invalid timestamp gracefully", () =&gt; {
+    expect(formatTimestamp("invalid-date")).toBe("");
   });
 &nbsp;
-  it('formats file sizes accurately', () =&gt; {
-    expect(formatFileSize(500)).toBe('500 B');
-    expect(formatFileSize(2048)).toBe('2.0 KB');
-    expect(formatFileSize(1048576 * 2.5)).toBe('2.5 MB');
+  it("formats file sizes accurately", () =&gt; {
+    expect(formatFileSize(500)).toBe("500 B");
+    expect(formatFileSize(2048)).toBe("2.0 KB");
+    expect(formatFileSize(1048576 * 2.5)).toBe("2.5 MB");
   });
 &nbsp;
-  it('truncates text with ellipsis', () =&gt; {
-    expect(truncateText('Short', 10)).toBe('Short');
-    expect(truncateText('A very long text exceeding max limit', 10)).toBe('A very lon…');
+  it("truncates text with ellipsis", () =&gt; {
+    expect(truncateText("Short", 10)).toBe("Short");
+    expect(truncateText("A very long text exceeding max limit", 10)).toBe(
+      "A very lon…",
+    );
   });
 });
 &nbsp;</pre></td></tr></table></pre>
@@ -262,7 +283,7 @@ describe('formatUtils', () =&gt; {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-09-20T14:21:38.310Z
+                at 2026-09-20T15:22:02.504Z
             </div>
         <script src="../../../../prettify.js"></script>
         <script>

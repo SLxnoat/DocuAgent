@@ -51,6 +51,7 @@ async def generate_manual(request: GenerateRequest):
             target_url=target_url,
             credentials=request.credentials or {},
             raw_input_script=request.script,
+            options=request.options or {},
         )
         logger.info("Dispatched generate_manual task for job_id=%s", job_id)
     except Exception as exc:

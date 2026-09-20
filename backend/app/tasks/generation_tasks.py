@@ -29,6 +29,7 @@ def generate_manual(
     credentials: dict | None = None,
     raw_input_script: str = "",
     structured_steps: list | None = None,
+    options: dict | None = None,
 ):
     """
     Celery task to generate a manual using the DocuAgent workflow.
@@ -46,6 +47,7 @@ def generate_manual(
             "raw_input_script": raw_input_script or "",
             "credentials": credentials or {},
             "structured_steps": structured_steps or [],
+            "options": options or {},
             "screenshot_assets": {},
             "markdown_content": "",
             "chat_history": [],
