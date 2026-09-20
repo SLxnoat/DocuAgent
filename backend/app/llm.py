@@ -23,6 +23,14 @@ def get_ollama_primary_url() -> str:
     return f"{settings.ollama_base_url}/api/generate"
 
 
+def get_ollama_headers() -> dict[str, str]:
+    """Get HTTP headers for Ollama API requests, including Bearer auth for Cloud models."""
+    headers: dict[str, str] = {"Content-Type": "application/json"}
+    if settings.ollama_api_key and settings.ollama_api_key != "your-ollama-cloud-api-key-here":
+        headers["Authorization"] = f"Bearer {settings.ollama_api_key}"
+    return headers
+
+
 # ------------------------------------------------------------------------------
 # Asynchronous LLM Inference (httpx.AsyncClient)
 # ------------------------------------------------------------------------------
@@ -58,6 +66,7 @@ async def async_ollama_generate_json(
         resp = await c.post(
             get_ollama_analyzer_url(),
             json=payload,
+            headers=get_ollama_headers(),
             timeout=settings.ollama_timeout_seconds,
         )
         resp.raise_for_status()
@@ -134,6 +143,7 @@ async def async_ollama_generate_text(
         resp = await c.post(
             get_ollama_primary_url(),
             json=payload,
+            headers=get_ollama_headers(),
             timeout=settings.ollama_timeout_seconds,
         )
         resp.raise_for_status()
@@ -176,7 +186,11 @@ def ollama_generate_json(
         payload["options"]["num_predict"] = max_tokens
 
     with httpx.Client(timeout=settings.ollama_timeout_seconds) as client:
-        response = client.post(get_ollama_analyzer_url(), json=payload)
+        response = client.post(
+            get_ollama_analyzer_url(),
+            json=payload,
+            headers=get_ollama_headers(),
+        )
         response.raise_for_status()
 
     result = response.json()
@@ -241,7 +255,11 @@ def ollama_generate_text(
         payload["options"]["num_predict"] = max_tokens
 
     with httpx.Client(timeout=settings.ollama_timeout_seconds) as client:
-        response = client.post(get_ollama_primary_url(), json=payload)
+        response = client.post(
+            get_ollama_primary_url(),
+            json=payload,
+            headers=get_ollama_headers(),
+        )
         response.raise_for_status()
 
     result = response.json()

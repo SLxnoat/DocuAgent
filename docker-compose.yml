@@ -66,6 +66,9 @@ services:
       - CELERY_BROKER_URL=redis://redis:6379/1
       - CELERY_RESULT_BACKEND=redis://redis:6379/2
       - OLLAMA_BASE_URL=${OLLAMA_BASE_URL:-http://host.docker.internal:11434}
+      - OLLAMA_API_KEY=${OLLAMA_API_KEY:-}
+      - OLLAMA_PRIMARY_MODEL=${OLLAMA_PRIMARY_MODEL:-llama3.3:70b}
+      - OLLAMA_ANALYZER_MODEL=${OLLAMA_ANALYZER_MODEL:-qwen2.5:72b}
       - API_TOKEN=${API_TOKEN:-production-secret-token-please-change}
       - ASSETS_DIR=/app/assets
       - EXPORTS_DIR=/app/exports
@@ -101,6 +104,9 @@ services:
       - CELERY_BROKER_URL=redis://redis:6379/1
       - CELERY_RESULT_BACKEND=redis://redis:6379/2
       - OLLAMA_BASE_URL=${OLLAMA_BASE_URL:-http://host.docker.internal:11434}
+      - OLLAMA_API_KEY=${OLLAMA_API_KEY:-}
+      - OLLAMA_PRIMARY_MODEL=${OLLAMA_PRIMARY_MODEL:-llama3.3:70b}
+      - OLLAMA_ANALYZER_MODEL=${OLLAMA_ANALYZER_MODEL:-qwen2.5:72b}
       - ASSETS_DIR=/app/assets
       - EXPORTS_DIR=/app/exports
     volumes:
